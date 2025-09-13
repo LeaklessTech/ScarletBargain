@@ -5,34 +5,40 @@ using UnityEngine.EventSystems;
 
 public class MenuController : MonoBehaviour
 {
+    public string gameSceneName = "MainScene";
+    public GameObject firstSelected;
+    private GameObject quitConfirmPanel;
 
     private void OnEnable()
     {
-
+        if (firstSelected != null && EventSystem.current != null)
+        {
+            EventSystem.current.SetSelectedGameObject(firstSelected);
+        }
     }
 
     public void StartGame()
     {
-
+        SceneManager.LoadScene(gameSceneName, LoadSceneMode.Single);
     }
 
     public void QuitGameImmediate()
     {
-
+        Application.Quit();
     }
 
-    public void ShowQuitConfirm()
-    {
+    // public void ShowQuitConfirm()
+    // {
 
-    }
+    // }
 
-    public void ConfirmQuit()
-    {
+    // public void ConfirmQuit()
+    // {
 
-    }
+    // }
 
-    public void CancelQuit()
-    {
-        
-    }
+    // public void CancelQuit()
+    // {
+
+    // }
 }
