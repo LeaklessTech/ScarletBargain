@@ -4,8 +4,9 @@ using UnityEngine;
 public class PlayerRigidbodyController : MonoBehaviour
 {
     [Header("Movement")]
-    public float speed = 6f;
-    public float jumpForce = 5f;
+    public float speed = 1f;
+    public float jumpForce = 1f;
+    public float fallMultiplier = 1f;
 
     [Header("Ground Check")]
     public Transform groundCheck;
@@ -47,6 +48,11 @@ public class PlayerRigidbodyController : MonoBehaviour
         }
 
         wantJump = false;
+
+        if (rb.linearVelocity.y < 0) // if falling
+        {
+            rb.linearVelocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
+        }
     }
 
     void OnDrawGizmosSelected()
