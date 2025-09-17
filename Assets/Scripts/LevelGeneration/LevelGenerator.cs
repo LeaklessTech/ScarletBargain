@@ -1,206 +1,127 @@
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class LevelGenerator : MonoBehaviour
+namespace LevelGeneration
 {
-    [Header("Level Size")]
-    public int LevelWidth = 10;
-    public int LevelLength = 10;
 
-    [Header("Rooms")]
-    public int MinRoomSize = 2;
-    public int MaxRoomSize = 5;
-    public int RoomCount = 5;
-    [Tooltip("How many failed placement attempts before we give up on adding more rooms")]
-    public int retryLimit = 50;
-
-    [Header("Tiles")]
-    public GameObject floorTilePrefab;
-    [Tooltip("World-space spacing between tiles (matches tile prefab footprint)")]
-    public int objectSizeOffset = 10;
-
-    private GameObject[,] floorGrid;
-    private bool[,] used; // tiles that belong to rooms
-
-    // For overlap checking
-    private readonly List<RectInt> placedRooms = new List<RectInt>();
-
-    void Start()
+    public class LevelGenerator : MonoBehaviour
     {
-        BuildBaseGrid();
-        PlaceRandomRooms();
-        CullUnusedTiles();
-        CarveRoomWalls();
-    }
+        [Header("Level Size")]
+        public int LevelWidth = 10;
+        public int LevelLength = 10;
 
-    void BuildBaseGrid()
-    {
-        floorGrid = new GameObject[LevelWidth, LevelLength];
-        used = new bool[LevelWidth, LevelLength];
+        [Header("Room Parameters")]
+        public int MinRoomWidth = 2;
+        public int MaxRoomWidth = 5;
 
-        var parent = new GameObject("FloorGrid").transform;
-        parent.SetParent(transform, worldPositionStays: true);
+        public int MinRoomLength = 2;
+        public int MaxRoomLength = 5;
 
-        for (int x = 0; x < LevelWidth; x++)
+        public int RoomCount = 5;
+
+        [Tooltip("How many failed placement attempts before we give up on adding more rooms")]
+        public int retryLimit = 50;
+
+        [Header("Tile Prefab")]
+        public GameObject floorTilePrefab;
+
+        [Tooltip("World-space spacing between tiles (matches tile prefab footprint)")]
+        public int objectSizeOffset = 10;
+
+        private GameObject[,] floorGrid;
+        private bool[,] used; // tiles that belong to rooms
+
+        // For overlap checking
+        private readonly List<Room> placedRooms = new();
+
+        void Start()
         {
-            for (int z = 0; z < LevelLength; z++)
+            // Generate initial grid
+            GenerateBase();
+            // Randomly create rooms
+            CreateRooms();
+            // Build Grid
+        }
+        
+
+        private void GenerateBase()
+        {
+            for (int i = 0; i < LevelWidth; i++)
             {
-                Vector3 position = new Vector3(x * objectSizeOffset, 0f, z * objectSizeOffset);
-                var tile = Instantiate(floorTilePrefab, position, Quaternion.identity, parent);
-                tile.name = $"Tile_{x}_{z}";
-                floorGrid[x, z] = tile;
-                used[x, z] = false; // default to not used; rooms will mark true
-            }
-        }
-    }
-
-    void PlaceRandomRooms()
-    {
-        // Clamp sizes
-        int minSize = Mathf.Max(1, Mathf.Min(MinRoomSize, MaxRoomSize));
-        int maxSize = Mathf.Max(minSize, MaxRoomSize);
-
-        int placed = 0;
-        int attempts = 0;
-
-        int padding = 1;
-
-        while (placed < RoomCount && attempts < retryLimit)
-        {
-            attempts++;
-
-            int rw = Random.Range(minSize, maxSize + 1);
-            int rh = Random.Range(minSize, maxSize + 1);
-
-            if (rw > LevelWidth || rh > LevelLength)
-                continue;
-
-            // Choose top-left anchor within bounds
-            int x = Random.Range(0, LevelWidth - rw + 1);
-            int z = Random.Range(0, LevelLength - rh + 1);
-
-            var room = new RectInt(x, z, rw, rh);
-
-            if (OverlapsExisting(room, padding))
-                continue;
-
-            // Accept room: mark tiles as used
-            for (int ix = room.xMin; ix < room.xMax; ix++)
-                for (int iz = room.yMin; iz < room.yMax; iz++)
-                    used[ix, iz] = true;
-
-            placedRooms.Add(room);
-            placed++;
-        }
-
-        if (placed < RoomCount)
-        {
-            Debug.LogWarning($"LevelGenerator: Only placed {placed}/{RoomCount} rooms after {attempts} attempts. Consider lowering RoomCount, sizes, or padding.");
-        }
-    }
-
-    bool OverlapsExisting(RectInt room, int padding)
-    {
-        // Expand by padding and check intersection with any placed room
-        var expanded = new RectInt(room.xMin - padding, room.yMin - padding, room.width + 2 * padding, room.height + 2 * padding);
-        foreach (var r in placedRooms)
-        {
-            if (expanded.Overlaps(r))
-                return true;
-        }
-        return false;
-    }
-
-    void CullUnusedTiles()
-    {
-        for (int x = 0; x < LevelWidth; x++)
-        {
-            for (int z = 0; z < LevelLength; z++)
-            {
-                if (!used[x, z] && floorGrid[x, z] != null)
+                for (int j = 0; j < LevelLength; j++)
                 {
-                    floorGrid[x, z].SetActive(false); // hide tiles not in any room
+                    Vector3 createAt = new Vector3(i * objectSizeOffset, 0, j * objectSizeOffset);
+
+                    GameObject newTile = Instantiate(floorTilePrefab, createAt, Quaternion.identity);
+
+                    floorGrid[i, j] = newTile;
+
+                    // we'll only want rooms to be visible/enabled
+                    // unused rooms should be removed in the end (maybe)
+                    newTile.SetActive(false);
                 }
             }
         }
-    }
 
-    void CarveRoomWalls()
-    {
-        // For every "used" tile, remove shared walls with used neighbors
-        for (int x = 0; x < LevelWidth; x++)
+        private void CreateRooms()
         {
-            for (int z = 0; z < LevelLength; z++)
+            // this is just here for debugging
+            int failedPlacements = 0;
+
+            for (int currentRoom = 0; currentRoom < RoomCount; currentRoom++)
             {
-                if (!used[x, z]) continue;
-
-                // North is Z-
-                if (IsUsed(x, z - 1))
+                for (int currentAttempt = 0; currentAttempt < retryLimit; currentAttempt++)
                 {
-                    SetWallActive(floorGrid[x, z], "NorthWall", false);
-                    SetWallActive(floorGrid[x, z - 1], "SouthWall", false);
-                }
+                    // randomly decide room size and position based on parameters
+                    int thisRoomWidth = Random.Range(MinRoomWidth, MaxRoomWidth);
+                    int thisRoomLength = Random.Range(MinRoomLength, MaxRoomLength);
 
-                // South is Z+
-                if (IsUsed(x, z + 1))
-                {
-                    SetWallActive(floorGrid[x, z], "SouthWall", false);
-                    SetWallActive(floorGrid[x, z + 1], "NorthWall", false);
-                }
+                    int thisRoomX = Random.Range(0, floorGrid.Length);
+                    int thisRoomY = Random.Range(0, floorGrid.Length);
 
-                // West is X+ 
-                if (IsUsed(x + 1, z))
-                {
-                    SetWallActive(floorGrid[x, z], "WestWall", false);
-                    SetWallActive(floorGrid[x + 1, z], "EastWall", false);
-                }
+                    RectInt thisRoom = new(thisRoomX, thisRoomY, thisRoomWidth, thisRoomLength);
 
-                // East is X-
-                if (IsUsed(x - 1, z))
-                {
-                    SetWallActive(floorGrid[x, z], "EastWall", false);
-                    SetWallActive(floorGrid[x - 1, z], "WestWall", false);
+                    // perform bounds checking, retry up to limit if bounds dont allow
+                    if(BoundsCheck(thisRoom))
+                    {
+                        placedRooms.Add(new(thisRoom));
+                        break;
+                    }
+                    else if (currentAttempt == retryLimit - 1)
+                        failedPlacements++;
                 }
             }
-        }
-    }
 
-    bool IsUsed(int x, int z)
-    {
-        // First check bounds
-        bool inBounds = x >= 0 && x < LevelWidth && z >= 0 && z < LevelLength;
-        if (!inBounds)
-        {
-            return false;
+            Debug.Log($"{RoomCount - failedPlacements}/{RoomCount} Rooms were created.");
         }
 
-        // Grab the tile object and used flag
-        GameObject tile = floorGrid[x, z];
-        bool markedUsed = used[x, z];
-
-        // Check that it's marked used, exists, and is active
-        if (markedUsed && tile != null && tile.activeSelf)
+        private bool BoundsCheck(RectInt room)
         {
+            int matrixWidth = floorGrid.GetLength(0);
+            int matrixHeight = floorGrid.GetLength(1);
+
+            // given the way the xMin and yMin are picked via random, this should never be under 0
+            bool insideMatrix = room.yMin >= 0 &&
+                                room.yMax <= matrixHeight &&
+                                room.xMin <= matrixWidth &&
+                                room.xMax >= 0;
+
+            if (room.yMin < 0 || room.xMin < 0)
+                Debug.LogWarning($"WARNING: Room starting point ({room.xMin},{room.yMin}) was set to less than 0, check LevelGenerator.cs");
+
+            if (!insideMatrix)
+                return false;
+
+            bool notIntersectingRoom = placedRooms.All(r => r.BoundsCheck(room));
+
+            if (!notIntersectingRoom)
+                return false;
+
             return true;
         }
 
-        return false;
-    }
-    void SetWallActive(GameObject tile, string wallName, bool active)
-    {
-        if (tile == null) return;
-        Transform child = tile.transform.Find(wallName);
-        if (child != null)
-        {
-            if (child.gameObject.activeSelf != active)
-                child.gameObject.SetActive(active);
-        }
-#if UNITY_EDITOR
-        else
-        {
-            Debug.LogWarning($"LevelGenerator: Could not find child '{wallName}' on '{tile.name}'. Check prefab child names.");
-        }
-#endif
-    }
 
+    }
 }
