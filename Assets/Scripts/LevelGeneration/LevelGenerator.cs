@@ -5,8 +5,7 @@ using UnityEngine;
 
 namespace LevelGeneration
 {
-
-    public class LevelGenerator : MonoBehaviour
+    public partial class LevelGenerator : MonoBehaviour
     {
         [Header("Level Size")]
         public int LevelWidth = 10;
@@ -56,6 +55,8 @@ namespace LevelGeneration
             CreateRooms();
             // Build Grid
             GenerateGrid();
+            // Create connections
+            GenerateHallways();
         }
 
         private void GenerateGrid()
