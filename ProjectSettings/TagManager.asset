@@ -4,12 +4,13 @@
 TagManager:
   serializedVersion: 3
   tags:
+  - ground
   - Monster
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
   - 
