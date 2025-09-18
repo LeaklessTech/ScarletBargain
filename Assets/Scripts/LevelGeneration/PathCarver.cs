@@ -14,7 +14,7 @@ namespace LevelGeneration
         ("SouthWall", new Vector2Int(0, 1), "NorthWall"),
         ("EastWall",  new Vector2Int(-1,0), "WestWall"),
         ("WestWall",  new Vector2Int( 1,0), "EastWall"),
-    };
+        };
 
         private void GenerateHallways()
         {
@@ -33,7 +33,6 @@ namespace LevelGeneration
 
         private List<(Room a, Room b)> BuildConnections(List<Room> rooms, int extraEdges = 0)
         {
-            // Fully connect via pairwise distances between rect centers
             var edges = new List<(Room a, Room b, float w)>();
             for (int i = 0; i < rooms.Count; i++)
                 for (int j = i + 1; j < rooms.Count; j++)
@@ -58,7 +57,6 @@ namespace LevelGeneration
                 }
             }
 
-            // Optional: add a few extra short edges for loops
             var remaining = sorted
                 .Where(e => !chosen.Any(c => (c.a == e.a && c.b == e.b) || (c.a == e.b && c.b == e.a)))
                 .Take(extraEdges)
@@ -98,7 +96,7 @@ namespace LevelGeneration
             foreach (var pa in PerimeterCells(a.bounds))
                 foreach (var pb in PerimeterCells(b.bounds))
                 {
-                    int d = Mathf.Abs(pa.x - pb.x) + Mathf.Abs(pa.y - pb.y); // Manhattan
+                    int d = Mathf.Abs(pa.x - pb.x) + Mathf.Abs(pa.y - pb.y); 
                     if (d < best.d)
                         best = (pa, pb, d);
                 }
@@ -106,17 +104,12 @@ namespace LevelGeneration
             return (best.from, best.to);
         }
 
-        // ---------------------------------------------
-        // (3) Carving: simple L-path
-        // ---------------------------------------------
         private void CarveCorridorL(Vector2Int start, Vector2Int end)
         {
-            // Randomize order for variety
             bool xFirst = UnityEngine.Random.value < 0.5f;
 
             Vector2Int cur = start;
 
-            // ensure start tile exists/active (opens door on edge when next step happens)
             EnsureTile(cur);
 
             if (xFirst)
@@ -167,13 +160,11 @@ namespace LevelGeneration
             var tileB = floorGrid[b.x, b.y];
             if (tileA == null || tileB == null) return;
 
-            // activate corridor tiles
             tileA.SetActive(true);
             tileB.SetActive(true);
 
             var delta = b - a;
 
-            // remove matching walls on both tiles
             foreach (var (wall, d, opposite) in DirsWithOpp)
             {
                 if (d == delta)
