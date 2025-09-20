@@ -18,6 +18,9 @@ public class FieldOfView : MonoBehaviour
     public bool searchForPlayer = true;
     public float delay = 0.2f;
 
+    // When player is found send an alert to all listeners
+    public static event Action onPlayerFound;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -55,7 +58,10 @@ public class FieldOfView : MonoBehaviour
                 float distanceToTarget = Vector3.Distance(transform.position, target.position);
 
                 if (!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstructionMask))
+                {
                     canSeePlayer = true;
+                    onPlayerFound?.Invoke();
+                }
                 else
                 {
                     canSeePlayer = false;
