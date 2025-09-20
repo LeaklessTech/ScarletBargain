@@ -4,22 +4,22 @@ using UnityEngine;
 
 public class FieldOfView : MonoBehaviour
 {
-    public float radius;
+    public float Radius;
     [Range(0, 360)]
-    public float angle;
+    public float Angle;
 
-    public GameObject targetRef;
+    public GameObject TargetRef;
 
-    public LayerMask targetMask;
-    public LayerMask obstructionMask;
+    public LayerMask TargetMask;
+    public LayerMask ObstructionMask;
 
-    public bool canSeePlayer;
+    public bool CanSeePlayer;
     // Default to true for now
-    public bool searchForPlayer = true;
-    public float delay = 0.2f;
+    public bool SearchForPlayer = true;
+    public float Delay = 0.2f;
 
     // When player is found send an alert to all listeners
-    public static event Action onPlayerFound;
+    public static event Action OnPlayerFound;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -29,7 +29,7 @@ public class FieldOfView : MonoBehaviour
 
     private IEnumerator FOVRoutine()
     {
-        WaitForSeconds wait = new WaitForSeconds(delay);
+        WaitForSeconds wait = new WaitForSeconds(Delay);
 
         while (true)
         {
@@ -40,45 +40,45 @@ public class FieldOfView : MonoBehaviour
 
     private void FieldOfViewCheck()
     {
-        Collider[] rangeChecks = Physics.OverlapSphere(transform.position, radius, targetMask);
+        Collider[] rangeChecks = Physics.OverlapSphere(transform.position, Radius, TargetMask);
 
         if (rangeChecks.Length != 0)
         {
             for (int i = 0; i <= rangeChecks.Length; i++)
             {
-                targetRef = rangeChecks[i].gameObject;
+                TargetRef = rangeChecks[i].gameObject;
                 break;
             }
 
-            Transform target = targetRef.transform;
+            Transform target = TargetRef.transform;
             Vector3 directionToTarget = (target.position - transform.position).normalized;
 
-            if (Vector3.Angle(transform.forward, directionToTarget) < angle / 2)
+            if (Vector3.Angle(transform.forward, directionToTarget) < Angle / 2)
             {
                 float distanceToTarget = Vector3.Distance(transform.position, target.position);
 
-                if (!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstructionMask))
+                if (!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, ObstructionMask))
                 {
-                    canSeePlayer = true;
-                    onPlayerFound?.Invoke();
+                    CanSeePlayer = true;
+                    OnPlayerFound?.Invoke();
                 }
                 else
                 {
-                    canSeePlayer = false;
-                    targetRef = null;
+                    CanSeePlayer = false;
+                    TargetRef = null;
                 }
             }
             else
             {
-                canSeePlayer = false;
-                targetRef = null;
+                CanSeePlayer = false;
+                TargetRef = null;
             }
         }
         else // Can no longer see target, so set to false
-            if (canSeePlayer)
+            if (CanSeePlayer)
             {
-                canSeePlayer = false;
-                targetRef = null;
+                CanSeePlayer = false;
+                TargetRef = null;
             }
     }
 
