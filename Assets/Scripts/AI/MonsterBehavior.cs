@@ -4,8 +4,8 @@ using UnityEngine.AI;
 public class MonsterBehavior : MonoBehaviour
 {
     // Parent Tree
-    public BehaviorTree tree;
-    public Node.Status treeStatus = Node.Status.RUNNING;
+    public BehaviorTree Tree;
+    public Node.Status TreeStatus = Node.Status.RUNNING;
 
     NavMeshAgent agent;
 
@@ -19,10 +19,10 @@ public class MonsterBehavior : MonoBehaviour
 
     // Specific Behavior Trees
     BehaviorTree chaseTree = new BehaviorTree();
-    public Node.Status chaseStatus;
+    public Node.Status ChaseStatus;
 
     BehaviorTree patrolTree = new BehaviorTree();
-    public Node.Status patrolStatus;
+    public Node.Status PatrolStatus;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -30,7 +30,7 @@ public class MonsterBehavior : MonoBehaviour
     {
         agent = this.GetComponent<NavMeshAgent>();
 
-        tree = new BehaviorTree();
+        Tree = new BehaviorTree();
         Sequence move = new Sequence("Move to objects");
         Leaf goToObject = new Leaf("Go to object", GoToObject);
         Leaf goToOtherGoal = new Leaf("Go to second object", GoToOtherGoal);
@@ -38,14 +38,14 @@ public class MonsterBehavior : MonoBehaviour
         move.AddChild(goToObject);
         move.AddChild(goToOtherGoal);
 
-        tree.AddChild(move);
-        tree.PrintTree();
+        Tree.AddChild(move);
+        Tree.PrintTree();
     }
 
     void Update()
     {
-        if (treeStatus != Node.Status.SUCCESS)
-            treeStatus = tree.Process();
+        if (TreeStatus != Node.Status.SUCCESS)
+            TreeStatus = Tree.Process();
     }
 
     #region Behaviors
