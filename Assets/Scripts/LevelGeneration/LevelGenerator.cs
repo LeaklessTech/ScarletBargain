@@ -18,6 +18,8 @@ namespace LevelGeneration
         public int MinRoomLength = 2;
         public int MaxRoomLength = 5;
 
+        public int RoomBuffer = 1;
+
         public int RoomCount = 5;
 
         [Tooltip("How many failed placement attempts before we give up on adding more rooms")]
@@ -30,8 +32,9 @@ namespace LevelGeneration
         public int objectSizeOffset = 10;
 
         private GameObject[,] floorGrid;
-        private bool[,] used; // tiles that belong to rooms
 
+        private GameObject LevelObject;
+        
         // For overlap checking
         private readonly List<Room> placedRooms = new();
 
@@ -43,12 +46,11 @@ namespace LevelGeneration
             ("WestWall",  new Vector2Int(1,  0)),
         };
 
-
         void Start()
         {
+            LevelObject = new("Level");
+
             floorGrid = new GameObject[LevelWidth, LevelLength];
-
-
             // Generate initial grid
             GenerateBase();
             // Randomly create rooms
@@ -56,8 +58,25 @@ namespace LevelGeneration
             // Build Grid
             GenerateGrid();
             // Create connections
-            GenerateHallways();
+            //GenerateHallways();
+
+            //foreach (var veccy in vec)
+            //{
+            //    Debug.Log(veccy);
+            //}    
         }
+
+        public List<Vector3> vec;
+
+        private void Update()
+        {
+            List<Vector3> veccy = CreateBWDelaunay(LevelObject);
+
+            Debug.DrawLine(veccy[0], veccy[1], Color.red, 0.01f);
+            Debug.DrawLine(veccy[1], veccy[2], Color.red, 0.01f);
+            Debug.DrawLine(veccy[2], veccy[0], Color.red, 0.01f);
+        }
+
 
         private void GenerateGrid()
         {
@@ -69,33 +88,32 @@ namespace LevelGeneration
 
         private void RefineRoom(Room room, bool disableInsteadOfDestroy = true)
         {
-            // optional: guard in case someone passes a mismatched grid
             if (floorGrid == null) return;
 
-            foreach (var pos in room.bounds.allPositionsWithin)
+            foreach (var tilePosition in room.bounds.allPositionsWithin)
             {
-                var tile = floorGrid[pos.x, pos.y];
-                if (tile == null) continue;
+                var tile = floorGrid[tilePosition.x, tilePosition.y];
+                if (tile == null) 
+                    continue;
                 tile.SetActive(true);
 
 
                 // For each direction, if the neighbor is ALSO inside the rect,
                 // remove this tile's wall that faces that neighbor.
                 // (When we iterate the neighbor tile later, its opposite wall will also be removed.)
-                foreach (var (wall, d) in Dirs)
+                foreach (var (wall, direction) in Dirs)
                 {
-                    Vector2Int n = pos + d;
+                    Vector2Int n = tilePosition + direction;
                     if (room.bounds.Contains(n))
                     {
-                        RemoveChild(tile, wall, disableInsteadOfDestroy);
+                        RemoveWall(tile, wall, disableInsteadOfDestroy);
                     }
                 }
             }
         }
 
-        private static void RemoveChild(GameObject parent, string childName, bool disable)
+        private static void RemoveWall(GameObject parent, string childName, bool disable)
         {
-            // Find() is fine for modest sizes; for large grids, consider caching child refs.
             var t = parent.transform.Find(childName);
             if (t == null) return;
 
@@ -146,7 +164,16 @@ namespace LevelGeneration
                     // perform bounds checking, retry up to limit if bounds dont allow
                     if (BoundsCheck(potentialRoom))
                     {
-                        placedRooms.Add(new(potentialRoom));
+                        GameObject roomObject = new($"Room {placedRooms.Count + 1}");
+
+                        foreach (var position in potentialRoom.allPositionsWithin)
+                        {
+                            floorGrid[position.x, position.y].transform.parent = roomObject.transform;
+                            roomObject.transform.parent = LevelObject.transform;
+                        }
+
+                        placedRooms.Add(new(potentialRoom, roomObject));
+                       
                         break;
                     }
                     else if (currentAttempt == retryLimit - 1)
@@ -162,26 +189,24 @@ namespace LevelGeneration
             int matrixWidth = floorGrid.GetLength(0);
             int matrixHeight = floorGrid.GetLength(1);
 
-            // given the way the xMin and yMin are picked via random, this should never be under 0
             bool insideMatrix =
                 room.xMin >= 0 &&
                 room.yMin >= 0 &&
                 room.xMax <= matrixWidth &&
                 room.yMax <= matrixHeight;
 
+            if (!insideMatrix) return false;
 
-            if (room.yMin < 0 || room.xMin < 0)
-                Debug.LogWarning($"WARNING: Room starting point ({room.xMin},{room.yMin}) was set to less than 0, check LevelGenerator.cs");
-
-            if (!insideMatrix)
-                return false;
-
-            bool notIntersectingRoom = placedRooms.All(r => !r.Intersects(room));
-
-            if (!notIntersectingRoom)
-                return false;
+            bool spacedFromOthers = placedRooms.All(r => !Inflate(r.bounds, RoomBuffer).Overlaps(room));
+            if (!spacedFromOthers) return false;
 
             return true;
+        }
+
+        // lets us modify bounds checking for the buffer without needing to do much rewrite
+        private static RectInt Inflate(RectInt r, int n)
+        {
+            return new RectInt(r.xMin - n, r.yMin - n, r.width + 2 * n, r.height + 2 * n);
         }
 
     }

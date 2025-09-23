@@ -12,18 +12,12 @@ namespace LevelGeneration
         // note that bounds.x and bounds.y refer to the top left corner
         public RectInt bounds { get; private set; }
 
-        List<GameObject> tiles;
+        public GameObject roomObject { get; private set; }
 
-        public Room(RectInt RoomBounds)
+        public Room(RectInt RoomBounds, GameObject roomObject)
         {
             this.bounds = RoomBounds;
+            this.roomObject = roomObject;
         }
-
-        // checks if a given point exists inside the room
-        public bool BoundsCheck(Vector2Int point) => bounds.Contains(point);
-
-        public bool Intersects(RectInt other) => bounds.Overlaps(other);
-
-
     }
 }
