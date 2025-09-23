@@ -58,7 +58,7 @@ namespace LevelGeneration
             // Build Grid
             GenerateGrid();
             // Create connections
-            //GenerateHallways();
+            GenerateHallways();
 
             //foreach (var veccy in vec)
             //{
@@ -70,11 +70,11 @@ namespace LevelGeneration
 
         private void Update()
         {
-            List<Vector3> veccy = CreateBWDelaunay(LevelObject);
+            //List<Vector3> veccy = CreateBWDelaunay(LevelObject);
 
-            Debug.DrawLine(veccy[0], veccy[1], Color.red, 0.01f);
-            Debug.DrawLine(veccy[1], veccy[2], Color.red, 0.01f);
-            Debug.DrawLine(veccy[2], veccy[0], Color.red, 0.01f);
+            //Debug.DrawLine(veccy[0], veccy[1], Color.red, 0.01f);
+            //Debug.DrawLine(veccy[1], veccy[2], Color.red, 0.01f);
+            //Debug.DrawLine(veccy[2], veccy[0], Color.red, 0.01f);
         }
 
 
@@ -209,5 +209,17 @@ namespace LevelGeneration
             return new RectInt(r.xMin - n, r.yMin - n, r.width + 2 * n, r.height + 2 * n);
         }
 
+        // readding this method temporarily
+        private static void RemoveChild(GameObject parent, string childName, bool disable)
+        {
+            // Find() is fine for modest sizes; for large grids, consider caching child refs.
+            var t = parent.transform.Find(childName);
+            if (t == null) return;
+
+            if (disable)
+                t.gameObject.SetActive(false);
+            else
+                Object.Destroy(t.gameObject);
+        }
     }
 }

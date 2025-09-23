@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,50 +7,195 @@ namespace LevelGeneration
 {
     public partial class LevelGenerator
     {
-        // first, we'll need to create a Delaunay Triangulation graph using bowyer-watson
+        // Same Dirs you fixed earlier, aligned with your wall orientation.
+        private static readonly (string wall, Vector2Int d, string opposite)[] DirsWithOpp =
+        {
+        ("NorthWall", new Vector2Int(0,-1), "SouthWall"),
+        ("SouthWall", new Vector2Int(0, 1), "NorthWall"),
+        ("EastWall",  new Vector2Int(-1,0), "WestWall"),
+        ("WestWall",  new Vector2Int( 1,0), "EastWall"),
+    };
 
-        private List<Vector3> CreateBWDelaunay(GameObject Level)
-        {  
-            // for debug
-            List<Vector3> vector3s = new List<Vector3>();
+        private void GenerateHallways()
+        {
+            // 1) Build room graph and pick connections (MST + optional extra edges)
+            var edgesToConnect = BuildConnections(placedRooms, extraEdges: Mathf.CeilToInt(placedRooms.Count * 0.25f));
 
-            Vector3 min = new(float.MaxValue, float.MaxValue, float.MaxValue);
-            Vector3 max = new(float.MinValue, float.MinValue, float.MinValue);
-
-            foreach (var t in Level.GetComponentsInChildren<Transform>())
+            // 2) For each connection, pick doorway cells (closest perimeter pair)
+            foreach (var (a, b) in edgesToConnect)
             {
-                if (t == Level.transform) 
-                    continue; 
-                Vector3 p = t.position; 
-                min = Vector3.Min(min, p);
-                max = Vector3.Max(max, p);
+                var (fromCell, toCell) = ClosestPerimeterCells(a, b);
+
+                // 3) Carve corridor (simple L-shape for now)
+                CarveCorridorL(fromCell, toCell);
             }
-
-            // start by creating super triangle that contains all rooms
-
-            Vector3 center = (min + max) * 0.5f;
-
-            float triangleWidth = max.x - min.x;
-            float triangleLength = max.z - min.z;
-
-            float L = Mathf.Max(triangleWidth, triangleLength);
-            float triangleScale = Mathf.Max(1f, 1.2f * L); 
-
-            float y0 = center.y;
-
-            Vector3 triangleVertex1 = new(center.x, y0, center.z - 2f * triangleScale);
-            Vector3 triangleVertex2 = new(center.x - triangleScale, y0, center.z + triangleScale);
-            Vector3 triangleVertex3 = new(center.x + triangleScale, y0, center.z + triangleScale);
-
-            
-
-            return vector3s;
         }
 
-        // once the graph is created, we'll use either Prim's or Kruskal's to create an MST (ensures all rooms are reachable)
+        private List<(Room a, Room b)> BuildConnections(List<Room> rooms, int extraEdges = 0)
+        {
+            // Fully connect via pairwise distances between rect centers
+            var edges = new List<(Room a, Room b, float w)>();
+            for (int i = 0; i < rooms.Count; i++)
+                for (int j = i + 1; j < rooms.Count; j++)
+                    edges.Add((rooms[i], rooms[j], RoomDistance(rooms[i], rooms[j])));
 
-        // once MST is created, we'll delete non-MST edges, randomly leaving some (this creates loops)
+            // Kruskal MST
+            var sorted = edges.OrderBy(e => e.w).ToList();
+            var parent = new Dictionary<Room, Room>();
+            foreach (var r in rooms) parent[r] = r;
 
-        // we'll then be left with a (cyclic?) graph with loops - which we'll then use A* to carve paths 
+            Room Find(Room x) => parent[x] == x ? x : (parent[x] = Find(parent[x]));
+            void Union(Room x, Room y) { x = Find(x); y = Find(y); if (x != y) parent[x] = y; }
+
+            var chosen = new List<(Room a, Room b)>();
+            foreach (var (a, b, _) in sorted)
+            {
+                if (Find(a) != Find(b))
+                {
+                    Union(a, b);
+                    chosen.Add((a, b));
+                    if (chosen.Count == rooms.Count - 1) break;
+                }
+            }
+
+            // Optional: add a few extra short edges for loops
+            var remaining = sorted
+                .Where(e => !chosen.Any(c => (c.a == e.a && c.b == e.b) || (c.a == e.b && c.b == e.a)))
+                .Take(extraEdges)
+                .Select(e => (e.a, e.b));
+
+            chosen.AddRange(remaining);
+            return chosen;
+        }
+
+        private static float RoomDistance(Room a, Room b)
+        {
+            var ac = a.bounds.center; // Vector2int-like center (RectInt gives x+width/2, y+height/2)
+            var bc = b.bounds.center;
+            return Vector2.Distance((Vector2)ac, (Vector2)bc);
+        }
+
+        private static IEnumerable<Vector2Int> PerimeterCells(RectInt r)
+        {
+            // top/bottom edges
+            for (int x = r.xMin; x < r.xMax; x++)
+            {
+                yield return new Vector2Int(x, r.yMin);
+                yield return new Vector2Int(x, r.yMax - 1);
+            }
+            // left/right edges
+            for (int y = r.yMin + 1; y < r.yMax - 1; y++)
+            {
+                yield return new Vector2Int(r.xMin, y);
+                yield return new Vector2Int(r.xMax - 1, y);
+            }
+        }
+
+        private static (Vector2Int from, Vector2Int to) ClosestPerimeterCells(Room a, Room b)
+        {
+            var best = (from: new Vector2Int(), to: new Vector2Int(), d: int.MaxValue);
+
+            foreach (var pa in PerimeterCells(a.bounds))
+                foreach (var pb in PerimeterCells(b.bounds))
+                {
+                    int d = Mathf.Abs(pa.x - pb.x) + Mathf.Abs(pa.y - pb.y); // Manhattan
+                    if (d < best.d)
+                        best = (pa, pb, d);
+                }
+
+            return (best.from, best.to);
+        }
+
+        // ---------------------------------------------
+        // (3) Carving: simple L-path
+        // ---------------------------------------------
+        private void CarveCorridorL(Vector2Int start, Vector2Int end)
+        {
+            // Randomize order for variety
+            bool xFirst = UnityEngine.Random.value < 0.5f;
+
+            Vector2Int cur = start;
+
+            // ensure start tile exists/active (opens door on edge when next step happens)
+            EnsureTile(cur);
+
+            if (xFirst)
+            {
+                // step x
+                int dx = Math.Sign(end.x - cur.x);
+                while (cur.x != end.x)
+                {
+                    var next = new Vector2Int(cur.x + dx, cur.y);
+                    CarveStep(cur, next);
+                    cur = next;
+                }
+                // step y
+                int dy = Math.Sign(end.y - cur.y);
+                while (cur.y != end.y)
+                {
+                    var next = new Vector2Int(cur.x, cur.y + dy);
+                    CarveStep(cur, next);
+                    cur = next;
+                }
+            }
+            else
+            {
+                // step y
+                int dy = Math.Sign(end.y - cur.y);
+                while (cur.y != end.y)
+                {
+                    var next = new Vector2Int(cur.x, cur.y + dy);
+                    CarveStep(cur, next);
+                    cur = next;
+                }
+                // step x
+                int dx = Math.Sign(end.x - cur.x);
+                while (cur.x != end.x)
+                {
+                    var next = new Vector2Int(cur.x + dx, cur.y);
+                    CarveStep(cur, next);
+                    cur = next;
+                }
+            }
+        }
+
+        private void CarveStep(Vector2Int a, Vector2Int b)
+        {
+            if (!InBounds(a) || !InBounds(b)) return;
+
+            var tileA = floorGrid[a.x, a.y];
+            var tileB = floorGrid[b.x, b.y];
+            if (tileA == null || tileB == null) return;
+
+            // activate corridor tiles
+            tileA.SetActive(true);
+            tileB.SetActive(true);
+
+            var delta = b - a;
+
+            foreach (var (wall, d, opposite) in DirsWithOpp)
+            {
+                if (d == delta)
+                {
+                    RemoveChild(tileA, wall, disable: true);
+                    RemoveChild(tileB, opposite, disable: true);
+                    break;
+                }
+            }
+        }
+
+        private bool InBounds(Vector2Int p)
+        {
+            int w = floorGrid.GetLength(0);
+            int h = floorGrid.GetLength(1);
+            return p.x >= 0 && p.y >= 0 && p.x < w && p.y < h;
+        }
+
+        private void EnsureTile(Vector2Int p)
+        {
+            if (!InBounds(p)) return;
+            var t = floorGrid[p.x, p.y];
+            if (t != null) t.SetActive(true);
+        }
     }
 }
