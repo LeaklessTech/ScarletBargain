@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 403060639}
   - component: {fileID: 403060638}
   - component: {fileID: 403060637}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: SecondGoal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -673,7 +673,7 @@ GameObject:
   - component: {fileID: 2113640838}
   - component: {fileID: 2113640837}
   - component: {fileID: 2113640836}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Goal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -780,6 +780,10 @@ PrefabInstance:
     - target: {fileID: 1970763974180988928, guid: 53e23f5d24fd729f399e0d39ee89844c, type: 3}
       propertyPath: m_Name
       value: Monster
+      objectReference: {fileID: 0}
+    - target: {fileID: 5557874361033515406, guid: 53e23f5d24fd729f399e0d39ee89844c, type: 3}
+      propertyPath: angle
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 6077744517542096031, guid: 53e23f5d24fd729f399e0d39ee89844c, type: 3}
       propertyPath: m_LocalPosition.x
