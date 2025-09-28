@@ -47,6 +47,13 @@ public class PlayerRigidbodyController : MonoBehaviour
         Vector3 target = rb.position + move * speed * Time.fixedDeltaTime;
         rb.MovePosition(target);
 
+        // rotate player to face movement direction
+        if (move != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(move);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 15f * Time.fixedDeltaTime);
+        }
+
 
         // jump/fall logic
         bool isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundMask);
@@ -57,6 +64,7 @@ public class PlayerRigidbodyController : MonoBehaviour
         }
 
         wantJump = false;
+
         if (rb.linearVelocity.y < 0) // if falling
         {
             rb.linearVelocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
