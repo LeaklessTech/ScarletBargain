@@ -60,7 +60,9 @@ public class PlayerRigidbodyController : MonoBehaviour
 
         if (wantJump && isGrounded)
         {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            Vector3 vel = rb.linearVelocity;
+            vel.y = jumpForce;
+            rb.linearVelocity = vel;
         }
 
         wantJump = false;
