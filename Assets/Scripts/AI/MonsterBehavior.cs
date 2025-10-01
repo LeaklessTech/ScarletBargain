@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -7,39 +8,65 @@ public class MonsterBehavior : MonoBehaviour
     public BehaviorTree Tree;
     public Node.Status TreeStatus = Node.Status.RUNNING;
 
-    NavMeshAgent agent;
+    // Specific Behavior Trees
+    BehaviorTree chaseTree;
+    BehaviorTree stunnedTree;
+    public Node.Status ChaseStatus;
+    public Node.Status StunStatus;
 
-    // TODO: delete these object references
-    public GameObject goal;
-    public GameObject secondGoal;
+    NavMeshAgent agent;
 
     // Describes whether or not an action is currently active or not, separate from a Node Status
     public enum ActionState { IDLE, WORKING };
     ActionState state = ActionState.IDLE;
 
-    // Specific Behavior Trees
-    BehaviorTree chaseTree = new BehaviorTree();
-    public Node.Status ChaseStatus;
-
-    BehaviorTree patrolTree = new BehaviorTree();
-    public Node.Status PatrolStatus;
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         agent = this.GetComponent<NavMeshAgent>();
 
+        // Instantiate Chase Tree
+        chaseTree = new BehaviorTree();
+
+        Sequence patrolSequence = new Sequence("Patrol Sequence");
+        Leaf lookAround = new Leaf("Look around", Swivel);
+
+        Selector patrolDestroy = new Selector("Patrol or Destroy");
+        Leaf patrol = new Leaf("Go to patrol position", GoToPatrolPoint);
+        Leaf destroyItem = new Leaf("Destroy object", DestroyItem);
+        patrolDestroy.AddChild(patrol);
+        patrolDestroy.AddChild(destroyItem);
+
+        patrolSequence.AddChild(patrolDestroy);
+        patrolSequence.AddChild(lookAround);
+
+        chaseTree.AddChild(patrolSequence);
+
+        Selector huntDestroy = new Selector("Hunt or Destroy");
+        Leaf hunt = new Leaf("Go to last known character position", HuntCharacter);
+        huntDestroy.AddChild(hunt);
+        huntDestroy.AddChild(destroyItem); // reuse leaf node from above
+
+        chaseTree.AddChild(huntDestroy);
+
+        Selector lookConsume = new Selector("Look around or Consume character");
+        Leaf consume = new Leaf("Consume Character", Consume);
+        lookConsume.AddChild(lookAround); // reuse leaf node from above
+        lookConsume.AddChild(consume);
+
+        chaseTree.AddChild(lookConsume);
+
+        Leaf angry = new Leaf("Angry roar", Angry);
+        Leaf victory = new Leaf("Victory roar", Victory);
+
+        chaseTree.AddChild(angry);
+        chaseTree.AddChild(victory);
+
+        chaseTree.PrintTree();
+
+        // TODO: Instantiate Stunned Behavior Tree
+
         Tree = new BehaviorTree();
-        Sequence move = new Sequence("Move to objects");
-        Leaf goToObject = new Leaf("Go to object", GoToObject);
-        Leaf goToOtherGoal = new Leaf("Go to second object", GoToOtherGoal);
-
-        move.AddChild(goToObject);
-        move.AddChild(goToOtherGoal);
-
-        Tree.AddChild(move);
-        Tree.PrintTree();
+        Tree.AddChild(chaseTree);
     }
 
     void Update()
@@ -49,16 +76,42 @@ public class MonsterBehavior : MonoBehaviour
     }
 
     #region Behaviors
-    public Node.Status GoToObject()
+    public Node.Status Swivel()
     {
-        return GoToLocation(goal.transform.position);
+        throw new NotImplementedException();
     }
 
-    public Node.Status GoToOtherGoal()
+    public Node.Status GoToPatrolPoint()
     {
-        return GoToLocation(secondGoal.transform.position);
+        throw new NotImplementedException();
+    }
+
+    public Node.Status DestroyItem()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Node.Status HuntCharacter()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Node.Status Consume()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Node.Status Angry()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Node.Status Victory()
+    {
+        throw new NotImplementedException();
     }
     #endregion
+
 
     #region Actions
     Node.Status GoToLocation(Vector3 destination)
