@@ -11,13 +11,14 @@ namespace LevelGeneration
     {
         // note that bounds.x and bounds.y refer to the top left corner
         public RectInt bounds { get; private set; }
-
         public GameObject roomObject { get; private set; }
+        public GameObject floorTilePrefab;
 
-        public Room(RectInt RoomBounds, GameObject roomObject)
+        public Room(RectInt bounds, GameObject roomObject, GameObject floorTilePrefab)
         {
-            this.bounds = RoomBounds;
+            this.bounds = bounds;
             this.roomObject = roomObject;
+            this.floorTilePrefab = floorTilePrefab;
         }
     }
 }

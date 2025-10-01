@@ -25,8 +25,9 @@ namespace LevelGeneration
         [Tooltip("How many failed placement attempts before we give up on adding more rooms")]
         public int retryLimit = 50;
 
-        [Header("Tile Prefab")]
-        public GameObject floorTilePrefab;
+        [Header("Tile Prefabs")]
+        [Tooltip("List of floor tile prefabs to randomly select from for each room")]
+        public List<GameObject> floorTilePrefabs;
 
         [Tooltip("World-space spacing between tiles (matches tile prefab footprint)")]
         public int objectSizeOffset = 10;
@@ -129,15 +130,7 @@ namespace LevelGeneration
             {
                 for (int j = 0; j < LevelLength; j++)
                 {
-                    Vector3 createAt = new Vector3(i * objectSizeOffset, 0, j * objectSizeOffset);
-
-                    GameObject newTile = Instantiate(floorTilePrefab, createAt, Quaternion.identity);
-
-                    floorGrid[i, j] = newTile;
-
-                    // we'll only want rooms to be visible/enabled
-                    // unused rooms should be removed in the end (maybe)
-                    newTile.SetActive(false);
+                    floorGrid[i, j] = null; // initialize as null and instantiate tiles in CreateRooms
                 }
             }
         }
@@ -147,6 +140,12 @@ namespace LevelGeneration
             // this is just here for debugging
             int failedPlacements = 0;
 
+            if (floorTilePrefabs == null || floorTilePrefabs.Count == 0)
+            {
+                Debug.LogError("No floor tile prefabs assigned in LevelGenerator. Please add prefabs in the Inspector.");
+                return;
+            }
+
             for (int currentRoom = 0; currentRoom < RoomCount; currentRoom++)
             {
                 for (int currentAttempt = 0; currentAttempt < retryLimit; currentAttempt++)
@@ -154,8 +153,6 @@ namespace LevelGeneration
                     // randomly decide room size and position based on parameters
                     int potentialRoomWidth = Random.Range(MinRoomWidth, MaxRoomWidth + 1);
                     int potentialRoomLength = Random.Range(MinRoomLength, MaxRoomLength + 1);
-
-
                     int potentialRoomX = Random.Range(0, LevelWidth - potentialRoomWidth + 1);
                     int potentialRoomY = Random.Range(0, LevelLength - potentialRoomLength + 1);
 
@@ -165,15 +162,19 @@ namespace LevelGeneration
                     if (BoundsCheck(potentialRoom))
                     {
                         GameObject roomObject = new($"Room {placedRooms.Count + 1}");
+                        GameObject selectedPrefab = floorTilePrefabs[Random.Range(0, floorTilePrefabs.Count)];
 
                         foreach (var position in potentialRoom.allPositionsWithin)
                         {
-                            floorGrid[position.x, position.y].transform.parent = roomObject.transform;
-                            roomObject.transform.parent = LevelObject.transform;
+                            Vector3 createAt = new Vector3(position.x * objectSizeOffset, 0, position.y * objectSizeOffset);
+                            GameObject newTile = Instantiate(selectedPrefab, createAt, Quaternion.identity);
+                            newTile.transform.parent = roomObject.transform;
+                            floorGrid[position.x, position.y] = newTile;
+                            newTile.SetActive(false);
                         }
 
-                        placedRooms.Add(new(potentialRoom, roomObject));
-                       
+                        roomObject.transform.parent = LevelObject.transform;
+                        placedRooms.Add(new Room(potentialRoom, roomObject, selectedPrefab));
                         break;
                     }
                     else if (currentAttempt == retryLimit - 1)
