@@ -32,7 +32,7 @@ namespace GraphStructures
 
     public class Point<T> : Point
     {
-        public T Item { get; set; }
+        public T Item { get; private set; }
 
         public Point(T item)
         {

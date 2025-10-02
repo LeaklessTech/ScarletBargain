@@ -12,6 +12,7 @@ namespace GraphStructures
     {
         public Point A { get; set; }
         public Point B { get; set; }
+        public bool BadEdge { get; set; }
 
         public Edge()
         {
@@ -24,14 +25,44 @@ namespace GraphStructures
             this.B = b;
         }
 
-        public bool Equals(Edge edge)
+        // just some helpful overrides to make code cleaner
+        public static bool operator ==(Edge edgeA, Edge edgeB)
         {
-            if((A == edge.A && B == edge.B) || (A == edge.B && B == edge.A))
-                return true;
-            else
-                return false;
+            return (edgeA.A == edgeB.A || edgeA.A == edgeB.B)
+                && (edgeA.B == edgeB.A || edgeA.B == edgeB.B);
         }
 
-        public 
+        public static bool operator !=(Edge edgeA, Edge edgeB)
+        {
+            return !(edgeA == edgeB);
+        }
+
+        public bool Equals(Edge edge)
+        {
+            return this == edge;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Edge edge)
+            {
+                return this == edge;
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(A, B);
+        }
+
+
+        // alternate version of equals that will give us a little more leeway 
+        public static bool AlmostEqual(Edge left, Edge right)
+        {
+            return DelaunayTriangulation.NearEqual(left.A, right.A) && DelaunayTriangulation.NearEqual(left.B, right.B)
+                || DelaunayTriangulation.NearEqual(left.A, right.B) && DelaunayTriangulation.NearEqual(left.A, right.B);
+        }
     }
 }

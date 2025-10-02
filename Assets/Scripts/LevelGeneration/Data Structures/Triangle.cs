@@ -7,7 +7,7 @@ using UnityEngine;
 // we'll use this to create the delaunay triangulation graph
 public class Triangle : IEquatable<Triangle>
 {
-    public bool badTriangle { get; private set; }
+    public bool badTriangle { get; set; }
 
     public Point A { get; private set; }
     public Point B { get; private set; }
