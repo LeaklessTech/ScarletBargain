@@ -20,6 +20,20 @@ public class MonsterBehavior : MonoBehaviour
     public enum ActionState { IDLE, WORKING };
     ActionState state = ActionState.IDLE;
 
+    /*
+        PLAN:
+        - patrol behavior: create a utility to handle patrol point gathering.
+          - get list of points from parent object in the world
+          - this list structure should have two objects per list item: object, value
+            - this represents the position of the waypoint and then its value (this value will be used as a weight in the random choice of which waypoint to move to)
+          - the utility will have a public method that returns a point (randomly generated with a value)
+          - in the patrol behavior code, if the monster sees an object in vision cone for too long that has the tag Destructable then fail the patrol behavior (will automatically switch to the destroy behavior)
+        - swivel behavior: play an animation that rotates the object
+        - 
+
+    */
+
+
     void Start()
     {
         agent = this.GetComponent<NavMeshAgent>();
@@ -83,7 +97,7 @@ public class MonsterBehavior : MonoBehaviour
 
     public Node.Status GoToPatrolPoint()
     {
-        throw new NotImplementedException();
+        return GoToLocation(WaypointsManager.Instance.GetWaypoint());
     }
 
     public Node.Status DestroyItem()
@@ -126,6 +140,7 @@ public class MonsterBehavior : MonoBehaviour
         else if (Vector3.Distance(agent.pathEndPosition, destination) >= 2)
         {
             state = ActionState.IDLE;
+            print("FAILURE TO REACH");
             return Node.Status.FAILURE;
         }
         else if (distanceToTarget < 2)
