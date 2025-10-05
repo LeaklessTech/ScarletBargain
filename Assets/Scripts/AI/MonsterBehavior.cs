@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.AI;
+using Utils;
 
 public class MonsterBehavior : MonoBehaviour
 {
@@ -14,7 +15,8 @@ public class MonsterBehavior : MonoBehaviour
     public Node.Status ChaseStatus;
     public Node.Status StunStatus;
 
-    NavMeshAgent agent;
+    private NavMeshAgent agent;
+    private Animator anim;
 
     // Describes whether or not an action is currently active or not, separate from a Node Status
     public enum ActionState { IDLE, WORKING };
@@ -37,6 +39,7 @@ public class MonsterBehavior : MonoBehaviour
     void Start()
     {
         agent = this.GetComponent<NavMeshAgent>();
+        anim = this.GetComponentInChildren<Animator>();
 
         // Instantiate Chase Tree
         chaseTree = new BehaviorTree();
@@ -92,7 +95,19 @@ public class MonsterBehavior : MonoBehaviour
     #region Behaviors
     public Node.Status Swivel()
     {
-        throw new NotImplementedException();
+        if (state == ActionState.IDLE)
+        {
+            anim.Play("Swivel", -1, 0f);
+            state = ActionState.WORKING;
+        }
+
+        if (!anim.GetCurrentAnimatorStateInfo(0).IsName("Swivel"))
+        {
+            state = ActionState.IDLE;
+            return Node.Status.SUCCESS;
+        }
+
+        return Node.Status.RUNNING;
     }
 
     public Node.Status GoToPatrolPoint()
@@ -130,20 +145,19 @@ public class MonsterBehavior : MonoBehaviour
     #region Actions
     Node.Status GoToLocation(Vector3 destination)
     {
-        float distanceToTarget = Vector3.Distance(destination, this.transform.position);
-
         if (state == ActionState.IDLE)
         {
             agent.SetDestination(destination);
             state = ActionState.WORKING;
         }
-        else if (Vector3.Distance(agent.pathEndPosition, destination) >= 2)
-        {
-            state = ActionState.IDLE;
-            print("FAILURE TO REACH");
-            return Node.Status.FAILURE;
-        }
-        else if (distanceToTarget < 2)
+        // Not checking for failure to reach right now
+        // else if (Vector3.Distance(agent.pathEndPosition, destination) >= 2)
+        // {
+        //     state = ActionState.IDLE;
+        //     print("FAILURE TO REACH");
+        //     return Node.Status.FAILURE;
+        // }
+        else if (NavMeshUtilities.IsAtTargetLocation(agent))
         {
             state = ActionState.IDLE;
             return Node.Status.SUCCESS;

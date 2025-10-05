@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eef645ada3f1b2bdc9826592e44b5e1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2
+  Speed: 2
 --- !u!114 &6798543227278665958
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61,8 +61,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1396a2b8230431d8f88f28a309fe0b73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  goal: {fileID: 0}
-  secondGoal: {fileID: 0}
+  TreeStatus: 1
+  ChaseStatus: 0
+  StunStatus: 0
 --- !u!195 &7675502468203840162
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -97,18 +98,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 426b6750744ff77f2a86278be06330d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 20
-  angle: 60
-  targetRef: {fileID: 0}
-  targetMask:
+  Radius: 0
+  Angle: 0
+  TargetRef: {fileID: 0}
+  TargetMask:
     serializedVersion: 2
-    m_Bits: 64
-  obstructionMask:
+    m_Bits: 0
+  ObstructionMask:
     serializedVersion: 2
-    m_Bits: 128
-  canSeePlayer: 0
-  searchForPlayer: 1
-  delay: 0.2
+    m_Bits: 0
+  CanSeePlayer: 0
+  SearchForPlayer: 1
+  Delay: 0.2
 --- !u!1 &3231682522202944082
 GameObject:
   m_ObjectHideFlags: 0
@@ -122,6 +123,7 @@ GameObject:
   - component: {fileID: 2636338475759916254}
   - component: {fileID: 6569435552973111251}
   - component: {fileID: 5991767787765641147}
+  - component: {fileID: 7657081913626531072}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -247,3 +249,25 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!95 &7657081913626531072
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3231682522202944082}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: bfc3fea49b3ac62d6b586ff7cc257a15, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
