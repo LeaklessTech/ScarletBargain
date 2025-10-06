@@ -12,11 +12,14 @@ public class MonsterBehavior : MonoBehaviour
     // Specific Behavior Trees
     BehaviorTree chaseTree;
     BehaviorTree stunnedTree;
+    BehaviorTree huntTree;
     public Node.Status ChaseStatus;
     public Node.Status StunStatus;
 
     private NavMeshAgent agent;
     private Animator anim;
+
+    private Vector3 characterPosition;
 
     // Describes whether or not an action is currently active or not, separate from a Node Status
     public enum ActionState { IDLE, WORKING };
@@ -38,11 +41,13 @@ public class MonsterBehavior : MonoBehaviour
 
     void Start()
     {
+        FieldOfView.OnPlayerFound += TriggerHunt;
         agent = this.GetComponent<NavMeshAgent>();
         anim = this.GetComponentInChildren<Animator>();
 
         // Instantiate Chase Tree
-        chaseTree = new BehaviorTree();
+        chaseTree = new BehaviorTree("Chase Tree");
+        huntTree = new BehaviorTree("Hunt Tree");
 
         Sequence patrolSequence = new Sequence("Patrol Sequence");
         Leaf lookAround = new Leaf("Look around", Swivel);
@@ -63,28 +68,37 @@ public class MonsterBehavior : MonoBehaviour
         huntDestroy.AddChild(hunt);
         huntDestroy.AddChild(destroyItem); // reuse leaf node from above
 
-        chaseTree.AddChild(huntDestroy);
+ 
 
         Selector lookConsume = new Selector("Look around or Consume character");
         Leaf consume = new Leaf("Consume Character", Consume);
-        lookConsume.AddChild(lookAround); // reuse leaf node from above
         lookConsume.AddChild(consume);
+        lookConsume.AddChild(lookAround); // reuse leaf node from above
 
-        chaseTree.AddChild(lookConsume);
+        huntDestroy.AddChild(lookConsume);
+        huntTree.AddChild(huntDestroy);
 
-        Leaf angry = new Leaf("Angry roar", Angry);
-        Leaf victory = new Leaf("Victory roar", Victory);
+        // TODO: figure out when to trigger these states
+        // Leaf angry = new Leaf("Angry roar", Angry);
+        // Leaf victory = new Leaf("Victory roar", Victory);
 
-        chaseTree.AddChild(angry);
-        chaseTree.AddChild(victory);
+        // chaseTree.AddChild(angry);
+        // chaseTree.AddChild(victory);
 
         chaseTree.PrintTree();
+        huntTree.PrintTree();
 
         // TODO: Instantiate Stunned Behavior Tree
 
-        Tree = new BehaviorTree();
+        Tree = new BehaviorTree("Base Tree");
         Tree.AddChild(chaseTree);
     }
+
+    private void TriggerHunt(Vector3 vector3)
+    {
+        characterPosition = vector3;
+    }
+
 
     void Update()
     {
@@ -122,7 +136,16 @@ public class MonsterBehavior : MonoBehaviour
 
     public Node.Status HuntCharacter()
     {
-        throw new NotImplementedException();
+        if (characterPosition == null || characterPosition == Vector3.zero)
+        {
+            state = ActionState.IDLE;
+            return Node.Status.FAILURE;
+        }
+
+
+
+
+        return Node.Status.RUNNING;
     }
 
     public Node.Status Consume()
