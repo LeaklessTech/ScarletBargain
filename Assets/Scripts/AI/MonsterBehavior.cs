@@ -9,12 +9,8 @@ public class MonsterBehavior : MonoBehaviour
     public BehaviorTree Tree;
     public Node.Status TreeStatus = Node.Status.RUNNING;
 
-    // Specific Behavior Trees
-    BehaviorTree chaseTree;
-    BehaviorTree stunnedTree;
-    BehaviorTree huntTree;
-    public Node.Status ChaseStatus;
-    public Node.Status StunStatus;
+    public bool IsStunned = false;
+    public bool IsCharacterFound = false;
 
     private NavMeshAgent agent;
     private Animator anim;
@@ -25,73 +21,49 @@ public class MonsterBehavior : MonoBehaviour
     public enum ActionState { IDLE, WORKING };
     ActionState state = ActionState.IDLE;
 
-    /*
-        PLAN:
-        - patrol behavior: create a utility to handle patrol point gathering.
-          - get list of points from parent object in the world
-          - this list structure should have two objects per list item: object, value
-            - this represents the position of the waypoint and then its value (this value will be used as a weight in the random choice of which waypoint to move to)
-          - the utility will have a public method that returns a point (randomly generated with a value)
-          - in the patrol behavior code, if the monster sees an object in vision cone for too long that has the tag Destructable then fail the patrol behavior (will automatically switch to the destroy behavior)
-        - swivel behavior: play an animation that rotates the object
-        - 
-
-    */
-
-
     void Start()
     {
         FieldOfView.OnPlayerFound += TriggerHunt;
         agent = this.GetComponent<NavMeshAgent>();
         anim = this.GetComponentInChildren<Animator>();
 
-        // Instantiate Chase Tree
-        chaseTree = new BehaviorTree("Chase Tree");
-        huntTree = new BehaviorTree("Hunt Tree");
-
-        Sequence patrolSequence = new Sequence("Patrol Sequence");
-        Leaf lookAround = new Leaf("Look around", Swivel);
-
-        Selector patrolDestroy = new Selector("Patrol or Destroy");
-        Leaf patrol = new Leaf("Go to patrol position", GoToPatrolPoint);
-        Leaf destroyItem = new Leaf("Destroy object", DestroyItem);
-        patrolDestroy.AddChild(patrol);
-        patrolDestroy.AddChild(destroyItem);
-
-        patrolSequence.AddChild(patrolDestroy);
-        patrolSequence.AddChild(lookAround);
-
-        chaseTree.AddChild(patrolSequence);
-
-        Selector huntDestroy = new Selector("Hunt or Destroy");
-        Leaf hunt = new Leaf("Go to last known character position", HuntCharacter);
-        huntDestroy.AddChild(hunt);
-        huntDestroy.AddChild(destroyItem); // reuse leaf node from above
-
- 
-
-        Selector lookConsume = new Selector("Look around or Consume character");
-        Leaf consume = new Leaf("Consume Character", Consume);
-        lookConsume.AddChild(consume);
-        lookConsume.AddChild(lookAround); // reuse leaf node from above
-
-        huntDestroy.AddChild(lookConsume);
-        huntTree.AddChild(huntDestroy);
-
-        // TODO: figure out when to trigger these states
-        // Leaf angry = new Leaf("Angry roar", Angry);
-        // Leaf victory = new Leaf("Victory roar", Victory);
-
-        // chaseTree.AddChild(angry);
-        // chaseTree.AddChild(victory);
-
-        chaseTree.PrintTree();
-        huntTree.PrintTree();
-
-        // TODO: Instantiate Stunned Behavior Tree
-
+        // AI Behavior Setup
         Tree = new BehaviorTree("Base Tree");
-        Tree.AddChild(chaseTree);
+
+        // Stun Sequence
+        Sequence stunSequence = new Sequence("Stun Sequence");
+        stunSequence.AddChild(new Leaf("Is Stunned?", IsMonsterStunned));
+        stunSequence.AddChild(new Leaf("Stunned", Stunned));
+
+        // Chase Sequence
+        Sequence chaseSequence = new Sequence("Chase Sequence");
+        chaseSequence.AddChild(new Leaf("Character Found?", FoundCharacter));
+
+        Selector huntLook = new Selector("Succeed Hunt or Fail Hunt");
+        Sequence huntSequence = new Sequence("Hunt Sequence");
+        huntSequence.AddChild(new Leaf("Hunt", HuntCharacter));
+        huntSequence.AddChild(new Leaf("Consume", Consume));
+        huntSequence.AddChild(new Leaf("Victory", Victory));
+        huntLook.AddChild(huntSequence);
+
+        Sequence failHuntSequence = new Sequence("Failed to Hunt");
+        failHuntSequence.AddChild(new Leaf("Look Around", Swivel));
+        failHuntSequence.AddChild(new Leaf("Anger", Angry));
+        huntLook.AddChild(failHuntSequence);
+
+        chaseSequence.AddChild(huntLook);
+
+        // Patrol Sequence
+        Sequence patrolSequence = new Sequence("Patrol Sequence");
+        patrolSequence.AddChild(new Leaf("Patrol", Patrol));
+        patrolSequence.AddChild(new Leaf("Look Around", Swivel));
+
+
+        Tree.AddChild(stunSequence);
+        Tree.AddChild(chaseSequence);
+        Tree.AddChild(patrolSequence);
+
+        Tree.PrintTree();
     }
 
     private void TriggerHunt(Vector3 vector3)
@@ -124,7 +96,7 @@ public class MonsterBehavior : MonoBehaviour
         return Node.Status.RUNNING;
     }
 
-    public Node.Status GoToPatrolPoint()
+    public Node.Status Patrol()
     {
         return GoToLocation(WaypointsManager.Instance.GetWaypoint());
     }
@@ -161,6 +133,21 @@ public class MonsterBehavior : MonoBehaviour
     public Node.Status Victory()
     {
         throw new NotImplementedException();
+    }
+
+    Node.Status IsMonsterStunned()
+    {
+        return IsStunned ? Node.Status.SUCCESS : Node.Status.FAILURE;
+    }
+
+    Node.Status Stunned()
+    {
+        throw new NotImplementedException();
+    }
+
+    Node.Status FoundCharacter()
+    {
+        return IsCharacterFound ? Node.Status.SUCCESS : Node.Status.FAILURE;
     }
     #endregion
 
