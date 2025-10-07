@@ -46,8 +46,15 @@ public class WaypointsManager : MonoBehaviour
     }
 
 
-    public Vector3 GetWaypoint()
+    public Waypoint GetWaypoint(Waypoint previousWaypoint)
     {
+        Waypoint removed = null;
+        if (previousWaypoint != null)
+        {
+            removed = previousWaypoint;
+            waypointList.Remove(previousWaypoint);
+        }
+
         int totalWeight = waypointList.Sum(x => x.Weight);
 
         int randomNumber = rnd.Next(0, totalWeight);
@@ -64,6 +71,11 @@ public class WaypointsManager : MonoBehaviour
             randomNumber = randomNumber - waypoint.Weight;
         }
 
-        return selectedWaypoint.gameObject.transform.position;
+        if (removed != null)
+        {
+            waypointList.Add(removed);
+        }
+
+        return selectedWaypoint;
     }
 }

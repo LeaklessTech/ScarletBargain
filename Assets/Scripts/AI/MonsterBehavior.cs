@@ -17,6 +17,8 @@ public class MonsterBehavior : MonoBehaviour
 
     private Vector3 characterPosition;
 
+    private Waypoint previousWaypoint;
+
     // Describes whether or not an action is currently active or not, separate from a Node Status
     public enum ActionState { IDLE, WORKING };
     ActionState state = ActionState.IDLE;
@@ -28,7 +30,7 @@ public class MonsterBehavior : MonoBehaviour
         anim = this.GetComponentInChildren<Animator>();
 
         // AI Behavior Setup
-        Tree = new BehaviorTree("Base Tree");
+        Tree = new BehaviorTree("Base Tree", Policies.RunForever);
 
         // Stun Sequence
         Sequence stunSequence = new Sequence("Stun Sequence");
@@ -74,8 +76,7 @@ public class MonsterBehavior : MonoBehaviour
 
     void Update()
     {
-        if (TreeStatus != Node.Status.SUCCESS)
-            TreeStatus = Tree.Process();
+        TreeStatus = Tree.Process();
     }
 
     #region Behaviors
@@ -98,7 +99,19 @@ public class MonsterBehavior : MonoBehaviour
 
     public Node.Status Patrol()
     {
-        return GoToLocation(WaypointsManager.Instance.GetWaypoint());
+        if (state == ActionState.IDLE)
+        {
+            previousWaypoint = WaypointsManager.Instance.GetWaypoint(previousWaypoint);
+            agent.SetDestination(previousWaypoint.transform.position);
+            state = ActionState.WORKING;
+        }
+        else if (NavMeshUtilities.IsAtTargetLocation(agent))
+        {
+            state = ActionState.IDLE;
+            return Node.Status.SUCCESS;
+        }
+
+        return Node.Status.RUNNING;
     }
 
     public Node.Status DestroyItem()
@@ -113,9 +126,6 @@ public class MonsterBehavior : MonoBehaviour
             state = ActionState.IDLE;
             return Node.Status.FAILURE;
         }
-
-
-
 
         return Node.Status.RUNNING;
     }
@@ -153,27 +163,27 @@ public class MonsterBehavior : MonoBehaviour
 
 
     #region Actions
-    Node.Status GoToLocation(Vector3 destination)
-    {
-        if (state == ActionState.IDLE)
-        {
-            agent.SetDestination(destination);
-            state = ActionState.WORKING;
-        }
-        // Not checking for failure to reach right now
-        // else if (Vector3.Distance(agent.pathEndPosition, destination) >= 2)
-        // {
-        //     state = ActionState.IDLE;
-        //     print("FAILURE TO REACH");
-        //     return Node.Status.FAILURE;
-        // }
-        else if (NavMeshUtilities.IsAtTargetLocation(agent))
-        {
-            state = ActionState.IDLE;
-            return Node.Status.SUCCESS;
-        }
+    // Node.Status GoToLocation(Vector3 destination)
+    // {
+    //     if (state == ActionState.IDLE)
+    //     {
+    //         agent.SetDestination(destination);
+    //         state = ActionState.WORKING;
+    //     }
+    //     // Not checking for failure to reach right now
+    //     // else if (Vector3.Distance(agent.pathEndPosition, destination) >= 2)
+    //     // {
+    //     //     state = ActionState.IDLE;
+    //     //     print("FAILURE TO REACH");
+    //     //     return Node.Status.FAILURE;
+    //     // }
+    //     else if (NavMeshUtilities.IsAtTargetLocation(agent))
+    //     {
+    //         state = ActionState.IDLE;
+    //         return Node.Status.SUCCESS;
+    //     }
 
-        return Node.Status.RUNNING;
-    }
+    //     return Node.Status.RUNNING;
+    // }
     #endregion
 }
