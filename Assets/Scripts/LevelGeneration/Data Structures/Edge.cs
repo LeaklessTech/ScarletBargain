@@ -57,12 +57,11 @@ namespace GraphStructures
             return HashCode.Combine(A, B);
         }
 
-
         // alternate version of equals that will give us a little more leeway 
-        public static bool AlmostEqual(Edge left, Edge right)
+        public static bool NearEqual(Edge left, Edge right)
         {
             return DelaunayTriangulation.NearEqual(left.A, right.A) && DelaunayTriangulation.NearEqual(left.B, right.B)
-                || DelaunayTriangulation.NearEqual(left.A, right.B) && DelaunayTriangulation.NearEqual(left.A, right.B);
+                || DelaunayTriangulation.NearEqual(left.A, right.B) && DelaunayTriangulation.NearEqual(left.B, right.A);
         }
     }
 }

@@ -1,5 +1,7 @@
+using NUnit.Framework;
 using System;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace GraphStructures
 {
@@ -14,14 +16,17 @@ namespace GraphStructures
 
         }
 
-        public Point(Vector3 location) 
+        public Point(Vector3 position) 
         {
-            Position = location;
+            Position = position;
         }
 
-        public bool Equals(Point vertex)
+        public bool Equals(Point other)
         {
-            return vertex.Position == this.Position;
+            if (other == null) 
+                return false;
+
+            return DelaunayTriangulation.NearEqual(this, other);
         }
 
         public override int GetHashCode()
@@ -39,7 +44,7 @@ namespace GraphStructures
             Item = item;
         }
 
-        public Point(Vector3 location, T item) : base(location)
+        public Point(Vector3 position, T item) : base(position)
         {
             Item = item;
         }

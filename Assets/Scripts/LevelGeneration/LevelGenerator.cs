@@ -58,15 +58,13 @@ namespace LevelGeneration
             // Build Grid
             GenerateGrid();
             // Create connections
-            GenerateHallways();
+            CreateGraph();
 
-            //foreach (var veccy in vec)
-            //{
-            //    Debug.Log(veccy);
-            //}    
+            CreateMST();
+
+            //DebugGraph();
         }
 
-        public List<Vector3> vec;
 
         private void Update()
         {
@@ -144,45 +142,93 @@ namespace LevelGeneration
 
         private void CreateRooms()
         {
-            // this is just here for debugging
             int failedPlacements = 0;
 
             for (int currentRoom = 0; currentRoom < RoomCount; currentRoom++)
             {
                 for (int currentAttempt = 0; currentAttempt < retryLimit; currentAttempt++)
                 {
-                    // randomly decide room size and position based on parameters
                     int potentialRoomWidth = Random.Range(MinRoomWidth, MaxRoomWidth + 1);
                     int potentialRoomLength = Random.Range(MinRoomLength, MaxRoomLength + 1);
-
 
                     int potentialRoomX = Random.Range(0, LevelWidth - potentialRoomWidth + 1);
                     int potentialRoomY = Random.Range(0, LevelLength - potentialRoomLength + 1);
 
                     RectInt potentialRoom = new(potentialRoomX, potentialRoomY, potentialRoomWidth, potentialRoomLength);
 
-                    // perform bounds checking, retry up to limit if bounds dont allow
                     if (BoundsCheck(potentialRoom))
                     {
-                        GameObject roomObject = new($"Room {placedRooms.Count + 1}");
+                        // Collect the tiles/transforms that will belong to this room
+                        var tileTransforms = new List<Transform>();
+                        var tileRenderers = new List<Renderer>();
+                        var tileColliders = new List<Collider>();
 
                         foreach (var position in potentialRoom.allPositionsWithin)
                         {
-                            floorGrid[position.x, position.y].transform.parent = roomObject.transform;
-                            roomObject.transform.parent = LevelObject.transform;
+                            var tile = floorGrid[position.x, position.y];
+                            if (tile == null) continue;
+
+                            Transform t = tile.transform;
+                            tileTransforms.Add(t);
+
+                            // prefer renderer bounds
+                            var r = tile.GetComponent<Renderer>();
+                            if (r != null) tileRenderers.Add(r);
+
+                            var c = tile.GetComponent<Collider>();
+                            if (c != null) tileColliders.Add(c);
+                        }
+
+                        // compute combined center in world space
+                        Vector3 combinedCenter;
+                        if (tileRenderers.Count > 0)
+                        {
+                            Bounds combined = tileRenderers[0].bounds;
+                            for (int i = 1; i < tileRenderers.Count; i++) combined.Encapsulate(tileRenderers[i].bounds);
+                            combinedCenter = combined.center;
+                        }
+                        else if (tileColliders.Count > 0)
+                        {
+                            Bounds combined = tileColliders[0].bounds;
+                            for (int i = 1; i < tileColliders.Count; i++) combined.Encapsulate(tileColliders[i].bounds);
+                            combinedCenter = combined.center;
+                        }
+                        else if (tileTransforms.Count > 0)
+                        {
+                            // fallback: average world positions
+                            Vector3 sum = Vector3.zero;
+                            foreach (var tt in tileTransforms) sum += tt.position;
+                            combinedCenter = sum / tileTransforms.Count;
+                        }
+                        else
+                        {
+                            combinedCenter = Vector3.zero;
+                        }
+
+                        // create the room object at visual center
+                        GameObject roomObject = new($"Room {placedRooms.Count + 1}");
+                        roomObject.transform.position = combinedCenter;
+                        roomObject.transform.parent = LevelObject.transform;
+
+                        // parent tiles to the room object while preserving their world positions
+                        foreach (var t in tileTransforms)
+                        {
+                            t.SetParent(roomObject.transform, true); // worldPositionStays = true
                         }
 
                         placedRooms.Add(new(potentialRoom, roomObject));
-                       
                         break;
                     }
                     else if (currentAttempt == retryLimit - 1)
+                    {
                         failedPlacements++;
+                    }
                 }
             }
 
             Debug.Log($"{RoomCount - failedPlacements}/{RoomCount} Rooms were created.");
         }
+
 
         private bool BoundsCheck(RectInt room)
         {

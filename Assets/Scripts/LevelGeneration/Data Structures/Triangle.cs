@@ -29,35 +29,41 @@ public class Triangle : IEquatable<Triangle>
     ///  A circumcircle is the circle created by the 3 points of a triangle in 2D space.
     ///  Here, we calculate if a position is inside this triangle's circumcircle.
     ///  We later use this to figure out if a triangle is "bad" or not.
+    ///  
+    /// 
     ///  </summary>
-    public bool PositionInsideCircumcircle(Vector3 position)
+    public bool PositionInsideCircumcircle(Vector3 p)
     {
-        // get our 3 triangle corners
-        Vector3 a = A.Position;
-        Vector3 b = B.Position;
-        Vector3 c = C.Position;
+        float ax = A.Position.x;
+        float az = A.Position.z;
+        float bx = B.Position.x;
+        float bz = B.Position.z;
+        float cx = C.Position.x;
+        float cz = C.Position.z;
+        float px = p.x;
+        float pz = p.z;
 
-        // get the squared lengths
-        float aSqr = a.sqrMagnitude;
-        float bSqr = b.sqrMagnitude;
-        float cSqr = c.sqrMagnitude;
+        float ab = (ax * ax + az * az - bx * bx - bz * bz) / 2;
+        float ac = (ax * ax + az * az - cx * cx - cz * cz) / 2;
 
-        // compute the circumcenter coordinates
-        float circumcenterX = (aSqr * (c.y - b.y) + bSqr * (a.y - c.y) + cSqr * (b.y - a.y)) / (a.x * (c.y - b.y) + b.x * (a.y - c.y) + c.x * (b.y - a.y));
+        float det = (ax - bx) * (az - cz) - (ax - cx) * (az - bz);
 
-        float circumcenterY = (aSqr * (c.x - b.x) + bSqr * (a.x - c.x) + cSqr * (b.x - a.x)) / (a.y * (c.x - b.x) + b.y * (a.x - c.x) + c.y * (b.x - a.x));
+        // since we're working with a dungeon that generates from a grid, we'll often end up with colinear (lined up) rooms
+        // this causes issues for a native version of Bowyer-Watson
+        // returning false for colinear rooms fixes this
+        if (Mathf.Abs(det) < 1e-6f) return false; // nearly colinear
 
-        // now we can calculate the circumcenter point
-        Vector3 circum = new(circumcenterX / 2, circumcenterY / 2);
+        float cx_circum = (ab * (az - cz) - ac * (az - bz)) / det;
+        float cz_circum = ((ax - bx) * ac - (ax - cx) * ab) / det;
 
-        // and the radius (squared)
-        float circumcircleRadius = Vector3.SqrMagnitude(a - circum);
+        float radiusSqr = (ax - cx_circum) * (ax - cx_circum) + (az - cz_circum) * (az - cz_circum);
+        float distSqr = (px - cx_circum) * (px - cx_circum) + (pz - cz_circum) * (pz - cz_circum);
 
-        // now we can figure out the distance from the position to the center, allowing us to detect if its inside the circumcircle
-        float distance = Vector3.SqrMagnitude(position - circum);
-
-        return distance <= circumcircleRadius;
+        return distSqr <= radiusSqr + 1e-6f;
     }
+
+
+
 
     // simple helper method
     // we give some tolerance for small variation in position
