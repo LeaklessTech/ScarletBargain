@@ -14,6 +14,8 @@ namespace GraphStructures
         public Point B { get; set; }
         public bool BadEdge { get; set; }
 
+        public float weight { get; set; }
+
         public Edge()
         {
 
@@ -23,6 +25,8 @@ namespace GraphStructures
         {
             this.A = a;
             this.B = b;
+
+            weight = Vector3.Distance(A.Position, B.Position);
         }
 
         // just some helpful overrides to make code cleaner

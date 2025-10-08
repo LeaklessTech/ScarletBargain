@@ -1,0 +1,99 @@
+using GraphStructures;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
+using UnityEngine;
+
+namespace LevelGeneration
+{
+    public partial class LevelGenerator
+    {
+        public DelaunayTriangulation Graph { get; private set; }
+        public MSTResult MST {  get; private set; }
+        public HashSet<GraphStructures.Edge> finalGraph { get; private set; }
+        // first we need to generate a Deluaney triangulation
+        
+        private void CreateHallways()
+        {
+            CreateGraph();
+
+            CreateMST();
+
+            AddRandomEdges();
+
+#if UNITY_EDITOR
+            //DebugGraph();
+            //DebugMST();
+            DebugFinalGraph();
+#endif
+        }
+
+        private void CreateGraph()
+        {
+            // first convert the centers of each room to points
+            List<Point> roomCenters = new();
+
+            foreach(var room in placedRooms)
+            {
+                roomCenters.Add(new Point(room.roomObject.transform.position));
+            }
+
+            Graph = DelaunayTriangulation.TriangulatePoints(roomCenters);
+        }
+
+        private void CreateMST()
+        {
+            PrimsMST mst = new(Graph);
+
+            MST = mst.CreateMST();
+        }
+
+        private int tempCount;
+        private void AddRandomEdges()
+        {
+            finalGraph = new(MST.TreeEdges);
+            HashSet<GraphStructures.Edge> allEdges = new(Graph.GraphEdges);
+            allEdges.ExceptWith(finalGraph);
+
+            tempCount = finalGraph.Count;
+
+            foreach(var edge in allEdges)
+            {
+                float rnd = UnityEngine.Random.Range(0f, 100f);
+                if(rnd < AdditionalHallwayChance)
+                {
+                    finalGraph.Add(edge);
+                    Debug.Log($"Edge added: {edge.A.Position},{edge.B.Position}. Rolled {rnd}.");
+                }
+            }
+        }
+        
+        private void DebugGraph()
+        {
+            foreach(var triangle in Graph.Triangles)
+            {
+                Debug.DrawLine(triangle.A.Position, triangle.B.Position, Color.white, 30f);
+                Debug.DrawLine(triangle.B.Position, triangle.C.Position, Color.white, 30f);
+                Debug.DrawLine(triangle.C.Position, triangle.A.Position, Color.white, 30f);
+            }
+
+        }
+
+        private void DebugMST()
+        {
+            foreach (GraphStructures.Edge edge in MST.TreeEdges)
+                Debug.DrawLine(edge.A.Position + new Vector3(2, 0, 2), edge.B.Position + new Vector3(2, 0, 2), Color.black, 40f);
+        }
+
+        private void DebugFinalGraph()
+        {
+            foreach(var edge in finalGraph)
+            {
+                Debug.DrawLine(edge.A.Position, edge.B.Position, Color.cyan, 30f);
+            }
+            Debug.Log($"Added {finalGraph.Count - tempCount} edges. Started with {tempCount}, ended with {finalGraph.Count}. Max was {Graph.GraphEdges.Count}.");
+        }
+    }
+}

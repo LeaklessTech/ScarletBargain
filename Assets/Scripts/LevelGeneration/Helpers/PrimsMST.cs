@@ -7,94 +7,103 @@ using System;
 using Utils;
 using TMPro;
 
+public class MSTResult
+{
+    public bool Success { get; set; }
+    public string Message { get; set; }
+    public HashSet<Edge> TreeEdges { get; set; }
+    public HashSet<Point> TreeNodes { get; set; }
+
+    public MSTResult()
+    {
+        TreeEdges = new();
+        TreeNodes = new();
+    }
+}
+
 public class PrimsMST
 {
-
     private List<Point> _graphNodes { get; set; }
     private List<Edge> _graphEdges { get; set; }
 
-    public List<Edge> treeEdges { get; set; } = new();
-    public List<Point> treeNodes { get; set; } = new();
-
-    PrimsMST()
+    public PrimsMST(DelaunayTriangulation triangulation)
     {
-        _graphNodes = new();
-        treeEdges = new();
-        treeNodes = new();
-    }
-
-    public static PrimsMST CalculateMST(DelaunayTriangulation triangulation)
-    {
-        PrimsMST resultTree = new();
-
-        resultTree._graphNodes = triangulation.GraphPoints;
-        resultTree._graphEdges = triangulation.GraphEdges;
-
-        resultTree.CreateMST();
-
-        foreach (Edge edge in resultTree.treeEdges)
-        {
-            Debug.DrawLine(edge.A.Position, edge.B.Position, Color.blue, 30f);
-        }
-
-        return null;
+        _graphNodes = triangulation.GraphPoints;
+        _graphEdges = triangulation.GraphEdges;
     }
 
     // we use Prims instead, since there is no need to check for loops
-    private void CreateMST()
+    public MSTResult CreateMST()
     {
+        if (_graphNodes == null || _graphEdges == null)
+            return new MSTResult { Success = false, Message = "Graph nodes/edges not properly initialized" };
+
+        if(_graphNodes.Count < 2)
+            return new MSTResult { Success = false, Message = "At least 2 graph nodes required." };
+
+        if (_graphEdges.Count < 1)
+            return new MSTResult { Success = false, Message = "At least 1 graph edge required." };
+
+        MSTResult result = new();
+
         PriorityQueue<Edge, float> canidateEdges = new();
 
         // we choose a random point/node as the start
         Point start = _graphNodes[UnityEngine.Random.Range(0, _graphNodes.Count)];
 
-        treeNodes.Add(start);
+        result.TreeNodes.Add(start);
 
         // get the initial edges
         foreach (Edge edge in _graphEdges)
         {
             if (edge.A.Equals(start) || edge.B.Equals(start))
-                canidateEdges.Enqueue(edge, Vector3.Distance(edge.A.Position, edge.B.Position));
+                canidateEdges.Enqueue(edge, edge.weight);
         }
 
         // keep building the tree 
-        while (treeNodes.Count < _graphNodes.Count)
+        while (result.TreeNodes.Count < _graphNodes.Count)
         {
+            if (canidateEdges.Count == 0)
+                return new MSTResult { Success = false, Message = "Empty canidateEdge queue, potentially disconnected graph." };
+
             Edge canidateEdge = canidateEdges.Dequeue();
 
             // treeNodes having both Points of a canidate edge means this edge would create a loop
-            if (treeNodes.Contains(canidateEdge.A) ^ treeNodes.Contains(canidateEdge.B))
+            if (result.TreeNodes.Contains(canidateEdge.A) ^ result.TreeNodes.Contains(canidateEdge.B))
             {
-                treeEdges.Add(canidateEdge);
+                result.TreeEdges.Add(canidateEdge);   
 
-                bool newVertexIsA = treeNodes.Contains(canidateEdge.B);
-                bool newVertexIsB = treeNodes.Contains(canidateEdge.A);
+                bool newVertexIsA = result.TreeNodes.Contains(canidateEdge.B);
+                bool newVertexIsB = result.TreeNodes.Contains(canidateEdge.A);
 
                 if (newVertexIsA)
                 {
-                    treeNodes.Add(canidateEdge.A);
+                    result.TreeNodes.Add(canidateEdge.A);
 
                     foreach (Edge edge in _graphEdges)
                     {
-                        if((edge.A.Equals(canidateEdge.A) || edge.B.Equals(canidateEdge.A)) && !treeEdges.Contains(edge))
+                        if((edge.A.Equals(canidateEdge.A) || edge.B.Equals(canidateEdge.A)) && !result.TreeEdges.Contains(edge))
                         {
-                            canidateEdges.Enqueue(edge, Vector3.Distance(edge.A.Position, edge.B.Position));
+                            canidateEdges.Enqueue(edge, edge.weight);
                         }
                     }
                 }
                 else if (newVertexIsB)
                 {
-                    treeNodes.Add(canidateEdge.B);
+                    result.TreeNodes.Add(canidateEdge.B);
 
                     foreach (Edge edge in _graphEdges)
                     {
-                        if ((edge.A.Equals(canidateEdge.B) || edge.B.Equals(canidateEdge.B)) && !treeEdges.Contains(edge))
+                        if ((edge.A.Equals(canidateEdge.B) || edge.B.Equals(canidateEdge.B)) && !result.TreeEdges.Contains(edge))
                         {
-                            canidateEdges.Enqueue(edge, Vector3.Distance(edge.A.Position, edge.B.Position));
+                            canidateEdges.Enqueue(edge, edge.weight);
                         }
                     }
                 }
             }
         }
+
+        result.Success = true;
+        return result;
     }
 }

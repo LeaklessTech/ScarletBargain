@@ -7,6 +7,11 @@ namespace LevelGeneration
 {
     public partial class LevelGenerator : MonoBehaviour
     {
+        [Header("Hallway Chance")]
+        [Tooltip("Odds that a hallway not in the MST gets added anyway")]
+        [Range(0f, 100f)]
+        public float AdditionalHallwayChance = 12.5f;
+
         [Header("Level Size")]
         public int LevelWidth = 10;
         public int LevelLength = 10;
@@ -51,28 +56,16 @@ namespace LevelGeneration
             LevelObject = new("Level");
 
             floorGrid = new GameObject[LevelWidth, LevelLength];
-            // Generate initial grid
+
             GenerateBase();
-            // Randomly create rooms
             CreateRooms();
-            // Build Grid
             GenerateGrid();
-            // Create connections
-            CreateGraph();
-
-            CreateMST();
-
-            //DebugGraph();
+            CreateHallways();
         }
 
 
         private void Update()
         {
-            //List<Vector3> veccy = CreateBWDelaunay(LevelObject);
-
-            //Debug.DrawLine(veccy[0], veccy[1], Color.red, 0.01f);
-            //Debug.DrawLine(veccy[1], veccy[2], Color.red, 0.01f);
-            //Debug.DrawLine(veccy[2], veccy[0], Color.red, 0.01f);
         }
 
 

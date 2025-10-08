@@ -13,7 +13,7 @@ public class DelaunayTriangulation
     public List<Triangle> Triangles { get; private set; }
 
 
-    DelaunayTriangulation()
+    public DelaunayTriangulation()
     {
         GraphEdges = new List<Edge>();
         Triangles = new List<Triangle>();
@@ -98,7 +98,7 @@ public class DelaunayTriangulation
                 }
             }
 
-            Debug.Log($"Point {point.Position}: bad triangles = {Triangles.Count(t => t.badTriangle)}");
+            //Debug.Log($"Point {point.Position}: bad triangles = {Triangles.Count(t => t.badTriangle)}");
 
             // get rid of bad triangles
             Triangles.RemoveAll(triangle => triangle.badTriangle);
