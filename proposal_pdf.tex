@@ -1,0 +1,151 @@
+\documentclass[11pt]{article}
+\usepackage[top=0.75in,bottom=0.85in,left=0.85in,right=0.85in]{geometry}
+\usepackage{microtype}
+\usepackage{parskip}
+\setlength{\parskip}{4pt plus 1pt minus 1pt}
+\usepackage{titlesec}
+\usepackage{enumitem}   % lists
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{caption}
+
+% --- Compact section spacing ---
+\titlespacing*{\section}{0pt}{6pt plus 1pt minus 1pt}{3pt}
+\titlespacing*{\subsection}{0pt}{4pt plus 1pt minus 1pt}{2pt}
+\titlespacing*{\subsubsection}{0pt}{3pt plus 1pt minus 1pt}{1.5pt}
+
+% --- Lists: deeper indentation ("tabbed over") ---
+% Level 1 bullets/numbered:
+\setlist[itemize,1]{nosep,leftmargin=2.2em}
+\setlist[enumerate,1]{nosep,leftmargin=2.2em}
+% Level 2 bullets (nested):
+\setlist[itemize,2]{nosep,leftmargin=3.0em}
+\setlist[enumerate,2]{nosep,leftmargin=3.0em}
+
+\linespread{1.00}
+\captionsetup{font=small,labelfont=bf}
+
+% --- Header/footer (static header avoids title macro issues) ---
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{SITE 6457: TEAM PROPOSAL}
+\rhead{Team Proposal}
+\cfoot{\thepage}
+\setlength{\headheight}{13.6pt}
+\setlength{\headsep}{8pt}
+
+% --- Title block (single author block; no \and) ---
+\title{Site 6457: A Prisoner's Dilemma -- Team Proposal}
+\author{Truman Hess \and Josh Smith \and Larry Wilson \and Wafer Sung \and Michael Markoe}
+\date{September 22, 2025}
+
+% --- Avoid widows/orphans ---
+\clubpenalty=10000
+\widowpenalty=10000
+
+\begin{document}
+\maketitle
+\vspace{-0.8em}
+
+\section{Basic Gameplay \& Core Mechanics}
+\textbf{Core Gameplay Loop.} The player toggles between four prisoners to pathfind and escape a procedurally generated horror environment. Each prisoner must evade the monster, locate the exit, and \textit{stay alive}. The player alternates control to coordinate escapes while non-selected characters are controlled by simple AI. The monster evolves within a round by absorbing traits from captured prisoners, and the next round's difficulty is influenced by how many (and which types of) prisoners were saved previously.
+
+\medskip
+\textbf{Unique Gameplay Elements.}
+\begin{itemize}
+  \item \textit{Monster Evolution}: When the monster captures a prisoner, it gains the strengths and weaknesses of that prisoner. Potential evolutions include speed, pathfinding effectiveness, and environmental manipulation (e.g., doors and entry points).
+  \item \textit{Procedural Levels}: Layouts vary each run.
+  \item \textit{Unlockable Control}: Potential variant---start as a single prisoner; others become controllable only after they are found.
+\end{itemize}
+
+\section{Formal Elements of the Game}
+
+\subsection*{a) Players \& Interaction Modes}
+\begin{itemize}
+  \item \textbf{Number of players}: MVP single-player; future potential for multiplayer.
+  \item \textbf{Interaction style}: MVP toggling between prisoners; future co-op possibilities.
+\end{itemize}
+
+\subsection*{b) Objectives}
+\begin{itemize}
+  \item \textbf{Primary}: Escape with at least one prisoner.
+  \item \textbf{Secondary / stretch}: Escape with multiple prisoners.
+  \item \textbf{Perfect win}: Escape with all prisoners.
+\end{itemize}
+
+\subsection*{c) Procedures}
+\begin{itemize}
+  \item \textbf{Starting action}: Player spawns alone in a room with a note.
+  \item \textbf{Progression}: Explore the generated environment and find other prisoners who can aid in escape. Audio cues indicate monster proximity.
+  \item \textbf{Special actions}:
+    \begin{itemize}
+      \item Each prisoner has a unique skill: (1) speed, (2) environmental manipulation (doors), (3) enhanced hearing.
+      \item If the monster catches a prisoner off-screen, the player is notified via sound effects.
+      \item On capture, the monster ``trains'' for 5--15 seconds, absorbing that prisoner's skill (e.g., becomes faster after capturing the speed-focused prisoner).
+    \end{itemize}
+  \item \textbf{Resolving action}: One to four prisoners reach the exit before all are captured.
+\end{itemize}
+
+\subsection*{d) Rules}
+\begin{itemize}
+  \item \textbf{Objects \& concepts}: Characters, monster, environment; the player can move, jump, toggle between characters, and interact with objects (e.g., doors).
+  \item \textbf{Restrictions}: The player can command characters to wait or to follow the actively controlled character.
+  \item \textbf{Effects}: Non-controlled prisoners generally stay put; depending on attributes, they may hide effectively from the monster.
+\end{itemize}
+
+\subsection*{e) Resources}
+\begin{itemize}
+  \item \textbf{From the monster's perspective}: Prisoners are resources that power the monster up (or down) by absorbing their skills.
+  \item \textbf{Exit points}: Initially one exit (may scale with difficulty later).
+  \item \textbf{From the player's perspective}: Prisoners are resources---adding prisoners improves team capabilities and score.
+\end{itemize}
+
+\subsection*{f) Conflict}
+\begin{itemize}
+  \item \textbf{Opponent}: The monster.
+  \item \textbf{Obstacles}: Doors and room access points.
+  \item \textbf{Player dilemma}: If the exit is found before all prisoners are located, decide whether to escape now or keep searching; optionally ``sacrifice'' a prisoner by ordering them to stay hidden.
+\end{itemize}
+
+\subsection*{g) Boundaries}
+\begin{itemize}
+  \item \textbf{Map}: Procedurally generated horror setting (e.g., prison or hospital).
+  \item \textbf{Access points}: Some walls are breakable only by certain prisoner types; some doors can be unlocked only by others.
+\end{itemize}
+
+\subsection*{h) Outcome}
+\begin{itemize}
+  \item \textbf{Win}: Highest win is all four escape.
+  \item \textbf{Partial win}: One to three escape.
+  \item \textbf{Loss}: All are captured by the monster.
+\end{itemize}
+
+\section{Narrative / Story Components}
+\begin{itemize}
+  \item \textbf{Theme / Setting}: Horror atmosphere (hospital or prison).
+  \item \textbf{Backstory}: Prisoners are test subjects in an AI training experiment; the monster learns by capturing escapees.
+  \item \textbf{Atmosphere Goals}: Excitement and fear via sound and environment; constant trade-offs between personal survival and group success.
+\end{itemize}
+
+\section{Work Plan}
+Team divides the game into key functional areas and generates tickets on a Trello board.
+
+\subsection*{Functional Breakout}
+\begin{itemize}
+  \item AI Systems
+  \item Procedural Generation
+  \item Environmental
+  \item Gameplay Control
+  \item Audio and UI
+\end{itemize}
+
+\subsection*{Key Algorithms / Libraries}
+\begin{itemize}
+  \item Kruskal's algorithm (minimum spanning tree) to connect rooms.
+  \item A* (A-star) for pathfinding.
+  \item Behavior Trees for agent control.
+\end{itemize}
+
+\end{document}
