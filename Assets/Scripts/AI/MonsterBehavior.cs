@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using UnityEngine;
 using UnityEngine.AI;
 using Utils;
@@ -15,7 +16,9 @@ public class MonsterBehavior : MonoBehaviour
     private NavMeshAgent agent;
     private Animator anim;
 
-    private Vector3 characterPosition;
+    private UnityEngine.Vector3 characterPosition;
+    private UnityEngine.Vector3 prevCharacterPosition;
+
 
     private Waypoint previousWaypoint;
 
@@ -68,12 +71,6 @@ public class MonsterBehavior : MonoBehaviour
         Tree.PrintTree();
     }
 
-    private void TriggerHunt(Vector3 vector3)
-    {
-        characterPosition = vector3;
-    }
-
-
     void Update()
     {
         TreeStatus = Tree.Process();
@@ -125,10 +122,31 @@ public class MonsterBehavior : MonoBehaviour
 
     public Node.Status HuntCharacter()
     {
-        if (characterPosition == null || characterPosition == Vector3.zero)
+
+        if (characterPosition == null || characterPosition == UnityEngine.Vector3.zero)
         {
             state = ActionState.IDLE;
             return Node.Status.FAILURE;
+        }
+
+        // If the monster has not lost sight of the character then keep trying to find them
+        if (prevCharacterPosition != characterPosition)
+        {
+            state = ActionState.WORKING;
+            agent.SetDestination(characterPosition);
+        }
+        else
+        {
+            state = ActionState.IDLE;
+            return Node.Status.FAILURE;
+        }
+
+        if (NavMeshUtilities.IsAtTargetLocation(agent))
+        {
+            // TODO: need to play kill animation then disable/destroy the character that was killed
+            state = ActionState.IDLE;
+            IsCharacterFound = false;
+            return Node.Status.SUCCESS;
         }
 
         return Node.Status.RUNNING;
@@ -136,17 +154,20 @@ public class MonsterBehavior : MonoBehaviour
 
     public Node.Status Consume()
     {
-        throw new NotImplementedException();
+        Debug.Log("Conusmed character");
+        return Node.Status.SUCCESS;
     }
 
     public Node.Status Angry()
     {
-        throw new NotImplementedException();
+        Debug.Log("Angry yell");
+        return Node.Status.SUCCESS;
     }
 
     public Node.Status Victory()
     {
-        throw new NotImplementedException();
+        Debug.Log("Victory yell");
+        return Node.Status.SUCCESS;
     }
 
     Node.Status IsMonsterStunned()
@@ -200,6 +221,12 @@ public class MonsterBehavior : MonoBehaviour
     bool AnimatorIsPlaying(string stateName)
     {
         return AnimatorIsPlaying() && anim.GetCurrentAnimatorStateInfo(0).IsName(stateName);
+    }
+
+    private void TriggerHunt(UnityEngine.Vector3 vector3)
+    {
+        characterPosition = vector3;
+        IsCharacterFound = true;
     }
     #endregion
 }

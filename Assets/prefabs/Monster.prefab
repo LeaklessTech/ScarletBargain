@@ -62,8 +62,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TreeStatus: 1
-  ChaseStatus: 0
-  StunStatus: 0
+  IsStunned: 0
+  IsCharacterFound: 0
 --- !u!195 &7675502468203840162
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -98,15 +98,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 426b6750744ff77f2a86278be06330d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Radius: 0
-  Angle: 0
+  Radius: 25
+  Angle: 60
   TargetRef: {fileID: 0}
   TargetMask:
     serializedVersion: 2
     m_Bits: 0
   ObstructionMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   CanSeePlayer: 0
   SearchForPlayer: 1
   Delay: 0.2

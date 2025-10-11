@@ -25,6 +25,7 @@ public class FieldOfView : MonoBehaviour
     void Start()
     {
         // characterRefs = GameObject.FindGameObjectsWithTag("character").ToList();
+        StartCoroutine(FOVRoutine());
     }
 
     private IEnumerator FOVRoutine()
