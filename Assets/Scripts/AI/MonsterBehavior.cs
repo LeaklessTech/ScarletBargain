@@ -82,15 +82,19 @@ public class MonsterBehavior : MonoBehaviour
     #region Behaviors
     public Node.Status Swivel()
     {
+
         if (state == ActionState.IDLE)
         {
             anim.Play("Swivel", -1, 0f);
             state = ActionState.WORKING;
+            // If we don't return RUNNING here then we will get to the Animator check and succed, thus returning the monster to the idle animation without ever having played the Swivel animation
+            return Node.Status.RUNNING;
         }
 
-        if (!anim.GetCurrentAnimatorStateInfo(0).IsName("Swivel"))
+        if (!AnimatorIsPlaying("Swivel"))
         {
             state = ActionState.IDLE;
+            anim.Play("MonsterIdle");
             return Node.Status.SUCCESS;
         }
 
@@ -185,5 +189,17 @@ public class MonsterBehavior : MonoBehaviour
 
     //     return Node.Status.RUNNING;
     // }
+    #endregion
+
+    #region Helpers
+    bool AnimatorIsPlaying()
+    {
+        return anim.GetCurrentAnimatorStateInfo(0).normalizedTime < 1;
+    }
+
+    bool AnimatorIsPlaying(string stateName)
+    {
+        return AnimatorIsPlaying() && anim.GetCurrentAnimatorStateInfo(0).IsName(stateName);
+    }
     #endregion
 }
