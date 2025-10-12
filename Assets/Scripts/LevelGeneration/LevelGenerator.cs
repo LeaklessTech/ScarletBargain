@@ -142,7 +142,7 @@ namespace LevelGeneration
 
             if (floorTilePrefabs == null || floorTilePrefabs.Count == 0)
             {
-                Debug.LogError("No floor tile prefabs assigned in LevelGenerator. Please add prefabs in the Inspector.");
+                Debug.LogError("No floor tile prefabs assigned in LevelGenerator.");
                 return;
             }
 
@@ -171,6 +171,75 @@ namespace LevelGeneration
                             newTile.transform.parent = roomObject.transform;
                             floorGrid[position.x, position.y] = newTile;
                             newTile.SetActive(false);
+
+                            // Scale ceiling material
+                            Transform ceilingTransform = newTile.transform.Find("Ceiling");
+                            if (ceilingTransform != null)
+                            {
+                                Renderer ceilingRenderer = ceilingTransform.GetComponent<Renderer>();
+                                if (ceilingRenderer != null)
+                                {
+                                    Material ceilingMaterial = new Material(ceilingRenderer.sharedMaterial);
+                                    ceilingRenderer.material = ceilingMaterial;
+                                    float textureScale = objectSizeOffset / 10f;
+                                    string uvTilingProperty = "_UV_Tiling";
+                                    if (ceilingMaterial.HasProperty(uvTilingProperty))
+                                    {
+                                        ceilingMaterial.SetVector(uvTilingProperty, new Vector4(textureScale, textureScale, 0, 0));
+                                    }
+                                    else
+                                    {
+                                        Debug.LogWarning($"Material '{ceilingMaterial.name}' on Ceiling at {createAt} lacks '_UV_Tiling'.");
+                                    }
+                                }
+                            }
+
+                            // Scale floor material
+                            Transform floorTransform = newTile.transform.Find("TileFloor");
+                            if (floorTransform != null)
+                            {
+                                Renderer floorRenderer = floorTransform.GetComponent<Renderer>();
+                                if (floorRenderer != null)
+                                {
+                                    Material floorMaterial = new Material(floorRenderer.sharedMaterial);
+                                    floorRenderer.material = floorMaterial;
+                                    float textureScale = objectSizeOffset / 10f;
+                                    string uvTilingProperty = "_UV_Tiling";
+                                    if (floorMaterial.HasProperty(uvTilingProperty))
+                                    {
+                                        floorMaterial.SetVector(uvTilingProperty, new Vector4(textureScale, textureScale, 0, 0));
+                                    }
+                                    else
+                                    {
+                                        Debug.LogWarning($"Material '{floorMaterial.name}' on TileFloor at {createAt} lacks '_UV_Tiling'.");
+                                    }
+                                }
+                            }
+
+                            // Scale wall materials
+                            foreach (var (wall, _) in Dirs)
+                            {
+                                Transform wallTransform = newTile.transform.Find(wall);
+                                if (wallTransform != null)
+                                {
+                                    Renderer wallRenderer = wallTransform.GetComponent<Renderer>();
+                                    if (wallRenderer != null)
+                                    {
+                                        Material wallMaterial = new Material(wallRenderer.sharedMaterial);
+                                        wallRenderer.material = wallMaterial;
+                                        float textureScale = objectSizeOffset / 10f;
+                                        string uvTilingProperty = "_UV_Tiling";
+                                        if (wallMaterial.HasProperty(uvTilingProperty))
+                                        {
+                                            wallMaterial.SetVector(uvTilingProperty, new Vector4(textureScale, textureScale, 0, 0));
+                                        }
+                                        else
+                                        {
+                                            Debug.LogWarning($"Material '{wallMaterial.name}' on {wall} at {createAt} lacks '_UV_Tiling'.");
+                                        }
+                                    }
+                                }
+                            }
                         }
 
                         roomObject.transform.parent = LevelObject.transform;
