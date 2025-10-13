@@ -13,6 +13,9 @@ public class PlayerRigidbodyController : MonoBehaviour
     public float groundCheckRadius = 0.2f;
     public LayerMask groundMask;
 
+    [Header("References")]
+    public Transform cam;
+
     Rigidbody rb;
     float hInput, vInput;
     bool wantJump = false;
@@ -33,11 +36,26 @@ public class PlayerRigidbodyController : MonoBehaviour
 
     void FixedUpdate()
     {
-        // move
-        Vector3 move = (transform.right * hInput + transform.forward * vInput).normalized;
+        // get cam forward direction and right direction
+        Vector3 camForward = cam.forward;
+        Vector3 camRight = cam.right;
+        camForward.y = 0;
+        camRight.y = 0;
+
+        // move relative to cam direction
+        Vector3 move = (camForward.normalized * vInput + camRight.normalized * hInput);
         Vector3 target = rb.position + move * speed * Time.fixedDeltaTime;
         rb.MovePosition(target);
 
+        // rotate player to face movement direction
+        if (move != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(move);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 15f * Time.fixedDeltaTime);
+        }
+
+
+        // jump/fall logic
         bool isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundMask);
 
         if (wantJump && isGrounded)
