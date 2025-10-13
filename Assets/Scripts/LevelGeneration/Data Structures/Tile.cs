@@ -6,7 +6,7 @@ namespace LevelGeneration
     public class Tile
     {
         const int HALLWAY_COST = 1;
-        const int ROOM_COST = 10;
+        const int ROOM_COST = 5;
         const int EMPTY_COST = 15;
 
         public enum TileType { HALLWAY, ROOM, EMPTY }
@@ -45,6 +45,7 @@ namespace LevelGeneration
 
         public Tile Previous { get; set; }
 
+        // we want fScore to be updated based on the changes in H and G score, so we use some backing fields
         private int _gScore;
         private int _hScore;
 

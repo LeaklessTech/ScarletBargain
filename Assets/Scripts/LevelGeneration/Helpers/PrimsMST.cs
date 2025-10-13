@@ -21,6 +21,7 @@ public class MSTResult
     }
 }
 
+// in retrospect this could be an MST class, maybe with a Prim's method. Would be more extensible that way
 public class PrimsMST
 {
     private List<GraphStructures.Node> _graphNodes { get; set; }

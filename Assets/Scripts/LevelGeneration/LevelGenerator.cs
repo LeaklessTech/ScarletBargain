@@ -1,15 +1,22 @@
 using Mono.Cecil.Cil;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using static LevelGeneration.Tile;
 
 namespace LevelGeneration
 {
     public partial class LevelGenerator : MonoBehaviour
     {
+        [Header("Step Mode")]
+        [Tooltip("Activating this mode makes level generation run at runtime. For debugging purposes.")]
+        public bool DebugActive = false;
+
         [Header("Hallway Chance")]
         [Tooltip("Odds that a hallway not in the MST gets added anyway")]
         [Range(0f, 100f)]
@@ -49,19 +56,25 @@ namespace LevelGeneration
         // For overlap checking
         private readonly List<Room> placedRooms = new();
 
-        private static readonly (string wall, Vector2Int d)[] Dirs =
+        private static readonly (Tile.Wall, Vector2Int d)[] Dirs =
         {
-            ("NorthWall", new Vector2Int(0, 1)),
-            ("SouthWall", new Vector2Int(0,  -1)),
-            ("EastWall",  new Vector2Int(1, 0)),
-            ("WestWall",  new Vector2Int(-1,  0)),
+            (Wall.North, new Vector2Int(0, 1)),
+            (Wall.South, new Vector2Int(0,  -1)),
+            (Wall.East,  new Vector2Int(1, 0)),
+            (Wall.West,  new Vector2Int(-1,  0)),
         };
 
         void Start()
         {
             // setting a seed makes debugging easier
             if (Seed == 0)
-                UnityEngine.Random.InitState(Random.Range(0, int.MaxValue));
+            {
+                System.Random random = new();
+
+                Seed = random.Next(0, int.MaxValue - 1);
+
+                UnityEngine.Random.InitState(Seed);
+            }
             else
                 UnityEngine.Random.InitState(Seed);
 
@@ -69,36 +82,15 @@ namespace LevelGeneration
 
             tileGrid = new Tile[LevelWidth, LevelLength];
 
-            GenerateBase();            
-            CreateRooms();
-            GenerateGrid();
-            CreateHallways();
-
-            //StartCoroutine(DebugCoroutine());
-
-        }
-
-        private IEnumerator DebugCoroutine()
-        {
-            yield return StartCoroutine(GenerateBaseCoroutine());
-            Debug.Log("Base Generated.");
-            yield return StartCoroutine(CreateRoomsCoroutine());
-            Debug.Log("Rooms Created.");
-            yield return StartCoroutine(GenerateGridCoroutine());
-            Debug.Log("Grid Generated.");
-            yield return StartCoroutine(HallwayCoroutine());
-            Debug.Log("Hallways Generated.");
-        }
-
-        private void Update()
-        {
-        }
-
-        private void GenerateGrid()
-        {
-            foreach (Room room in placedRooms)
+            if (DebugActive)
             {
-                RefineRoom(room);
+                StartCoroutine(DebugCoroutine());
+            }
+            else
+            {
+                GenerateBase();
+                CreateRooms();
+                CreateHallways();
             }
         }
 
@@ -121,23 +113,10 @@ namespace LevelGeneration
                     Vector2Int n = tilePosition + direction;
                     if (room.Bounds.Contains(n))
                     {
-                        RemoveWall(tile, wall, disableInsteadOfDestroy);
+                        tile.RemoveWall(wall);
                     }
                 }
             }
-        }
-
-        private static void RemoveWall(Tile parent, string childName, bool disable)
-        {
-            GameObject parentObject = parent.TileObject;
-
-            var t = parentObject.transform.Find(childName);
-            if (t == null) return;
-
-            if (disable)
-                t.gameObject.SetActive(false);
-            else
-                Object.Destroy(t.gameObject);
         }
 
         private void GenerateBase()
@@ -173,11 +152,11 @@ namespace LevelGeneration
             {
                 for (int currentAttempt = 0; currentAttempt < retryLimit; currentAttempt++)
                 {
-                    int potentialRoomWidth = Random.Range(MinRoomWidth, MaxRoomWidth + 1);
-                    int potentialRoomLength = Random.Range(MinRoomLength, MaxRoomLength + 1);
+                    int potentialRoomWidth = UnityEngine.Random.Range(MinRoomWidth, MaxRoomWidth + 1);
+                    int potentialRoomLength = UnityEngine.Random.Range(MinRoomLength, MaxRoomLength + 1);
 
-                    int potentialRoomX = Random.Range(0, LevelWidth - potentialRoomWidth + 1);
-                    int potentialRoomY = Random.Range(0, LevelLength - potentialRoomLength + 1);
+                    int potentialRoomX = UnityEngine.Random.Range(0, LevelWidth - potentialRoomWidth + 1);
+                    int potentialRoomY = UnityEngine.Random.Range(0, LevelLength - potentialRoomLength + 1);
 
                     RectInt potentialRoom = new(potentialRoomX, potentialRoomY, potentialRoomWidth, potentialRoomLength);
 
@@ -256,6 +235,11 @@ namespace LevelGeneration
                         failedPlacements++;
                     }
                 }
+            }
+
+            foreach (Room room in placedRooms)
+            {
+                RefineRoom(room);
             }
 
             Debug.Log($"{RoomCount - failedPlacements}/{RoomCount} Rooms were created.");
@@ -286,9 +270,21 @@ namespace LevelGeneration
             return new RectInt(r.xMin - n, r.yMin - n, r.width + 2 * n, r.height + 2 * n);
         }
 
+        // Regions are bad practice 99% of the time, but this makes collapsing them easier
         #region Coroutines
         // we use the coroutines to slow the generation down at edit time
         // probably need to be later removed
+
+        private IEnumerator DebugCoroutine()
+        {
+            yield return StartCoroutine(GenerateBaseCoroutine());
+            Debug.Log("Base Generated.");
+            yield return StartCoroutine(CreateRoomsCoroutine());
+            Debug.Log("Grid Generated.");
+            yield return StartCoroutine(HallwayCoroutine());
+            Debug.Log("Hallways Generated.");
+        }
+
         private IEnumerator GenerateBaseCoroutine()
         {
             for (int i = 0; i < LevelWidth; i++)
@@ -309,7 +305,7 @@ namespace LevelGeneration
                     // enable the tile so it shows up
                     newTile.TileObject.SetActive(true);
                 }
-                yield return new WaitForSeconds(.25f);
+                yield return new WaitForSeconds(.1f);
             }
         }
         private IEnumerator CreateRoomsCoroutine()
@@ -320,11 +316,11 @@ namespace LevelGeneration
             {
                 for (int currentAttempt = 0; currentAttempt < retryLimit; currentAttempt++)
                 {
-                    int potentialRoomWidth = Random.Range(MinRoomWidth, MaxRoomWidth + 1);
-                    int potentialRoomLength = Random.Range(MinRoomLength, MaxRoomLength + 1);
+                    int potentialRoomWidth = UnityEngine.Random.Range(MinRoomWidth, MaxRoomWidth + 1);
+                    int potentialRoomLength = UnityEngine.Random.Range(MinRoomLength, MaxRoomLength + 1);
 
-                    int potentialRoomX = Random.Range(0, LevelWidth - potentialRoomWidth + 1);
-                    int potentialRoomY = Random.Range(0, LevelLength - potentialRoomLength + 1);
+                    int potentialRoomX = UnityEngine.Random.Range(0, LevelWidth - potentialRoomWidth + 1);
+                    int potentialRoomY = UnityEngine.Random.Range(0, LevelLength - potentialRoomLength + 1);
 
                     RectInt potentialRoom = new(potentialRoomX, potentialRoomY, potentialRoomWidth, potentialRoomLength);
 
@@ -405,27 +401,24 @@ namespace LevelGeneration
                 }
             }
 
-            Debug.Log($"{RoomCount - failedPlacements}/{RoomCount} Rooms were created.");
-            yield return new WaitForSeconds(2f);
-        }
-        private IEnumerator GenerateGridCoroutine()
-        {
             foreach (Room room in placedRooms)
             {
                 RefineRoom(room);
-                yield return new WaitForSeconds(.5f);
+                yield return new WaitForSeconds(.25f);
             }
 
-            for(int i = 0; i < LevelLength;i++)
+            for (int i = 0; i < LevelLength; i++)
             {
                 for (int j = 0; j < LevelWidth; j++)
                 {
-                    if (tileGrid[i,j].Type == Tile.TileType.EMPTY)
-                        tileGrid[i,j].TileObject.SetActive(false);
+                    if (tileGrid[i, j].Type == TileType.EMPTY)
+                        tileGrid[i, j].TileObject.SetActive(false);
                 }
 
-                yield return new WaitForSeconds(.25f);
+                yield return new WaitForSeconds(.1f);
             }
+
+            Debug.Log($"{RoomCount - failedPlacements}/{RoomCount} Rooms were created.");
         }
 
         #endregion

@@ -176,6 +176,7 @@ namespace LevelGeneration
             return validNeighbors;
         }
 
+        // we use this instead of euclidean distance (Vector3.Distance) since we're working in a grid and can't generate diagonal hallways
         private static int ManhattanDistance(Vector2 positonA, Vector2 positionB)
         {
             return (int)(math.abs(positonA.x - positionB.x) + math.abs(positonA.y - positionB.y));

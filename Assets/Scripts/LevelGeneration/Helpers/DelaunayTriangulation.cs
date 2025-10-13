@@ -19,18 +19,18 @@ public class DelaunayTriangulation
         Triangles = new List<Triangle>();
     }
 
-    // couple helper functions ispired by Vazgriz, helps with small variation in positioning
+    // couple helper functions inspired by Vazgriz, helps with small variation in positioning
+    // the way he set it up doesn't totally work - we instead define a small tolerance
+    // obviously this is to deal with floating point numbers being inequal
     public static bool NearEqual(float a, float b, float tolerance = 0.001f)
     {
         return Mathf.Abs(a - b) <= tolerance;
     }
 
-
     public static bool NearEqual(GraphStructures.Node left, GraphStructures.Node right)
     {
         return NearEqual(left.Position.x, right.Position.x) && NearEqual(left.Position.z, right.Position.z);
     }
-
 
     public static DelaunayTriangulation TriangulatePoints(List<GraphStructures.Node> points)
     {

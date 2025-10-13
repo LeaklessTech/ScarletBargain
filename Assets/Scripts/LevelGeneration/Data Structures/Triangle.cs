@@ -62,11 +62,8 @@ public class Triangle : IEquatable<Triangle>
         return distSqr <= radiusSqr + 1e-6f;
     }
 
-
-
-
     // simple helper method
-    // we give some tolerance for small variation in position
+    // we give some tolerance for small variation in position, since floating points won't ever be exactly equal
     public bool ContainsPoint(Vector3 point)
     {
         return Vector3.Distance(point, A.Position) < 0.01f ||
@@ -102,7 +99,6 @@ public class Triangle : IEquatable<Triangle>
             return false;
     }
 
-    // we use XOR here as a computationally ch
     public override int GetHashCode()
     {
         return HashCode.Combine(A, B, C);
