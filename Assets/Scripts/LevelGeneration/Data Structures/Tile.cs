@@ -5,6 +5,10 @@ namespace LevelGeneration
 {
     public class Tile
     {
+        const int HALLWAY_COST = 1;
+        const int ROOM_COST = 10;
+        const int EMPTY_COST = 15;
+
         public enum TileType { HALLWAY, ROOM, EMPTY }
         public enum Wall { North, South, East, West}
 
@@ -26,14 +30,13 @@ namespace LevelGeneration
                 _type = value;
                 BaseCost = value switch
                 {
-                    TileType.HALLWAY => 1,
-                    TileType.ROOM => 10,
-                    TileType.EMPTY => 15,
+                    TileType.HALLWAY => HALLWAY_COST,
+                    TileType.ROOM => ROOM_COST,
+                    TileType.EMPTY => EMPTY_COST,
                     _ => BaseCost
                 };
             }
         }
-
 
         public int BaseCost { get; set; }
         public GameObject TileObject { get; set; }

@@ -1,4 +1,5 @@
 using GraphStructures;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
@@ -50,7 +51,7 @@ namespace LevelGeneration
         // otherwise the algorithim will be checking old gScores
         private static void ResetScores(Tile[,] grid)
         {
-            foreach(Tile tile in grid)
+            foreach (Tile tile in grid)
             {
                 tile.ResetScores();
             }
@@ -81,7 +82,7 @@ namespace LevelGeneration
                         break;
                     case NeighborDirections.East:
                         current.RemoveWall(Tile.Wall.East);
-                        current.Previous.RemoveWall(Tile.Wall.West); 
+                        current.Previous.RemoveWall(Tile.Wall.West);
                         break;
                     case NeighborDirections.West:
                         current.RemoveWall(Tile.Wall.West);
@@ -179,5 +180,38 @@ namespace LevelGeneration
         {
             return (int)(math.abs(positonA.x - positionB.x) + math.abs(positonA.y - positionB.y));
         }
+
+        #region Coroutines
+        public static IEnumerator PathfindHallwaysCoroutine(List<Edge> graph, Tile[,] grid)
+        {
+            int temp = 0;
+
+            List<Edge> graphEdges = new(graph);
+
+            // pathfind every edge
+            foreach (Edge edge in graphEdges)
+            {
+                // initialize
+                Room startingRoom = edge.NodeA.Room;
+                Room endingRoom = edge.NodeB.Room;
+
+                Tile startingTile = startingRoom.RoomTiles[UnityEngine.Random.Range(0, startingRoom.RoomTiles.Count)];
+                Tile endingTile = endingRoom.RoomTiles[UnityEngine.Random.Range(0, endingRoom.RoomTiles.Count)];
+
+                Tile endOfPath = Pathfind(startingTile, endingTile, grid);
+
+                ResetScores(grid);
+
+                GenerateHallway(endOfPath);
+
+                temp++;
+
+                yield return new WaitForSeconds(1f);
+            }
+
+            Debug.Log($"Hallways generated: {temp}");
+        }
+
+            #endregion
     }
 }

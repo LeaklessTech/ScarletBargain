@@ -1,7 +1,9 @@
 using GraphStructures;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using Unity.VisualScripting;
 using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
@@ -18,17 +20,28 @@ namespace LevelGeneration
         private void CreateHallways()
         {
             CreateGraph();
-
             CreateMST();
-
             AddRandomEdges();
 
             AStar.PathfindHallways(new (finalGraph), tileGrid);
 #if UNITY_EDITOR
             //DebugGraph();
             //DebugMST();
-            DebugFinalGraph();
+            //DebugFinalGraph();
 #endif
+        }
+
+        private IEnumerator HallwayCoroutine()
+        {
+            CreateGraph();
+            CreateMST();
+
+            yield return StartCoroutine(DebugGraphCoroutine());
+            yield return StartCoroutine(DebugMSTCoroutine());
+            AddRandomEdges();
+            yield return StartCoroutine(DebugFinalGraphCoroutine());
+
+            yield return StartCoroutine(AStar.PathfindHallwaysCoroutine(new(finalGraph), tileGrid));
         }
 
         private void CreateGraph()
@@ -38,7 +51,6 @@ namespace LevelGeneration
 
             foreach(var room in placedRooms)
             {
-                
                 roomCenters.Add(new GraphStructures.Node(room.RoomObject.transform.position, room));
             }
 
@@ -97,5 +109,39 @@ namespace LevelGeneration
             }
             Debug.Log($"Added {finalGraph.Count - tempCount} edges. Started with {tempCount}, ended with {finalGraph.Count}. Max was {Graph.GraphEdges.Count}.");
         }
+
+        #region Coroutines
+
+        private IEnumerator DebugGraphCoroutine()
+        {
+            foreach (var triangle in Graph.Triangles)
+            {
+                Debug.DrawLine(triangle.A.Position, triangle.B.Position, Color.white, 30f);
+                Debug.DrawLine(triangle.B.Position, triangle.C.Position, Color.white, 30f);
+                Debug.DrawLine(triangle.C.Position, triangle.A.Position, Color.white, 30f);
+                yield return new WaitForSeconds(.5f);
+            }
+
+        }
+        private IEnumerator DebugMSTCoroutine()
+        {
+            foreach (GraphStructures.Edge edge in MST.TreeEdges)
+            {
+                Debug.DrawLine(edge.NodeA.Position + new Vector3(2, 0, 2), edge.NodeB.Position + new Vector3(2, 0, 2), Color.black, 40f);
+                yield return new WaitForSeconds(.5f);
+            }
+        }
+
+        private IEnumerator DebugFinalGraphCoroutine()
+        {
+            foreach (var edge in finalGraph)
+            {
+                Debug.DrawLine(edge.NodeA.Position, edge.NodeB.Position, Color.cyan, 120f);
+                yield return new WaitForSeconds(.5f);
+            }
+            Debug.Log($"Added {finalGraph.Count - tempCount} edges. Started with {tempCount}, ended with {finalGraph.Count}. Max was {Graph.GraphEdges.Count}.");
+        }
+
+        #endregion
     }
 }

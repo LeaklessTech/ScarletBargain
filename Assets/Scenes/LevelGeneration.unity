@@ -406,18 +406,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b223f0d38beefb34285a2cb1cb090cc6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AdditionalHallwayChance: 10
-  LevelWidth: 25
-  LevelLength: 25
+  AdditionalHallwayChance: 18
+  LevelWidth: 50
+  LevelLength: 50
   MinRoomWidth: 2
-  MaxRoomWidth: 5
+  MaxRoomWidth: 6
   MinRoomLength: 2
-  MaxRoomLength: 5
+  MaxRoomLength: 6
   RoomBuffer: 1
-  RoomCount: 100
-  retryLimit: 1000
+  RoomCount: 25
+  retryLimit: 100
   floorTilePrefab: {fileID: 6805246545633482266, guid: 0e431421b7cf6e442952b0465061bf50, type: 3}
   objectSizeOffset: 10
+  Seed: 12202512
 --- !u!4 &1309857617
 Transform:
   m_ObjectHideFlags: 0
