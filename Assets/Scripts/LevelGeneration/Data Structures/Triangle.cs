@@ -9,16 +9,16 @@ public class Triangle : IEquatable<Triangle>
 {
     public bool badTriangle { get; set; }
 
-    public Point A { get; private set; }
-    public Point B { get; private set; }
-    public Point C { get; private set; }
+    public GraphStructures.Node A { get; private set; }
+    public GraphStructures.Node B { get; private set; }
+    public GraphStructures.Node C { get; private set; }
 
     public Triangle()
     {
 
     }
 
-    public Triangle(Point a, Point b, Point c)
+    public Triangle(GraphStructures.Node a, GraphStructures.Node b, GraphStructures.Node c)
     {
         this.A = a;
         this.B = b;

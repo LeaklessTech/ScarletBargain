@@ -10,8 +10,8 @@ namespace GraphStructures
     // inspired by https://github.com/vazgriz/DungeonGenerator
     public class Edge : IEquatable<Edge>
     {
-        public Point A { get; set; }
-        public Point B { get; set; }
+        public Node NodeA { get; set; }
+        public Node NodeB { get; set; }
         public bool BadEdge { get; set; }
 
         public float weight { get; set; }
@@ -21,19 +21,19 @@ namespace GraphStructures
 
         }
 
-        public Edge(Point a, Point b)
+        public Edge(Node a, Node b)
         {
-            this.A = a;
-            this.B = b;
+            this.NodeA = a;
+            this.NodeB = b;
 
-            weight = Vector3.Distance(A.Position, B.Position);
+            weight = Vector3.Distance(NodeA.Position, NodeB.Position);
         }
 
         // just some helpful overrides to make code cleaner
         public static bool operator ==(Edge edgeA, Edge edgeB)
         {
-            return (edgeA.A == edgeB.A || edgeA.A == edgeB.B)
-                && (edgeA.B == edgeB.A || edgeA.B == edgeB.B);
+            return (edgeA.NodeA == edgeB.NodeA || edgeA.NodeA == edgeB.NodeB)
+                && (edgeA.NodeB == edgeB.NodeA || edgeA.NodeB == edgeB.NodeB);
         }
 
         public static bool operator !=(Edge edgeA, Edge edgeB)
@@ -58,14 +58,14 @@ namespace GraphStructures
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(A, B);
+            return HashCode.Combine(NodeA, NodeB);
         }
 
         // alternate version of equals that will give us a little more leeway 
         public static bool NearEqual(Edge left, Edge right)
         {
-            return DelaunayTriangulation.NearEqual(left.A, right.A) && DelaunayTriangulation.NearEqual(left.B, right.B)
-                || DelaunayTriangulation.NearEqual(left.A, right.B) && DelaunayTriangulation.NearEqual(left.B, right.A);
+            return DelaunayTriangulation.NearEqual(left.NodeA, right.NodeA) && DelaunayTriangulation.NearEqual(left.NodeB, right.NodeB)
+                || DelaunayTriangulation.NearEqual(left.NodeA, right.NodeB) && DelaunayTriangulation.NearEqual(left.NodeB, right.NodeA);
         }
     }
 }

@@ -1,5 +1,8 @@
+using Mono.Cecil.Cil;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -36,38 +39,40 @@ namespace LevelGeneration
         [Tooltip("World-space spacing between tiles (matches tile prefab footprint)")]
         public int objectSizeOffset = 10;
 
-        private GameObject[,] floorGrid;
+        private Tile[,] tileGrid;
 
         private GameObject LevelObject;
-        
+
         // For overlap checking
         private readonly List<Room> placedRooms = new();
 
         private static readonly (string wall, Vector2Int d)[] Dirs =
         {
-            ("NorthWall", new Vector2Int(0, -1)),
-            ("SouthWall", new Vector2Int(0,  1)),
-            ("EastWall",  new Vector2Int(-1, 0)),
-            ("WestWall",  new Vector2Int(1,  0)),
+            ("NorthWall", new Vector2Int(0, 1)),
+            ("SouthWall", new Vector2Int(0,  -1)),
+            ("EastWall",  new Vector2Int(1, 0)),
+            ("WestWall",  new Vector2Int(-1,  0)),
         };
 
         void Start()
         {
+            // setting a seed makes debugging easier
+            UnityEngine.Random.InitState(1234);
+
             LevelObject = new("Level");
 
-            floorGrid = new GameObject[LevelWidth, LevelLength];
+            tileGrid = new Tile[LevelWidth, LevelLength];
 
-            GenerateBase();
+            //GenerateBase();
+            StartCoroutine(GenerateBaseCoroutine());
             CreateRooms();
             GenerateGrid();
             CreateHallways();
         }
 
-
         private void Update()
         {
         }
-
 
         private void GenerateGrid()
         {
@@ -79,15 +84,14 @@ namespace LevelGeneration
 
         private void RefineRoom(Room room, bool disableInsteadOfDestroy = true)
         {
-            if (floorGrid == null) return;
+            if (tileGrid == null) return;
 
-            foreach (var tilePosition in room.bounds.allPositionsWithin)
+            foreach (var tilePosition in room.Bounds.allPositionsWithin)
             {
-                var tile = floorGrid[tilePosition.x, tilePosition.y];
-                if (tile == null) 
+                var tile = tileGrid[tilePosition.x, tilePosition.y];
+                if (tile == null)
                     continue;
-                tile.SetActive(true);
-
+                tile.TileObject.SetActive(true);
 
                 // For each direction, if the neighbor is ALSO inside the rect,
                 // remove this tile's wall that faces that neighbor.
@@ -95,7 +99,7 @@ namespace LevelGeneration
                 foreach (var (wall, direction) in Dirs)
                 {
                     Vector2Int n = tilePosition + direction;
-                    if (room.bounds.Contains(n))
+                    if (room.Bounds.Contains(n))
                     {
                         RemoveWall(tile, wall, disableInsteadOfDestroy);
                     }
@@ -103,9 +107,11 @@ namespace LevelGeneration
             }
         }
 
-        private static void RemoveWall(GameObject parent, string childName, bool disable)
+        private static void RemoveWall(Tile parent, string childName, bool disable)
         {
-            var t = parent.transform.Find(childName);
+            GameObject parentObject = parent.TileObject;
+
+            var t = parentObject.transform.Find(childName);
             if (t == null) return;
 
             if (disable)
@@ -120,15 +126,49 @@ namespace LevelGeneration
             {
                 for (int j = 0; j < LevelLength; j++)
                 {
-                    Vector3 createAt = new Vector3(i * objectSizeOffset, 0, j * objectSizeOffset);
+                    Vector3 createAt = new Vector3(-i * objectSizeOffset, 0, -j * objectSizeOffset);
 
-                    GameObject newTile = Instantiate(floorTilePrefab, createAt, Quaternion.identity);
+                    GameObject newTileGameObject = Instantiate(floorTilePrefab, createAt, Quaternion.identity);
 
-                    floorGrid[i, j] = newTile;
+                    // debug
+                    newTileGameObject.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = $"{i},{j}";
+
+                    Tile newTile = new(Tile.TileType.EMPTY, newTileGameObject, (i, j));
+
+                    tileGrid[i, j] = newTile;
 
                     // we'll only want rooms to be visible/enabled
-                    // unused rooms should be removed in the end (maybe)
-                    newTile.SetActive(false);
+                    // unused tiles should be removed in the end (maybe)
+                    newTile.TileObject.SetActive(false);
+
+                }
+            }
+        }
+
+        // we use the coroutines to slow the generation down at edit time
+        // probably need to be later removed
+        private IEnumerator GenerateBaseCoroutine()
+        {
+            for (int i = 0; i < LevelWidth; i++)
+            {
+                for (int j = 0; j < LevelLength; j++)
+                {
+                    Vector3 createAt = new Vector3(-i * objectSizeOffset, 0, -j * objectSizeOffset);
+
+                    GameObject newTileGameObject = Instantiate(floorTilePrefab, createAt, Quaternion.identity);
+
+                    // debug
+                    newTileGameObject.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = $"{i},{j}";
+
+                    Tile newTile = new(Tile.TileType.EMPTY, newTileGameObject, (i, j));
+
+                    tileGrid[i, j] = newTile;
+
+                    // enable the tile so it shows up
+                    newTile.TileObject.SetActive(true);
+
+                    // wait one second before spawning the next tile
+                    yield return new WaitForSeconds(.5f);
                 }
             }
         }
@@ -152,24 +192,31 @@ namespace LevelGeneration
                     if (BoundsCheck(potentialRoom))
                     {
                         // Collect the tiles/transforms that will belong to this room
-                        var tileTransforms = new List<Transform>();
-                        var tileRenderers = new List<Renderer>();
-                        var tileColliders = new List<Collider>();
+                        List<Transform> tileTransforms = new();
+                        List<Renderer> tileRenderers = new();
+                        List<Collider> tileColliders = new();
+
+                        List<Tile> roomTiles = new();
 
                         foreach (var position in potentialRoom.allPositionsWithin)
                         {
-                            var tile = floorGrid[position.x, position.y];
+                            var tile = tileGrid[position.x, position.y];
                             if (tile == null) continue;
 
-                            Transform t = tile.transform;
+                            Transform t = tile.TileObject.transform;
                             tileTransforms.Add(t);
 
                             // prefer renderer bounds
-                            var r = tile.GetComponent<Renderer>();
+                            var r = tile.TileObject.GetComponent<Renderer>();
                             if (r != null) tileRenderers.Add(r);
 
-                            var c = tile.GetComponent<Collider>();
+                            var c = tile.TileObject.GetComponent<Collider>();
                             if (c != null) tileColliders.Add(c);
+
+                            // this is important for when we pathfind hallways
+                            tile.Type = Tile.TileType.ROOM;
+
+                            roomTiles.Add(tile);
                         }
 
                         // compute combined center in world space
@@ -206,10 +253,10 @@ namespace LevelGeneration
                         // parent tiles to the room object while preserving their world positions
                         foreach (var t in tileTransforms)
                         {
-                            t.SetParent(roomObject.transform, true); // worldPositionStays = true
+                            t.SetParent(roomObject.transform, true);
                         }
 
-                        placedRooms.Add(new(potentialRoom, roomObject));
+                        placedRooms.Add(new(potentialRoom, roomObject, roomTiles));
                         break;
                     }
                     else if (currentAttempt == retryLimit - 1)
@@ -225,8 +272,8 @@ namespace LevelGeneration
 
         private bool BoundsCheck(RectInt room)
         {
-            int matrixWidth = floorGrid.GetLength(0);
-            int matrixHeight = floorGrid.GetLength(1);
+            int matrixWidth = tileGrid.GetLength(0);
+            int matrixHeight = tileGrid.GetLength(1);
 
             bool insideMatrix =
                 room.xMin >= 0 &&
@@ -236,7 +283,7 @@ namespace LevelGeneration
 
             if (!insideMatrix) return false;
 
-            bool spacedFromOthers = placedRooms.All(r => !Inflate(r.bounds, RoomBuffer).Overlaps(room));
+            bool spacedFromOthers = placedRooms.All(r => !Inflate(r.Bounds, RoomBuffer).Overlaps(room));
             if (!spacedFromOthers) return false;
 
             return true;
@@ -246,19 +293,6 @@ namespace LevelGeneration
         private static RectInt Inflate(RectInt r, int n)
         {
             return new RectInt(r.xMin - n, r.yMin - n, r.width + 2 * n, r.height + 2 * n);
-        }
-
-        // readding this method temporarily
-        private static void RemoveChild(GameObject parent, string childName, bool disable)
-        {
-            // Find() is fine for modest sizes; for large grids, consider caching child refs.
-            var t = parent.transform.Find(childName);
-            if (t == null) return;
-
-            if (disable)
-                t.gameObject.SetActive(false);
-            else
-                Object.Destroy(t.gameObject);
         }
     }
 }

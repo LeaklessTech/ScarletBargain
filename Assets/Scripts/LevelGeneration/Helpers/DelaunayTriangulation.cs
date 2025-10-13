@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 
 public class DelaunayTriangulation
 {
-    public List<Point> GraphPoints { get; private set; }
+    public List<GraphStructures.Node> GraphNodes { get; private set; }
     public List<Edge> GraphEdges { get; private set; }
     public List<Triangle> Triangles { get; private set; }
 
@@ -26,16 +26,16 @@ public class DelaunayTriangulation
     }
 
 
-    public static bool NearEqual(Point left, Point right)
+    public static bool NearEqual(GraphStructures.Node left, GraphStructures.Node right)
     {
         return NearEqual(left.Position.x, right.Position.x) && NearEqual(left.Position.z, right.Position.z);
     }
 
 
-    public static DelaunayTriangulation TriangulatePoints(List<Point> points)
+    public static DelaunayTriangulation TriangulatePoints(List<GraphStructures.Node> points)
     {
         DelaunayTriangulation triangulation = new();
-        triangulation.GraphPoints = new(points);
+        triangulation.GraphNodes = new(points);
 
         triangulation.CreateTriangulation();
 
@@ -48,12 +48,12 @@ public class DelaunayTriangulation
         // first, we'll create a "super triangle" that encompasses ALL points
 
         // we'll need to get the extremes first to make sure we encompass all of them
-        float xMin = GraphPoints[0].Position.x;
-        float zMin = GraphPoints[0].Position.z;
+        float xMin = GraphNodes[0].Position.x;
+        float zMin = GraphNodes[0].Position.z;
         float xMax = xMin;
         float zMax = zMin;
 
-        foreach (var point in GraphPoints)
+        foreach (var point in GraphNodes)
         {
             xMin = Mathf.Min(xMin, point.Position.x);
             zMin = Mathf.Min(zMin, point.Position.z);
@@ -66,9 +66,9 @@ public class DelaunayTriangulation
         float yDiff = zMax - zMin;
         float dMax = Mathf.Max(xDiff, yDiff) * 2;
 
-        Point A = new Point(new Vector3(xMin - 1, 0, zMin - 1));
-        Point B = new Point(new Vector3(xMin - 1, 0, zMax + dMax));
-        Point C = new Point(new Vector3(xMax + dMax, 0, zMin - 1));
+        GraphStructures.Node A = new GraphStructures.Node(new Vector3(xMin - 1, 0, zMin - 1));
+        GraphStructures.Node B = new GraphStructures.Node(new Vector3(xMin - 1, 0, zMax + dMax));
+        GraphStructures.Node C = new GraphStructures.Node(new Vector3(xMax + dMax, 0, zMin - 1));
 
 
 
@@ -82,7 +82,7 @@ public class DelaunayTriangulation
         // now we can start inserting points and determining "bad" triangles
 
         // upon insertion of a new point, if a triangle contains the point in its circumcircle, it is bad
-        foreach (var point in GraphPoints)
+        foreach (var point in GraphNodes)
         {
             List<Edge> poly = new();
 
@@ -121,7 +121,7 @@ public class DelaunayTriangulation
             // add good triangles to the list
             foreach (var edge in poly)
             {
-                Triangles.Add(new(edge.A, edge.B, point));
+                Triangles.Add(new(edge.NodeA, edge.NodeB, point));
             }
         }
 

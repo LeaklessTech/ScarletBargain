@@ -23,6 +23,7 @@ namespace LevelGeneration
 
             AddRandomEdges();
 
+            AStar.PathfindHallways(new (finalGraph), tileGrid);
 #if UNITY_EDITOR
             //DebugGraph();
             //DebugMST();
@@ -33,11 +34,12 @@ namespace LevelGeneration
         private void CreateGraph()
         {
             // first convert the centers of each room to points
-            List<Point> roomCenters = new();
+            List<GraphStructures.Node> roomCenters = new();
 
             foreach(var room in placedRooms)
             {
-                roomCenters.Add(new Point(room.roomObject.transform.position));
+                
+                roomCenters.Add(new GraphStructures.Node(room.RoomObject.transform.position, room));
             }
 
             Graph = DelaunayTriangulation.TriangulatePoints(roomCenters);
@@ -65,7 +67,7 @@ namespace LevelGeneration
                 if(rnd < AdditionalHallwayChance)
                 {
                     finalGraph.Add(edge);
-                    Debug.Log($"Edge added: {edge.A.Position},{edge.B.Position}. Rolled {rnd}.");
+                    Debug.Log($"Edge added: {edge.NodeA.Position},{edge.NodeB.Position}. Rolled {rnd}.");
                 }
             }
         }
@@ -84,14 +86,14 @@ namespace LevelGeneration
         private void DebugMST()
         {
             foreach (GraphStructures.Edge edge in MST.TreeEdges)
-                Debug.DrawLine(edge.A.Position + new Vector3(2, 0, 2), edge.B.Position + new Vector3(2, 0, 2), Color.black, 40f);
+                Debug.DrawLine(edge.NodeA.Position + new Vector3(2, 0, 2), edge.NodeB.Position + new Vector3(2, 0, 2), Color.black, 40f);
         }
 
         private void DebugFinalGraph()
         {
             foreach(var edge in finalGraph)
             {
-                Debug.DrawLine(edge.A.Position, edge.B.Position, Color.cyan, 30f);
+                Debug.DrawLine(edge.NodeA.Position, edge.NodeB.Position, Color.cyan, 30f);
             }
             Debug.Log($"Added {finalGraph.Count - tempCount} edges. Started with {tempCount}, ended with {finalGraph.Count}. Max was {Graph.GraphEdges.Count}.");
         }

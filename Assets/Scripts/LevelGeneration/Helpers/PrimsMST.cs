@@ -12,7 +12,7 @@ public class MSTResult
     public bool Success { get; set; }
     public string Message { get; set; }
     public HashSet<Edge> TreeEdges { get; set; }
-    public HashSet<Point> TreeNodes { get; set; }
+    public HashSet<GraphStructures.Node> TreeNodes { get; set; }
 
     public MSTResult()
     {
@@ -23,12 +23,12 @@ public class MSTResult
 
 public class PrimsMST
 {
-    private List<Point> _graphNodes { get; set; }
+    private List<GraphStructures.Node> _graphNodes { get; set; }
     private List<Edge> _graphEdges { get; set; }
 
     public PrimsMST(DelaunayTriangulation triangulation)
     {
-        _graphNodes = triangulation.GraphPoints;
+        _graphNodes = triangulation.GraphNodes;
         _graphEdges = triangulation.GraphEdges;
     }
 
@@ -49,14 +49,14 @@ public class PrimsMST
         PriorityQueue<Edge, float> canidateEdges = new();
 
         // we choose a random point/node as the start
-        Point start = _graphNodes[UnityEngine.Random.Range(0, _graphNodes.Count)];
+        GraphStructures.Node start = _graphNodes[UnityEngine.Random.Range(0, _graphNodes.Count)];
 
         result.TreeNodes.Add(start);
 
         // get the initial edges
         foreach (Edge edge in _graphEdges)
         {
-            if (edge.A.Equals(start) || edge.B.Equals(start))
+            if (edge.NodeA.Equals(start) || edge.NodeB.Equals(start))
                 canidateEdges.Enqueue(edge, edge.weight);
         }
 
@@ -69,20 +69,20 @@ public class PrimsMST
             Edge canidateEdge = canidateEdges.Dequeue();
 
             // treeNodes having both Points of a canidate edge means this edge would create a loop
-            if (result.TreeNodes.Contains(canidateEdge.A) ^ result.TreeNodes.Contains(canidateEdge.B))
+            if (result.TreeNodes.Contains(canidateEdge.NodeA) ^ result.TreeNodes.Contains(canidateEdge.NodeB))
             {
                 result.TreeEdges.Add(canidateEdge);   
 
-                bool newVertexIsA = result.TreeNodes.Contains(canidateEdge.B);
-                bool newVertexIsB = result.TreeNodes.Contains(canidateEdge.A);
+                bool newVertexIsA = result.TreeNodes.Contains(canidateEdge.NodeB);
+                bool newVertexIsB = result.TreeNodes.Contains(canidateEdge.NodeA);
 
                 if (newVertexIsA)
                 {
-                    result.TreeNodes.Add(canidateEdge.A);
+                    result.TreeNodes.Add(canidateEdge.NodeA);
 
                     foreach (Edge edge in _graphEdges)
                     {
-                        if((edge.A.Equals(canidateEdge.A) || edge.B.Equals(canidateEdge.A)) && !result.TreeEdges.Contains(edge))
+                        if((edge.NodeA.Equals(canidateEdge.NodeA) || edge.NodeB.Equals(canidateEdge.NodeA)) && !result.TreeEdges.Contains(edge))
                         {
                             canidateEdges.Enqueue(edge, edge.weight);
                         }
@@ -90,11 +90,11 @@ public class PrimsMST
                 }
                 else if (newVertexIsB)
                 {
-                    result.TreeNodes.Add(canidateEdge.B);
+                    result.TreeNodes.Add(canidateEdge.NodeB);
 
                     foreach (Edge edge in _graphEdges)
                     {
-                        if ((edge.A.Equals(canidateEdge.B) || edge.B.Equals(canidateEdge.B)) && !result.TreeEdges.Contains(edge))
+                        if ((edge.NodeA.Equals(canidateEdge.NodeB) || edge.NodeB.Equals(canidateEdge.NodeB)) && !result.TreeEdges.Contains(edge))
                         {
                             canidateEdges.Enqueue(edge, edge.weight);
                         }
