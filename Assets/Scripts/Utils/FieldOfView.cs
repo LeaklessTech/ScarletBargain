@@ -19,12 +19,13 @@ public class FieldOfView : MonoBehaviour
     public float Delay = 0.2f;
 
     // When player is found send an alert to all listeners
-    public static event Action OnPlayerFound;
+    public static event Action<Vector3> OnPlayerFound;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         // characterRefs = GameObject.FindGameObjectsWithTag("character").ToList();
+        StartCoroutine(FOVRoutine());
     }
 
     private IEnumerator FOVRoutine()
@@ -60,7 +61,7 @@ public class FieldOfView : MonoBehaviour
                 if (!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, ObstructionMask))
                 {
                     CanSeePlayer = true;
-                    OnPlayerFound?.Invoke();
+                    OnPlayerFound?.Invoke(target.transform.position);
                 }
                 else
                 {

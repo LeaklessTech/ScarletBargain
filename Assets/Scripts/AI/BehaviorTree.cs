@@ -3,19 +3,21 @@ using System.Collections.Generic;
 
 public class BehaviorTree : Node
 {
-    public BehaviorTree()
-    {
-        name = "Tree";
-    }
-
-    public BehaviorTree(string n)
-    {
-        name = n;
+    readonly IPolicy policy;
+    
+    public BehaviorTree(string n, IPolicy policy = null) : base(n) {
+        this.policy = policy ?? Policies.RunForever;
     }
 
     public override Status Process()
     {
-        return children[currentChild].Process();
+        Status status = children[currentChild].Process();
+        if (policy.ShouldReturn(status)) {
+            return status;
+        }
+        
+        currentChild = (currentChild + 1) % children.Count;
+        return Status.RUNNING;
     }
 
     struct NodeLevel 

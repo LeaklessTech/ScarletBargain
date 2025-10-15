@@ -11,8 +11,6 @@ public class Sequence : Node
     {
         Status childStatus = children[currentChild].Process();
 
-        Debug.Log("Processing: " + children[currentChild].name + ", with Status: " + childStatus);
-
         // If child status is currently running then continue processing that child
         if (childStatus == Status.RUNNING) return Status.RUNNING;
 
