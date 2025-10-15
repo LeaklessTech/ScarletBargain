@@ -10,15 +10,16 @@ namespace LevelGeneration
     public class Room
     {
         // note that bounds.x and bounds.y refer to the top left corner
-        public RectInt bounds { get; private set; }
-        public GameObject roomObject { get; private set; }
-        public GameObject floorTilePrefab;
+        public RectInt Bounds { get; private set; }
+        public GameObject RoomObject { get; private set; }
 
-        public Room(RectInt bounds, GameObject roomObject, GameObject floorTilePrefab)
+        public List<Tile> RoomTiles { get; private set; }
+
+        public Room(RectInt RoomBounds, GameObject roomObject, List<Tile> roomTiles)
         {
-            this.bounds = bounds;
-            this.roomObject = roomObject;
-            this.floorTilePrefab = floorTilePrefab;
+            this.Bounds = RoomBounds;
+            this.RoomObject = roomObject;
+            RoomTiles = roomTiles;
         }
     }
 }
