@@ -3,7 +3,7 @@ using UnityEngine;
 public class ThirdPersonCam : MonoBehaviour
 {
     [Header("Target")]
-    public Transform target;                    // assign player
+    public Transform target;
     public Vector3 targetOffset = new Vector3(0f, 1.2f, 0f);
 
     [Header("Orbit & Input")]
