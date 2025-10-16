@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.AI;
 
 
 public class PartyManager : MonoBehaviour
@@ -28,11 +29,17 @@ public class PartyManager : MonoBehaviour
             return;
         }
 
-        // enable only the first member; others act as followers until rescued
+        // enable only the first member; others will be followers when they become active
         for (int i = 0; i < partyMembers.Count; i++)
         {
             bool isActive = i == activeIndex;
             partyMembers[i].SetActive(isActive);
+
+            PrisonerAI ai = partyMembers[i].GetComponent<PrisonerAI>();
+            if (ai != null)
+            {
+                ai.enabled = false;
+            }
         }
         // set the camera to look at the active member
         if (cameraScript != null)
@@ -66,6 +73,7 @@ public class PartyManager : MonoBehaviour
             // new member is inactive until selected
             ctrl.SetActive(false);
             // immediately start following the current leader
+            prisoner.enabled = true;
             prisoner.Rescue(partyMembers[activeIndex].transform);
         }
     }
@@ -79,13 +87,15 @@ public class PartyManager : MonoBehaviour
         AdvancedPlayerController current = partyMembers[activeIndex];
         current.SetActive(false);
 
-        // compute next index
+        // compute next index (the new leader)
         int nextIndex = (activeIndex + 1) % partyMembers.Count;
 
-        // ssign NavMesh following to the previous leader
+        // enable the AI on the previous leader so it will follow the new leader
         PrisonerAI prevAI = current.GetComponent<PrisonerAI>();
         if (prevAI != null)
         {
+            // enable AI script when a character becomes a follower
+            prevAI.enabled = true;
             prevAI.Rescue(partyMembers[nextIndex].transform);
         }
 
@@ -93,6 +103,19 @@ public class PartyManager : MonoBehaviour
         activeIndex = nextIndex;
         AdvancedPlayerController newLeader = partyMembers[activeIndex];
         newLeader.SetActive(true);
+
+        // disable the AI on the newly controlled character so it doesn't interferes
+        PrisonerAI newAI = newLeader.GetComponent<PrisonerAI>();
+        if (newAI != null)
+        {
+            // disable the AI script for the leader and stop its NavMeshAgent
+            newAI.enabled = false;
+            NavMeshAgent nav = newAI.GetComponent<NavMeshAgent>();
+            if (nav != null)
+            {
+                nav.isStopped = true;
+            }
+        }
 
         // update camera target
         if (cameraScript != null)
@@ -107,6 +130,8 @@ public class PartyManager : MonoBehaviour
             PrisonerAI ai = partyMembers[i].GetComponent<PrisonerAI>();
             if (ai != null)
             {
+                // enable AI script when a character becomes a follower
+                ai.enabled = true;
                 ai.Rescue(newLeader.transform);
             }
         }

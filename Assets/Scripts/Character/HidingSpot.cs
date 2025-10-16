@@ -6,8 +6,8 @@ public class HidingSpot : MonoBehaviour
     [Tooltip("hide key")]
     public KeyCode hideKey = KeyCode.Z;
 
-    AdvancedPlayerController currentPlayer;
-    bool playerInside;
+    private AdvancedPlayerController currentPlayer;
+    private bool playerInside;
 
     void OnTriggerEnter(Collider other)
     {

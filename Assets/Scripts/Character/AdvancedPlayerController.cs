@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -25,22 +26,28 @@ public class AdvancedPlayerController : MonoBehaviour
     public KeyCode crouchKey = KeyCode.C;
     // public KeyCode interactKey = KeyCode.E;
 
-    [Header("crouch height")]
-    [Range(0.1f, 1f)]
-    public float crouchHeightFactor = 0.2f;
+    [SerializeField, Range(0f, 1f)]
+    private float crouchHeightFactor = 0.2f;
+
+    [SerializeField, Range(0f, 89f)] private float maxGroundAngle = 60f;
+    [SerializeField] private string groundTag = "Ground";
 
     // internal
-    Rigidbody rb;
-    CapsuleCollider col;
-    float hInput;
-    float vInput;
-    bool wantJump;
-    bool isCrouching;
-    bool isRunning;
-    bool isHiding;
-    bool isActive = true;
-    float originalHeight;
-    Vector3 originalCenter;
+    private Rigidbody rb;
+    private CapsuleCollider col;
+    private float hInput;
+    private float vInput;
+    private bool wantJump;
+    private bool isCrouching;
+    private bool isRunning;
+    private bool isHiding;
+    private bool isActive = true;
+    private bool isGrounded;
+    private float originalHeight;
+    private Vector3 originalCenter;
+
+    private readonly HashSet<Collider> _groundContacts = new();
+    private float _minGroundDot; // cos(maxGroundAngle)
 
     void Start()
     {
@@ -48,26 +55,35 @@ public class AdvancedPlayerController : MonoBehaviour
         col = GetComponent<CapsuleCollider>();
         originalHeight = col.height;
         originalCenter = col.center;
+        _minGroundDot = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
+        if (!cam)
+            Debug.LogWarning("AdvancedPlayerController: 'cam' reference is not set.", this);
+    }
+
+    private void OnValidate()
+    {
+        _minGroundDot = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
+        crouchHeightFactor = Mathf.Clamp01(crouchHeightFactor);
     }
 
     void Update()
     {
         if (!isActive) return;
 
-        // gather movement input on the horizontal axes
+        // gather movement input
         hInput = Input.GetAxisRaw("Horizontal");
         vInput = Input.GetAxisRaw("Vertical");
 
-        // toggle crouch on key press
+        // toggle crouch
         if (Input.GetKeyDown(crouchKey))
         {
             ToggleCrouch();
         }
-
+            
         // sprint is held down
         isRunning = Input.GetKey(sprintKey) && !isCrouching;
 
-        // register jump request
+        // jump request
         if (Input.GetButtonDown("Jump"))
         {
             wantJump = true;
@@ -78,7 +94,7 @@ public class AdvancedPlayerController : MonoBehaviour
     {
         if (!isActive) return;
 
-        // determine movement direction relative to camera orientation
+        // move relative to camera
         Vector3 camForward = cam.forward;
         Vector3 camRight = cam.right;
         camForward.y = 0f;
@@ -88,11 +104,7 @@ public class AdvancedPlayerController : MonoBehaviour
         if (moveDir.magnitude > 1f) moveDir.Normalize();
 
         // determine the appropriate speed
-        float targetSpeed = walkSpeed;
-        if (isCrouching)
-            targetSpeed = crouchSpeed;
-        else if (isRunning)
-            targetSpeed = runSpeed;
+        float targetSpeed = isCrouching ? crouchSpeed : (isRunning ? runSpeed : walkSpeed);
 
         // move the rigidbody using MovePosition for smooth collision resolution
         Vector3 displacement = moveDir * targetSpeed * Time.fixedDeltaTime;
@@ -105,11 +117,13 @@ public class AdvancedPlayerController : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 15f * Time.fixedDeltaTime);
         }
 
-        // ground detection
-        bool grounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundMask);
+        if (!isGrounded)
+        {
+            isGrounded = ProbeGrounded();
+        }
 
-        // jumping – assign vertical velocity only when grounded
-        if (wantJump && grounded && !isHiding)
+        // jumping
+        if (wantJump && isGrounded && !isHiding)
         {
             // apply instantaneous vertical velocity for jumping
             Vector3 vel = rb.linearVelocity;
@@ -125,15 +139,70 @@ public class AdvancedPlayerController : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        ProcessGroundCollision(collision);
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        ProcessGroundCollision(collision);
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (!collision.collider || !collision.collider.CompareTag(groundTag)) return;
+        _groundContacts.Remove(collision.collider);
+        isGrounded = _groundContacts.Count > 0;
+    }
+
+    private void ProcessGroundCollision(Collision collision)
+    {
+        if (!collision.collider || !collision.collider.CompareTag(groundTag)) return;
+
+        bool hasValidGroundNormal = false;
+        int count = collision.contactCount;
+        for (int i = 0; i < count; i++)
+        {
+            var n = collision.GetContact(i).normal;
+            // Accept only reasonably-upward surfaces (reject walls/ceilings)
+            if (n.y >= _minGroundDot)
+            {
+                hasValidGroundNormal = true;
+                break;
+            }
+        }
+
+        if (hasValidGroundNormal)
+            _groundContacts.Add(collision.collider);
+        else
+            _groundContacts.Remove(collision.collider);
+
+        isGrounded = _groundContacts.Count > 0;
+    }
+
+    private bool ProbeGrounded()
+    {
+        float radius = Mathf.Max(0.01f, col.radius - 0.01f);
+        Vector3 center = transform.TransformPoint(col.center);
+        float half = (col.height * 0.5f) - radius;
+        Vector3 bottom = center + Vector3.down * half;
+
+        // short capsule just beneath the feet
+        return Physics.CheckCapsule(bottom + Vector3.up * 0.02f, bottom + Vector3.up * 0.04f,
+                                    radius, groundMask, QueryTriggerInteraction.Ignore);
+    }
+
 
     void ToggleCrouch()
     {
         if (isHiding) return;
+
         isCrouching = !isCrouching;
         if (isCrouching)
         {
             col.height = originalHeight * crouchHeightFactor;
-            col.center = originalCenter * crouchHeightFactor;
+            col.center = new Vector3(originalCenter.x, originalCenter.y * crouchHeightFactor, originalCenter.z);
         }
         else
         {
