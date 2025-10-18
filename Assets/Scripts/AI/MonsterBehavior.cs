@@ -7,7 +7,8 @@ using Utils;
 public class MonsterBehavior : MonoBehaviour
 {
     // Event Listeners
-
+    [Header("Events")]
+    public GameEvent onCharacterKilled;
 
     // Parent Tree
     public BehaviorTree Tree;
@@ -22,6 +23,7 @@ public class MonsterBehavior : MonoBehaviour
     private UnityEngine.Vector3 characterPosition;
     private UnityEngine.Vector3 prevCharacterPosition;
 
+    private int huntedPlayerId;
 
     private Waypoint previousWaypoint;
 
@@ -158,6 +160,7 @@ public class MonsterBehavior : MonoBehaviour
     public Node.Status Consume()
     {
         Debug.Log("Conusmed character");
+        onCharacterKilled.TriggerEvent(this, huntedPlayerId);
         return Node.Status.SUCCESS;
     }
 
@@ -228,9 +231,10 @@ public class MonsterBehavior : MonoBehaviour
 
     public void TriggerHunt(Component sender, object data)
     {
-        if (data is UnityEngine.Vector3)
+        if (data is CharacterPosition)
         {
-            characterPosition = (UnityEngine.Vector3) data;
+            characterPosition = ((CharacterPosition)data).position;
+            huntedPlayerId = ((CharacterPosition)data).objectId;
             IsCharacterFound = true;
         }
     }

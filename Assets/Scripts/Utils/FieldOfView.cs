@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class FieldOfView : MonoBehaviour
 {
@@ -61,7 +62,7 @@ public class FieldOfView : MonoBehaviour
                 if (!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, ObstructionMask))
                 {
                     CanSeePlayer = true;
-                    onPlayerFound.TriggerEvent(this, target.transform.position);
+                    onPlayerFound.TriggerEvent(this, new CharacterPosition{ position = target.transform.position, objectId = TargetRef.GetInstanceID() });
                 }
                 else
                 {

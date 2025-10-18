@@ -62,6 +62,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1396a2b8230431d8f88f28a309fe0b73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  onCharacterKilled: {fileID: 11400000, guid: af0ece34110b4d47197815df5aec01bc, type: 2}
   TreeStatus: 1
   IsStunned: 0
   IsCharacterFound: 0
