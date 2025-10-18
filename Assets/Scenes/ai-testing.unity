@@ -825,7 +825,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcf5b8e3dee12bfda8f16634dd32c35e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waypointList: []
+  waypointList:
+    UseConstant: 0
+    ConstantValue: []
+    Variable: {fileID: 11400000, guid: 5372321db87b80d8483796503a9060c0, type: 2}
 --- !u!4 &1733127815
 Transform:
   m_ObjectHideFlags: 0

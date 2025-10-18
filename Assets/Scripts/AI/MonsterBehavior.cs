@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Numerics;
 using UnityEngine;
 using UnityEngine.AI;
@@ -20,6 +21,7 @@ public class MonsterBehavior : MonoBehaviour
     private NavMeshAgent agent;
     private Animator anim;
 
+    public WaypointListReference waypointList;
     private UnityEngine.Vector3 characterPosition;
     private UnityEngine.Vector3 prevCharacterPosition;
 
@@ -30,6 +32,8 @@ public class MonsterBehavior : MonoBehaviour
     // Describes whether or not an action is currently active or not, separate from a Node Status
     public enum ActionState { IDLE, WORKING };
     ActionState state = ActionState.IDLE;
+
+    System.Random rnd = new System.Random();
 
     void Start()
     {
@@ -107,7 +111,7 @@ public class MonsterBehavior : MonoBehaviour
     {
         if (state == ActionState.IDLE)
         {
-            previousWaypoint = WaypointsManager.Instance.GetWaypoint(previousWaypoint);
+            previousWaypoint = GetWaypoint(previousWaypoint);
             agent.SetDestination(previousWaypoint.transform.position);
             state = ActionState.WORKING;
         }
@@ -237,6 +241,39 @@ public class MonsterBehavior : MonoBehaviour
             huntedPlayerId = ((CharacterPosition)data).objectId;
             IsCharacterFound = true;
         }
+    }
+
+    public Waypoint GetWaypoint(Waypoint prevWaypoint)
+    {
+        Waypoint removed = null;
+        if (prevWaypoint != null)
+        {
+            removed = prevWaypoint;
+            waypointList.WaypointListRef.Remove(prevWaypoint);
+        }
+
+        int totalWeight = waypointList.WaypointListRef.Sum(x => x.Weight);
+
+        int randomNumber = rnd.Next(0, totalWeight);
+
+        Waypoint selectedWaypoint = null;
+        foreach (Waypoint waypoint in waypointList.WaypointListRef)
+        {
+            if (randomNumber < waypoint.Weight)
+            {
+                selectedWaypoint = waypoint;
+                break;
+            }
+
+            randomNumber = randomNumber - waypoint.Weight;
+        }
+
+        if (removed != null)
+        {
+            waypointList.WaypointListRef.Add(removed);
+        }
+
+        return selectedWaypoint;
     }
     #endregion
 }

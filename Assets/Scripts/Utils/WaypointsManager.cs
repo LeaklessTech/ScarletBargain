@@ -1,16 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class WaypointsManager : MonoBehaviour
 {
     public static WaypointsManager Instance { get; private set; }
 
-    public List<Waypoint> waypointList = new List<Waypoint>();
-
-    System.Random rnd = new System.Random();
+    public WaypointListReference waypointList;
 
     private void Awake()
     {
@@ -41,41 +36,7 @@ public class WaypointsManager : MonoBehaviour
     {
         foreach (Transform child in transform)
         {
-            waypointList.Add(child.gameObject.GetComponent<Waypoint>());
+            waypointList.WaypointListRef.Add(child.gameObject.GetComponent<Waypoint>());
         }
-    }
-
-
-    public Waypoint GetWaypoint(Waypoint previousWaypoint)
-    {
-        Waypoint removed = null;
-        if (previousWaypoint != null)
-        {
-            removed = previousWaypoint;
-            waypointList.Remove(previousWaypoint);
-        }
-
-        int totalWeight = waypointList.Sum(x => x.Weight);
-
-        int randomNumber = rnd.Next(0, totalWeight);
-
-        Waypoint selectedWaypoint = null;
-        foreach (Waypoint waypoint in waypointList)
-        {
-            if (randomNumber < waypoint.Weight)
-            {
-                selectedWaypoint = waypoint;
-                break;
-            }
-
-            randomNumber = randomNumber - waypoint.Weight;
-        }
-
-        if (removed != null)
-        {
-            waypointList.Add(removed);
-        }
-
-        return selectedWaypoint;
     }
 }

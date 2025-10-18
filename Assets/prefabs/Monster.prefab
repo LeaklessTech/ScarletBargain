@@ -66,6 +66,10 @@ MonoBehaviour:
   TreeStatus: 1
   IsStunned: 0
   IsCharacterFound: 0
+  waypointList:
+    UseConstant: 0
+    ConstantValue: []
+    Variable: {fileID: 11400000, guid: 5372321db87b80d8483796503a9060c0, type: 2}
 --- !u!195 &7675502468203840162
 NavMeshAgent:
   m_ObjectHideFlags: 0
