@@ -1,7 +1,8 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class FieldOfView : MonoBehaviour
 {
@@ -42,16 +43,12 @@ public class FieldOfView : MonoBehaviour
 
     private void FieldOfViewCheck()
     {
-        Collider[] rangeChecks = Physics.OverlapSphere(transform.position, Radius, TargetMask);
+        List<Collider> rangeChecks = Physics.OverlapSphere(transform.position, Radius, TargetMask).ToList();
 
-        if (rangeChecks.Length != 0)
+        if (rangeChecks.Count != 0)
         {
-            for (int i = 0; i <= rangeChecks.Length; i++)
-            {
-                TargetRef = rangeChecks[i].gameObject;
-                break;
-            }
-
+            rangeChecks = rangeChecks.OrderBy(target => Vector3.Distance(target.gameObject.transform.position, transform.position)).ToList();
+            TargetRef = rangeChecks.FirstOrDefault().gameObject;
             Transform target = TargetRef.transform;
             Vector3 directionToTarget = (target.position - transform.position).normalized;
 
