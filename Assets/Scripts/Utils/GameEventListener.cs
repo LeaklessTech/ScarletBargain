@@ -1,10 +1,13 @@
 using UnityEngine;
 using UnityEngine.Events;
 
+[System.Serializable]
+public class ParamGameEvent : UnityEvent<Component, object> { }
+
 public class GameEventListener : MonoBehaviour
 {
     public GameEvent gameEvent;
-    public UnityEvent onEventTriggered;
+    public ParamGameEvent onEventTriggered;
 
     void OnEnable()
     {
@@ -16,8 +19,8 @@ public class GameEventListener : MonoBehaviour
         gameEvent.RemoveListener(this);
     }
 
-    public void OnEventTriggered()
+    public void OnEventTriggered(Component sender, object data)
     {
-        onEventTriggered.Invoke();
+        onEventTriggered.Invoke(sender, data);
     }
 }

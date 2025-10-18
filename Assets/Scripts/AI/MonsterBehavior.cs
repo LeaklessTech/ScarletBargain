@@ -6,6 +6,9 @@ using Utils;
 
 public class MonsterBehavior : MonoBehaviour
 {
+    // Event Listeners
+
+
     // Parent Tree
     public BehaviorTree Tree;
     public Node.Status TreeStatus = Node.Status.RUNNING;
@@ -28,7 +31,7 @@ public class MonsterBehavior : MonoBehaviour
 
     void Start()
     {
-        FieldOfView.OnPlayerFound += TriggerHunt;
+        // FieldOfView.OnPlayerFound += TriggerHunt;
         agent = this.GetComponent<NavMeshAgent>();
         anim = this.GetComponentInChildren<Animator>();
 
@@ -223,10 +226,13 @@ public class MonsterBehavior : MonoBehaviour
         return AnimatorIsPlaying() && anim.GetCurrentAnimatorStateInfo(0).IsName(stateName);
     }
 
-    private void TriggerHunt(UnityEngine.Vector3 vector3)
+    public void TriggerHunt(Component sender, object data)
     {
-        characterPosition = vector3;
-        IsCharacterFound = true;
+        if (data is UnityEngine.Vector3)
+        {
+            characterPosition = (UnityEngine.Vector3) data;
+            IsCharacterFound = true;
+        }
     }
     #endregion
 }
