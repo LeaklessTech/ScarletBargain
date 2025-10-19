@@ -54,6 +54,8 @@ namespace LevelGeneration
 
         private GameObject LevelObject;
 
+        public GameObject TilePrefab;
+
         // For overlap checking
         private readonly List<Room> placedRooms = new();
 
@@ -128,7 +130,7 @@ namespace LevelGeneration
                 {
                     Vector3 createAt = new Vector3(-i * objectSizeOffset, 0, -j * objectSizeOffset);
 
-                    GameObject newTileGameObject = Instantiate(floorTilePrefab, createAt, Quaternion.identity);
+                    GameObject newTileGameObject = Instantiate(TilePrefab, createAt, Quaternion.identity);
 
                     // debug
                     //newTileGameObject.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = $"{i},{j}";
@@ -176,12 +178,44 @@ namespace LevelGeneration
 
                         List<Tile> roomTiles = new();
 
+                        // compute combined center in world space
+                        Vector3 combinedCenter;
+                        if (tileRenderers.Count > 0)
+                        {
+                            Bounds combined = tileRenderers[0].bounds;
+                            for (int i = 1; i < tileRenderers.Count; i++) combined.Encapsulate(tileRenderers[i].bounds);
+                            combinedCenter = combined.center;
+                        }
+                        else if (tileColliders.Count > 0)
+                        {
+                            Bounds combined = tileColliders[0].bounds;
+                            for (int i = 1; i < tileColliders.Count; i++) combined.Encapsulate(tileColliders[i].bounds);
+                            combinedCenter = combined.center;
+                        }
+                        else if (tileTransforms.Count > 0)
+                        {
+                            // fallback: average world positions
+                            Vector3 sum = Vector3.zero;
+                            foreach (var tt in tileTransforms) sum += tt.position;
+                            combinedCenter = sum / tileTransforms.Count;
+                        }
+                        else
+                        {
+                            combinedCenter = Vector3.zero;
+                        }
+
+                        // create the room object at visual center
+                        GameObject roomObject = new($"Room {placedRooms.Count + 1}");
+                        roomObject.transform.position = combinedCenter;
+                        roomObject.transform.parent = LevelObject.transform;
+
+
                         foreach (var position in potentialRoom.allPositionsWithin)
                         {
                             Vector3 createAt = new Vector3(position.x * objectSizeOffset, 0, position.y * objectSizeOffset);
                             GameObject newTile = Instantiate(selectedPrefab, createAt, Quaternion.identity);
                             newTile.transform.parent = roomObject.transform;
-                            floorGrid[position.x, position.y] = newTile;
+                            tileGrid[position.x, position.y] = newTile;
                             newTile.SetActive(false);
 
                             // Scale ceiling material
@@ -253,37 +287,6 @@ namespace LevelGeneration
                                 }
                             }
                         }
-
-                        // compute combined center in world space
-                        Vector3 combinedCenter;
-                        if (tileRenderers.Count > 0)
-                        {
-                            Bounds combined = tileRenderers[0].bounds;
-                            for (int i = 1; i < tileRenderers.Count; i++) combined.Encapsulate(tileRenderers[i].bounds);
-                            combinedCenter = combined.center;
-                        }
-                        else if (tileColliders.Count > 0)
-                        {
-                            Bounds combined = tileColliders[0].bounds;
-                            for (int i = 1; i < tileColliders.Count; i++) combined.Encapsulate(tileColliders[i].bounds);
-                            combinedCenter = combined.center;
-                        }
-                        else if (tileTransforms.Count > 0)
-                        {
-                            // fallback: average world positions
-                            Vector3 sum = Vector3.zero;
-                            foreach (var tt in tileTransforms) sum += tt.position;
-                            combinedCenter = sum / tileTransforms.Count;
-                        }
-                        else
-                        {
-                            combinedCenter = Vector3.zero;
-                        }
-
-                        // create the room object at visual center
-                        GameObject roomObject = new($"Room {placedRooms.Count + 1}");
-                        roomObject.transform.position = combinedCenter;
-                        roomObject.transform.parent = LevelObject.transform;
 
                         // parent tiles to the room object while preserving their world positions
                         foreach (var t in tileTransforms)
@@ -357,7 +360,7 @@ namespace LevelGeneration
                 {
                     Vector3 createAt = new Vector3(-i * objectSizeOffset, 0, -j * objectSizeOffset);
 
-                    GameObject newTileGameObject = Instantiate(floorTilePrefab, createAt, Quaternion.identity);
+                    GameObject newTileGameObject = Instantiate(TilePrefab, createAt, Quaternion.identity);
 
                     // debug
                     newTileGameObject.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = $"{i},{j}";
