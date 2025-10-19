@@ -12,7 +12,7 @@ namespace LevelGeneration
         public enum TileType { HALLWAY, ROOM, EMPTY }
         public enum Wall { North, South, East, West}
 
-        private static readonly Dictionary<Wall, string> WallNames = new()
+        public static readonly Dictionary<Wall, string> WallNames = new()
         {
             { Wall.North, "NorthWall"},
             { Wall.South, "SouthWall"},

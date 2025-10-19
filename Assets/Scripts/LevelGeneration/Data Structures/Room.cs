@@ -12,7 +12,6 @@ namespace LevelGeneration
         // note that bounds.x and bounds.y refer to the top left corner
         public RectInt Bounds { get; private set; }
         public GameObject RoomObject { get; private set; }
-
         public List<Tile> RoomTiles { get; private set; }
 
         public Room(RectInt RoomBounds, GameObject roomObject, List<Tile> roomTiles)
