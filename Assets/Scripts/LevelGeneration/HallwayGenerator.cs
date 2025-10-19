@@ -37,6 +37,11 @@ namespace LevelGeneration
             }
 
             Graph = DelaunayTriangulation.TriangulatePoints(roomCenters);
+
+            foreach(var edge in Graph.GraphEdges)
+            {
+                Debug.DrawLine(edge.NodeA.Position, edge.NodeB.Position, Color.magenta, 40f);
+            }
         }
 
         private void CreateMST()
