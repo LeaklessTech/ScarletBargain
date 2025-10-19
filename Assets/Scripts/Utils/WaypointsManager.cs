@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 public class WaypointsManager : MonoBehaviour
@@ -22,6 +23,7 @@ public class WaypointsManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        waypointList.UseConstant = false;
         InitWaypoints();
     }
 
@@ -34,9 +36,8 @@ public class WaypointsManager : MonoBehaviour
     // All waypoints should be spawned as children of the WaypointsManager so as to easily access them (don't want to gather all objects tagged as Waypoint because that is slow)
     private void InitWaypoints()
     {
-        foreach (Transform child in transform)
-        {
-            waypointList.WaypointListRef.Add(child.gameObject.GetComponent<Waypoint>());
-        }
+        waypointList.WaypointListRef.Clear();
+        
+        waypointList.WaypointListRef.AddRange(GameObject.FindGameObjectsWithTag("Waypoint").Select(x => x.GetComponent<Waypoint>()));
     }
 }

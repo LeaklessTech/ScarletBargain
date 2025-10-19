@@ -112,7 +112,7 @@ public class MonsterBehavior : MonoBehaviour
         if (state == ActionState.IDLE)
         {
             previousWaypoint = GetWaypoint(previousWaypoint);
-            agent.SetDestination(previousWaypoint.transform.position);
+            agent.SetDestination(previousWaypoint.Position);
             state = ActionState.WORKING;
         }
         else if (NavMeshUtilities.IsAtTargetLocation(agent))
