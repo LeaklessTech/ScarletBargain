@@ -1,5 +1,8 @@
+using System;
+using System.Numerics;
 using UnityEngine;
 using UnityEngine.AI;
+using Utils;
 
 public class MonsterBehavior : MonoBehaviour
 {
@@ -7,81 +10,223 @@ public class MonsterBehavior : MonoBehaviour
     public BehaviorTree Tree;
     public Node.Status TreeStatus = Node.Status.RUNNING;
 
-    NavMeshAgent agent;
+    public bool IsStunned = false;
+    public bool IsCharacterFound = false;
 
-    // TODO: delete these object references
-    public GameObject goal;
-    public GameObject secondGoal;
+    private NavMeshAgent agent;
+    private Animator anim;
+
+    private UnityEngine.Vector3 characterPosition;
+    private UnityEngine.Vector3 prevCharacterPosition;
+
+
+    private Waypoint previousWaypoint;
 
     // Describes whether or not an action is currently active or not, separate from a Node Status
     public enum ActionState { IDLE, WORKING };
     ActionState state = ActionState.IDLE;
 
-    // Specific Behavior Trees
-    BehaviorTree chaseTree = new BehaviorTree();
-    public Node.Status ChaseStatus;
-
-    BehaviorTree patrolTree = new BehaviorTree();
-    public Node.Status PatrolStatus;
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        FieldOfView.OnPlayerFound += TriggerHunt;
         agent = this.GetComponent<NavMeshAgent>();
+        anim = this.GetComponentInChildren<Animator>();
 
-        Tree = new BehaviorTree();
-        Sequence move = new Sequence("Move to objects");
-        Leaf goToObject = new Leaf("Go to object", GoToObject);
-        Leaf goToOtherGoal = new Leaf("Go to second object", GoToOtherGoal);
+        // AI Behavior Setup
+        Tree = new BehaviorTree("Base Tree", Policies.RunForever);
 
-        move.AddChild(goToObject);
-        move.AddChild(goToOtherGoal);
+        // Stun Sequence
+        Sequence stunSequence = new Sequence("Stun Sequence");
+        stunSequence.AddChild(new Leaf("Is Stunned?", IsMonsterStunned));
+        stunSequence.AddChild(new Leaf("Stunned", Stunned));
 
-        Tree.AddChild(move);
+        // Chase Sequence
+        Sequence chaseSequence = new Sequence("Chase Sequence");
+        chaseSequence.AddChild(new Leaf("Character Found?", FoundCharacter));
+
+        Selector huntLook = new Selector("Succeed Hunt or Fail Hunt");
+        Sequence huntSequence = new Sequence("Hunt Sequence");
+        huntSequence.AddChild(new Leaf("Hunt", HuntCharacter));
+        huntSequence.AddChild(new Leaf("Consume", Consume));
+        huntSequence.AddChild(new Leaf("Victory", Victory));
+        huntLook.AddChild(huntSequence);
+
+        Sequence failHuntSequence = new Sequence("Failed to Hunt");
+        failHuntSequence.AddChild(new Leaf("Look Around", Swivel));
+        failHuntSequence.AddChild(new Leaf("Anger", Angry));
+        huntLook.AddChild(failHuntSequence);
+
+        chaseSequence.AddChild(huntLook);
+
+        // Patrol Sequence
+        Sequence patrolSequence = new Sequence("Patrol Sequence");
+        patrolSequence.AddChild(new Leaf("Patrol", Patrol));
+        patrolSequence.AddChild(new Leaf("Look Around", Swivel));
+
+
+        Tree.AddChild(stunSequence);
+        Tree.AddChild(chaseSequence);
+        Tree.AddChild(patrolSequence);
+
         Tree.PrintTree();
     }
 
     void Update()
     {
-        if (TreeStatus != Node.Status.SUCCESS)
-            TreeStatus = Tree.Process();
+        TreeStatus = Tree.Process();
     }
 
     #region Behaviors
-    public Node.Status GoToObject()
+    public Node.Status Swivel()
     {
-        return GoToLocation(goal.transform.position);
-    }
-
-    public Node.Status GoToOtherGoal()
-    {
-        return GoToLocation(secondGoal.transform.position);
-    }
-    #endregion
-
-    #region Actions
-    Node.Status GoToLocation(Vector3 destination)
-    {
-        float distanceToTarget = Vector3.Distance(destination, this.transform.position);
 
         if (state == ActionState.IDLE)
         {
-            agent.SetDestination(destination);
+            anim.Play("Swivel", -1, 0f);
             state = ActionState.WORKING;
+            // If we don't return RUNNING here then we will get to the Animator check and succed, thus returning the monster to the idle animation without ever having played the Swivel animation
+            return Node.Status.RUNNING;
         }
-        else if (Vector3.Distance(agent.pathEndPosition, destination) >= 2)
+
+        if (!AnimatorIsPlaying("Swivel"))
         {
             state = ActionState.IDLE;
-            return Node.Status.FAILURE;
+            anim.Play("MonsterIdle");
+            return Node.Status.SUCCESS;
         }
-        else if (distanceToTarget < 2)
+
+        return Node.Status.RUNNING;
+    }
+
+    public Node.Status Patrol()
+    {
+        if (state == ActionState.IDLE)
+        {
+            previousWaypoint = WaypointsManager.Instance.GetWaypoint(previousWaypoint);
+            agent.SetDestination(previousWaypoint.transform.position);
+            state = ActionState.WORKING;
+        }
+        else if (NavMeshUtilities.IsAtTargetLocation(agent))
         {
             state = ActionState.IDLE;
             return Node.Status.SUCCESS;
         }
 
         return Node.Status.RUNNING;
+    }
+
+    public Node.Status DestroyItem()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Node.Status HuntCharacter()
+    {
+
+        if (characterPosition == null || characterPosition == UnityEngine.Vector3.zero)
+        {
+            state = ActionState.IDLE;
+            return Node.Status.FAILURE;
+        }
+
+        // If the monster has not lost sight of the character then keep trying to find them
+        if (prevCharacterPosition != characterPosition)
+        {
+            state = ActionState.WORKING;
+            agent.SetDestination(characterPosition);
+        }
+        else
+        {
+            state = ActionState.IDLE;
+            return Node.Status.FAILURE;
+        }
+
+        if (NavMeshUtilities.IsAtTargetLocation(agent))
+        {
+            // TODO: need to play kill animation then disable/destroy the character that was killed
+            state = ActionState.IDLE;
+            IsCharacterFound = false;
+            return Node.Status.SUCCESS;
+        }
+
+        return Node.Status.RUNNING;
+    }
+
+    public Node.Status Consume()
+    {
+        Debug.Log("Conusmed character");
+        return Node.Status.SUCCESS;
+    }
+
+    public Node.Status Angry()
+    {
+        Debug.Log("Angry yell");
+        return Node.Status.SUCCESS;
+    }
+
+    public Node.Status Victory()
+    {
+        Debug.Log("Victory yell");
+        return Node.Status.SUCCESS;
+    }
+
+    Node.Status IsMonsterStunned()
+    {
+        return IsStunned ? Node.Status.SUCCESS : Node.Status.FAILURE;
+    }
+
+    Node.Status Stunned()
+    {
+        throw new NotImplementedException();
+    }
+
+    Node.Status FoundCharacter()
+    {
+        return IsCharacterFound ? Node.Status.SUCCESS : Node.Status.FAILURE;
+    }
+    #endregion
+
+
+    #region Actions
+    // Node.Status GoToLocation(Vector3 destination)
+    // {
+    //     if (state == ActionState.IDLE)
+    //     {
+    //         agent.SetDestination(destination);
+    //         state = ActionState.WORKING;
+    //     }
+    //     // Not checking for failure to reach right now
+    //     // else if (Vector3.Distance(agent.pathEndPosition, destination) >= 2)
+    //     // {
+    //     //     state = ActionState.IDLE;
+    //     //     print("FAILURE TO REACH");
+    //     //     return Node.Status.FAILURE;
+    //     // }
+    //     else if (NavMeshUtilities.IsAtTargetLocation(agent))
+    //     {
+    //         state = ActionState.IDLE;
+    //         return Node.Status.SUCCESS;
+    //     }
+
+    //     return Node.Status.RUNNING;
+    // }
+    #endregion
+
+    #region Helpers
+    bool AnimatorIsPlaying()
+    {
+        return anim.GetCurrentAnimatorStateInfo(0).normalizedTime < 1;
+    }
+
+    bool AnimatorIsPlaying(string stateName)
+    {
+        return AnimatorIsPlaying() && anim.GetCurrentAnimatorStateInfo(0).IsName(stateName);
+    }
+
+    private void TriggerHunt(UnityEngine.Vector3 vector3)
+    {
+        characterPosition = vector3;
+        IsCharacterFound = true;
     }
     #endregion
 }
