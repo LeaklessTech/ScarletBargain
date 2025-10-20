@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6798543227278665958}
   - component: {fileID: 7675502468203840162}
   - component: {fileID: 5557874361033515406}
+  - component: {fileID: 8429230762490392706}
   m_Layer: 0
   m_Name: Monster
   m_TagString: Monster
@@ -61,9 +62,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1396a2b8230431d8f88f28a309fe0b73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  onCharacterKilled: {fileID: 11400000, guid: af0ece34110b4d47197815df5aec01bc, type: 2}
   TreeStatus: 1
   IsStunned: 0
   IsCharacterFound: 0
+  waypointList:
+    UseConstant: 0
+    ConstantValue: []
+    Variable: {fileID: 11400000, guid: 5372321db87b80d8483796503a9060c0, type: 2}
 --- !u!195 &7675502468203840162
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -103,13 +109,42 @@ MonoBehaviour:
   TargetRef: {fileID: 0}
   TargetMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   ObstructionMask:
     serializedVersion: 2
     m_Bits: 128
   CanSeePlayer: 0
   SearchForPlayer: 1
   Delay: 0.2
+  onPlayerFound: {fileID: 11400000, guid: 3dbc49f3afbc74f0fa1333088a0ef6bc, type: 2}
+--- !u!114 &8429230762490392706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1970763974180988928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4a2b5f9b9ef8f93f85b37262104a5f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEvent: {fileID: 11400000, guid: 3dbc49f3afbc74f0fa1333088a0ef6bc, type: 2}
+  onEventTriggered:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6798543227278665958}
+        m_TargetAssemblyTypeName: MonsterBehavior, Assembly-CSharp
+        m_MethodName: TriggerHunt
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &3231682522202944082
 GameObject:
   m_ObjectHideFlags: 0

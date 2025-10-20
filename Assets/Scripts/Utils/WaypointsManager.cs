@@ -1,16 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class WaypointsManager : MonoBehaviour
 {
     public static WaypointsManager Instance { get; private set; }
 
-    public List<Waypoint> waypointList = new List<Waypoint>();
-
-    System.Random rnd = new System.Random();
+    public WaypointListReference waypointList;
 
     private void Awake()
     {
@@ -27,6 +23,7 @@ public class WaypointsManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        waypointList.UseConstant = false;
         InitWaypoints();
     }
 
@@ -39,43 +36,8 @@ public class WaypointsManager : MonoBehaviour
     // All waypoints should be spawned as children of the WaypointsManager so as to easily access them (don't want to gather all objects tagged as Waypoint because that is slow)
     private void InitWaypoints()
     {
-        foreach (Transform child in transform)
-        {
-            waypointList.Add(child.gameObject.GetComponent<Waypoint>());
-        }
-    }
-
-
-    public Waypoint GetWaypoint(Waypoint previousWaypoint)
-    {
-        Waypoint removed = null;
-        if (previousWaypoint != null)
-        {
-            removed = previousWaypoint;
-            waypointList.Remove(previousWaypoint);
-        }
-
-        int totalWeight = waypointList.Sum(x => x.Weight);
-
-        int randomNumber = rnd.Next(0, totalWeight);
-
-        Waypoint selectedWaypoint = null;
-        foreach (Waypoint waypoint in waypointList)
-        {
-            if (randomNumber < waypoint.Weight)
-            {
-                selectedWaypoint = waypoint;
-                break;
-            }
-
-            randomNumber = randomNumber - waypoint.Weight;
-        }
-
-        if (removed != null)
-        {
-            waypointList.Add(removed);
-        }
-
-        return selectedWaypoint;
+        waypointList.WaypointListRef.Clear();
+        
+        waypointList.WaypointListRef.AddRange(GameObject.FindGameObjectsWithTag("Waypoint").Select(x => x.GetComponent<Waypoint>()));
     }
 }

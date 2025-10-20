@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Numerics;
 using UnityEngine;
 using UnityEngine.AI;
@@ -6,6 +7,10 @@ using Utils;
 
 public class MonsterBehavior : MonoBehaviour
 {
+    // Event Listeners
+    [Header("Events")]
+    public GameEvent onCharacterKilled;
+
     // Parent Tree
     public BehaviorTree Tree;
     public Node.Status TreeStatus = Node.Status.RUNNING;
@@ -16,9 +21,11 @@ public class MonsterBehavior : MonoBehaviour
     private NavMeshAgent agent;
     private Animator anim;
 
+    public WaypointListReference waypointList;
     private UnityEngine.Vector3 characterPosition;
     private UnityEngine.Vector3 prevCharacterPosition;
 
+    private int huntedPlayerId;
 
     private Waypoint previousWaypoint;
 
@@ -26,9 +33,11 @@ public class MonsterBehavior : MonoBehaviour
     public enum ActionState { IDLE, WORKING };
     ActionState state = ActionState.IDLE;
 
+    System.Random rnd = new System.Random();
+
     void Start()
     {
-        FieldOfView.OnPlayerFound += TriggerHunt;
+        // FieldOfView.OnPlayerFound += TriggerHunt;
         agent = this.GetComponent<NavMeshAgent>();
         anim = this.GetComponentInChildren<Animator>();
 
@@ -102,8 +111,8 @@ public class MonsterBehavior : MonoBehaviour
     {
         if (state == ActionState.IDLE)
         {
-            previousWaypoint = WaypointsManager.Instance.GetWaypoint(previousWaypoint);
-            agent.SetDestination(previousWaypoint.transform.position);
+            previousWaypoint = GetWaypoint(previousWaypoint);
+            agent.SetDestination(previousWaypoint.Position);
             state = ActionState.WORKING;
         }
         else if (NavMeshUtilities.IsAtTargetLocation(agent))
@@ -155,6 +164,7 @@ public class MonsterBehavior : MonoBehaviour
     public Node.Status Consume()
     {
         Debug.Log("Conusmed character");
+        onCharacterKilled.TriggerEvent(this, huntedPlayerId);
         return Node.Status.SUCCESS;
     }
 
@@ -223,10 +233,47 @@ public class MonsterBehavior : MonoBehaviour
         return AnimatorIsPlaying() && anim.GetCurrentAnimatorStateInfo(0).IsName(stateName);
     }
 
-    private void TriggerHunt(UnityEngine.Vector3 vector3)
+    public void TriggerHunt(Component sender, object data)
     {
-        characterPosition = vector3;
-        IsCharacterFound = true;
+        if (data is CharacterPosition)
+        {
+            characterPosition = ((CharacterPosition)data).position;
+            huntedPlayerId = ((CharacterPosition)data).objectId;
+            IsCharacterFound = true;
+        }
+    }
+
+    public Waypoint GetWaypoint(Waypoint prevWaypoint)
+    {
+        Waypoint removed = null;
+        if (prevWaypoint != null)
+        {
+            removed = prevWaypoint;
+            waypointList.WaypointListRef.Remove(prevWaypoint);
+        }
+
+        int totalWeight = waypointList.WaypointListRef.Sum(x => x.Weight);
+
+        int randomNumber = rnd.Next(0, totalWeight);
+
+        Waypoint selectedWaypoint = null;
+        foreach (Waypoint waypoint in waypointList.WaypointListRef)
+        {
+            if (randomNumber < waypoint.Weight)
+            {
+                selectedWaypoint = waypoint;
+                break;
+            }
+
+            randomNumber = randomNumber - waypoint.Weight;
+        }
+
+        if (removed != null)
+        {
+            waypointList.WaypointListRef.Add(removed);
+        }
+
+        return selectedWaypoint;
     }
     #endregion
 }
