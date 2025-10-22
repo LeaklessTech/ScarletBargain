@@ -47,8 +47,9 @@ namespace LevelGeneration
         [Tooltip("World-space spacing between tiles (matches tile prefab footprint)")]
         public int objectSizeOffset = 10;
 
-        [SerializeField]
         public int Seed;
+
+        public GameObject TilePrefab;
 
         private Tile[,] tileGrid;
 
@@ -128,7 +129,7 @@ namespace LevelGeneration
                 {
                     Vector3 createAt = new Vector3(-i * objectSizeOffset, 0, -j * objectSizeOffset);
 
-                    GameObject newTileGameObject = Instantiate(floorTilePrefab, createAt, Quaternion.identity);
+                    GameObject newTileGameObject = Instantiate(TilePrefab, createAt, Quaternion.identity);
 
                     // debug
                     //newTileGameObject.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = $"{i},{j}";
@@ -300,7 +301,7 @@ namespace LevelGeneration
                 {
                     Vector3 createAt = new Vector3(-i * objectSizeOffset, 0, -j * objectSizeOffset);
 
-                    GameObject newTileGameObject = Instantiate(floorTilePrefab, createAt, Quaternion.identity);
+                    GameObject newTileGameObject = Instantiate(TilePrefab, createAt, Quaternion.identity);
 
                     // debug
                     newTileGameObject.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = $"{i},{j}";
