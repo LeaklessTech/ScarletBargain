@@ -2634,8 +2634,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e61cd07699ca456798976682e05807f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationDegrees: 12
-  jitterSpeed: 12
+  rotationDegrees: 6
+  jitterSpeed: 15
   randomOffset: 100
 --- !u!1 &1402231144
 GameObject:
