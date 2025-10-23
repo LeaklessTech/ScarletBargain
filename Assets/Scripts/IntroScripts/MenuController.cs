@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 public class MenuController : MonoBehaviour
 {
-    public string gameSceneName = "main";
+    public string gameSceneName = "GameScene";
     public GameObject firstSelected;
     private GameObject quitConfirmPanel;
 
@@ -25,6 +25,11 @@ public class MenuController : MonoBehaviour
     public void QuitGameImmediate()
     {
         Application.Quit();
+    }
+
+    public void PreferencesScene()
+    {
+        SceneManager.LoadScene("PreferenceScene", LoadSceneMode.Single);
     }
 
     // public void ShowQuitConfirm()
