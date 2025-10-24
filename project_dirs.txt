@@ -1,0 +1,48 @@
+Assets
+Assets/Animations
+Assets/AnimatorControllers
+Assets/Asset
+Assets/Asset/BackroomsLikeAsset
+Assets/Asset/Shaders
+Assets/Characters
+Assets/Characters/0
+Assets/Characters/1
+Assets/Characters/2
+Assets/Dnk_Dev
+Assets/Dnk_Dev/HospitalHorrorPack
+Assets/Editor
+Assets/Events
+Assets/ImportedAssets
+Assets/ImportedAssets/Aliosa
+Assets/ImportedAssets/npc_casual_set_00
+Assets/Materials
+Assets/Physics Materials
+Assets/Prefabs
+Assets/Resources
+Assets/Scenes
+Assets/Scenes/ai-testing
+Assets/Scenes/GameScene
+Assets/Scenes/IntroScene
+Assets/Scripts
+Assets/Scripts/AI
+Assets/Scripts/Character
+Assets/Scripts/IntroScripts
+Assets/Scripts/LevelGeneration
+Assets/Scripts/Models
+Assets/Scripts/Utils
+Assets/Settings
+Assets/StarterAssets
+Assets/StarterAssets/Environment
+Assets/StarterAssets/InputSystem
+Assets/StarterAssets/Mobile
+Assets/StarterAssets/ThirdPersonController
+Assets/StarterAssets/TutorialInfo
+Assets/TextMesh Pro
+Assets/TextMesh Pro/Fonts
+Assets/TextMesh Pro/Resources
+Assets/TextMesh Pro/Shaders
+Assets/TextMesh Pro/Sprites
+Assets/TutorialInfo
+Assets/TutorialInfo/Icons
+Assets/TutorialInfo/Scripts
+Assets/Variables

@@ -9,6 +9,9 @@ public class MenuController : MonoBehaviour
     public GameObject firstSelected;
     private GameObject quitConfirmPanel;
 
+    public GameObject MenuPanel;
+    public GameObject SettingsPanel;
+
     private void OnEnable()
     {
         if (firstSelected != null && EventSystem.current != null)
@@ -27,9 +30,16 @@ public class MenuController : MonoBehaviour
         Application.Quit();
     }
 
-    public void PreferencesScene()
+    public void OpenPreferences()
     {
-        SceneManager.LoadScene("PreferenceScene", LoadSceneMode.Single);
+        MenuPanel.SetActive(false);
+        SettingsPanel.SetActive(true);
+    }
+    
+    public void ClosePreferences()
+    {
+        SettingsPanel.SetActive(false); 
+        MenuPanel.SetActive(true);
     }
 
     // public void ShowQuitConfirm()
