@@ -10,8 +10,8 @@ public class AdvancedPlayerController : MonoBehaviour
     public float walkSpeed = 2f;
     public float runSpeed = 4f;
     public float crouchSpeed = 1.2f;
-    public float jumpForce = 3f;
-    public float gravityMultiplier = 2f;
+    public float jumpForce = 4.5f;
+    public float gravityMultiplier = 3f;
 
     [Header("ground check")]
     public Transform groundCheck;
@@ -35,8 +35,10 @@ public class AdvancedPlayerController : MonoBehaviour
     // internal
     private Rigidbody rb;
     private CapsuleCollider col;
+
     private float hInput;
     private float vInput;
+
     private bool wantJump;
     private bool isCrouching;
     private bool isRunning;
@@ -45,9 +47,13 @@ public class AdvancedPlayerController : MonoBehaviour
     private bool isGrounded;
     private float originalHeight;
     private Vector3 originalCenter;
+    private Animator animator;
 
     private readonly HashSet<Collider> _groundContacts = new();
     private float _minGroundDot; // cos(maxGroundAngle)
+
+    // for animation Speed param calculation
+    private Vector3 _lastRbPos;
 
     void Start()
     {
@@ -56,6 +62,15 @@ public class AdvancedPlayerController : MonoBehaviour
         originalHeight = col.height;
         originalCenter = col.center;
         _minGroundDot = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
+        animator = GetComponent<Animator>();
+        Debug.Log(animator);
+
+        // rigidbody stability settings
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
+
+        _lastRbPos = rb.position;
         if (!cam)
             Debug.LogWarning("AdvancedPlayerController: 'cam' reference is not set.", this);
     }
@@ -64,6 +79,11 @@ public class AdvancedPlayerController : MonoBehaviour
     {
         _minGroundDot = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
         crouchHeightFactor = Mathf.Clamp01(crouchHeightFactor);
+        if (col)
+        {
+            if (col.height < 0.2f) col.height = 0.2f;
+            if (col.radius < 0.05f) col.radius = 0.05f;
+        }
     }
 
     void Update()
@@ -88,6 +108,9 @@ public class AdvancedPlayerController : MonoBehaviour
         {
             wantJump = true;
         }
+
+        // kills any tilt creep
+        rb.angularVelocity = Vector3.zero;
     }
 
     void FixedUpdate()
@@ -114,8 +137,18 @@ public class AdvancedPlayerController : MonoBehaviour
         if (moveDir != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(moveDir);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 15f * Time.fixedDeltaTime);
+            Quaternion next = Quaternion.Slerp(rb.rotation, targetRotation, 15f * Time.fixedDeltaTime);
+            rb.MoveRotation(next);
         }
+
+        // gets speed with planar and tells animator controller the speed parameter, apparently using planar is more robust than linearvelocity
+        if (animator)
+        {
+            Vector3 delta = rb.position - _lastRbPos;
+            float planarSpeed = new Vector3(delta.x, 0f, delta.z).magnitude / Time.fixedDeltaTime;
+            animator.SetFloat("Speed", planarSpeed, 0.1f, Time.deltaTime);
+        }
+        _lastRbPos = rb.position;
 
         if (!isGrounded)
         {
@@ -210,7 +243,6 @@ public class AdvancedPlayerController : MonoBehaviour
             col.center = originalCenter;
         }
     }
-
 
     public void SetActive(bool active)
     {
