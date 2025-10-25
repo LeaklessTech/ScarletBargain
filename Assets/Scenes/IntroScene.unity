@@ -3829,7 +3829,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: b86ebbc92e2384250b39702fbf034679, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.3
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -3948,7 +3948,7 @@ MonoBehaviour:
   delayRange: {x: 3, y: 20}
   chancePerEvent: 0.9
   maxSimultaneousSounds: 1
-  volumeRange: {x: 0.5, y: 0.9}
+  volumeRange: {x: 0.3, y: 0.6}
 --- !u!1 &1173108042
 GameObject:
   m_ObjectHideFlags: 0
