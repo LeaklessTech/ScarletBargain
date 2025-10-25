@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Numerics;
 using UnityEngine;
 using UnityEngine.AI;
 using Utils;
@@ -10,6 +9,7 @@ public class MonsterBehavior : MonoBehaviour
     // Event Listeners
     [Header("Events")]
     public GameEvent onCharacterKilled;
+    public GameEvent onPlayMonsterAudio;
 
     // Parent Tree
     public BehaviorTree Tree;
@@ -57,7 +57,6 @@ public class MonsterBehavior : MonoBehaviour
         Sequence huntSequence = new Sequence("Hunt Sequence");
         huntSequence.AddChild(new Leaf("Hunt", HuntCharacter));
         huntSequence.AddChild(new Leaf("Consume", Consume));
-        huntSequence.AddChild(new Leaf("Victory", Victory));
         huntLook.AddChild(huntSequence);
 
         Sequence failHuntSequence = new Sequence("Failed to Hunt");
@@ -144,11 +143,6 @@ public class MonsterBehavior : MonoBehaviour
             state = ActionState.WORKING;
             agent.SetDestination(characterPosition);
         }
-        else
-        {
-            state = ActionState.IDLE;
-            return Node.Status.FAILURE;
-        }
 
         if (NavMeshUtilities.IsAtTargetLocation(agent))
         {
@@ -163,20 +157,27 @@ public class MonsterBehavior : MonoBehaviour
 
     public Node.Status Consume()
     {
-        Debug.Log("Conusmed character");
-        onCharacterKilled.TriggerEvent(this, huntedPlayerId);
+
+
+        if (Vector3.Distance(this.transform.position, characterPosition) < 2)
+        {
+            Debug.Log("Conusmed character");
+            onCharacterKilled.TriggerEvent(this, huntedPlayerId);
+            onPlayMonsterAudio.TriggerEvent(this, Resources.Load<AudioClip>("Audio/monster-victory"));
+            state = ActionState.IDLE;
+        }
+        else
+        {
+            return Node.Status.FAILURE;
+        }
+
+
         return Node.Status.SUCCESS;
     }
 
     public Node.Status Angry()
     {
         Debug.Log("Angry yell");
-        return Node.Status.SUCCESS;
-    }
-
-    public Node.Status Victory()
-    {
-        Debug.Log("Victory yell");
         return Node.Status.SUCCESS;
     }
 
@@ -192,7 +193,14 @@ public class MonsterBehavior : MonoBehaviour
 
     Node.Status FoundCharacter()
     {
-        return IsCharacterFound ? Node.Status.SUCCESS : Node.Status.FAILURE;
+        // This Node will interrupt whatever the monster is doing, so we need to reset their actionstate to idle
+        if (IsCharacterFound)
+        {
+            state = ActionState.IDLE;
+            return Node.Status.SUCCESS;
+        }
+        
+        return Node.Status.FAILURE;
     }
     #endregion
 
