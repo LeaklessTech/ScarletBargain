@@ -5,9 +5,12 @@ using UnityEngine.EventSystems;
 
 public class MenuController : MonoBehaviour
 {
-    public string gameSceneName = "main";
+    public string gameSceneName = "GameScene";
     public GameObject firstSelected;
     private GameObject quitConfirmPanel;
+
+    public GameObject MenuPanel;
+    public GameObject SettingsPanel;
 
     private void OnEnable()
     {
@@ -25,6 +28,18 @@ public class MenuController : MonoBehaviour
     public void QuitGameImmediate()
     {
         Application.Quit();
+    }
+
+    public void OpenPreferences()
+    {
+        MenuPanel.SetActive(false);
+        SettingsPanel.SetActive(true);
+    }
+    
+    public void ClosePreferences()
+    {
+        SettingsPanel.SetActive(false); 
+        MenuPanel.SetActive(true);
     }
 
     // public void ShowQuitConfirm()
