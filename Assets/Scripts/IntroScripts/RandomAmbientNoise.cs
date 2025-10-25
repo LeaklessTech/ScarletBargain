@@ -1,19 +1,25 @@
 using UnityEngine;
 using UnityEngine.Audio;
 
+
+//Notes:
+// the clips used for the ambient sound came from:
+// https://freesound.org/
+// and all were filtered to have 
+// creative commons licensing.  
+
 public class RandomAmbientNoise : MonoBehaviour
 {
-
+    [Header("Audio Source")]
     public AudioSource audioSource;
 
+    [Header("Sound Assets")]
     public AudioClip[] soundClips;
 
+    [Header("Delay Range, probability of sound and max sounds")]
     public Vector2 delayRange = new Vector2(3f, 20f);
-
     public float chancePerEvent = 0.9f;
-
     public int maxSimultaneousSounds = 1;
-
     public Vector2 volumeRange = new Vector2(0.5f, 0.9f);
 
     private int currentlyPlaying = 0;
@@ -26,7 +32,7 @@ public class RandomAmbientNoise : MonoBehaviour
     {
         if (audioSource == null)
         {
-            audioSource = gameObject.AddComponent < AudioSource>();
+            audioSource = gameObject.AddComponent<AudioSource>();
             audioSource.playOnAwake = false;
             audioSource.loop = false;
         }
