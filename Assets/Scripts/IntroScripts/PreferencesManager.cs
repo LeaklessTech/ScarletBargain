@@ -11,9 +11,12 @@ public class PreferencesManager : MonoBehaviour
     public TMP_Dropdown resolutionDropdown;
 
     public Toggle fullScreenToggle;
+    public Toggle musicToggle;
 
     private Resolution[] res;
     private List<string> options;
+
+    const string PREF_MUSIC = "pref_music_enabled";
 
     void Awake()
     {
@@ -22,7 +25,7 @@ public class PreferencesManager : MonoBehaviour
             Debug.LogWarning("[PreferencesManager] UI refs not set. Skipping init.");
             return;
         }
-        
+
         PopulateResolutions();
         SyncUIToCurrentScreen();
         LoadPrefsIntoUI();
@@ -107,6 +110,7 @@ public class PreferencesManager : MonoBehaviour
     {
         int savedResIndex = PlayerPrefs.GetInt("pref_res_index", GetCurrentResolutionIndex());
         bool savedFull = PlayerPrefs.GetInt("pref_fullscreen", Screen.fullScreen ? 1 : 0) == 1;
+        bool savedMusic = PlayerPrefs.GetInt(PREF_MUSIC, 1) == 1;
 
         if (savedResIndex < 0 || savedResIndex >= res.Length)
         {
@@ -117,6 +121,11 @@ public class PreferencesManager : MonoBehaviour
         resolutionDropdown.RefreshShownValue();
 
         fullScreenToggle.isOn = savedFull;
+
+        if (musicToggle != null)
+        {
+            musicToggle.isOn = savedMusic;
+        }
     }    
     
     void ApplyCurrentUISettings()
@@ -149,6 +158,14 @@ public class PreferencesManager : MonoBehaviour
             }
         }
         return 0;
+    }
+
+    public void OnMusicToggle(bool enabled)
+    {
+        PlayerPrefs.SetInt(PREF_MUSIC, enabled ? 1 : 0);
+        PlayerPrefs.Save();
+
+        Debug.Log($"[Preferences] Music state changed.");
     }
 
 }
