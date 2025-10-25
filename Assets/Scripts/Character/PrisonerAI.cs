@@ -13,11 +13,12 @@ public class PrisonerAI : MonoBehaviour
     public bool isRescued { get; private set; }
 
     private float maxHistorySeconds = 20f; // max trail time history
-    private float lookbackSeconds = 2f; // how far behind in seconds to follow leader
+    private float lookbackSeconds = 0.6f; // how far behind in seconds to follow leader
     private float sampleInterval = 0.05f; // how often leader pos is sampled
     private float minStepDistance = 0.05f; // record only if leader moved this far
     Transform leader;
     NavMeshAgent agent;
+    Animator animator;
     AdvancedPlayerController controller;
 
     struct Sample { public Vector3 pos; public float time; }
@@ -28,6 +29,7 @@ public class PrisonerAI : MonoBehaviour
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
         controller = GetComponent<AdvancedPlayerController>();
         if (controller != null)
         {
@@ -101,6 +103,14 @@ public class PrisonerAI : MonoBehaviour
         {
             // stop moving if close enough
             agent.isStopped = true;
+        }
+
+        // feed speed float into animator param
+        if (animator)
+        {
+            Vector3 vel = agent.velocity;
+            float horizontalSpeed = new Vector3(vel.x, 0f, vel.z).magnitude;
+            animator.SetFloat("Speed", horizontalSpeed, 0.1f, Time.deltaTime);
         }
     }
 
