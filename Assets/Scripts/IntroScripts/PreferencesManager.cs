@@ -17,6 +17,12 @@ public class PreferencesManager : MonoBehaviour
 
     void Awake()
     {
+        if (resolutionDropdown == null || fullScreenToggle == null)
+        {
+            Debug.LogWarning("[PreferencesManager] UI refs not set. Skipping init.");
+            return;
+        }
+        
         PopulateResolutions();
         SyncUIToCurrentScreen();
         LoadPrefsIntoUI();
