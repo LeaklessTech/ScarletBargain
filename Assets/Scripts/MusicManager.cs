@@ -4,7 +4,7 @@ public class MusicManager : MonoBehaviour
 {
 
     public AudioSource musicSource;
-    const string PREF_KEY = "pref_music_enabled";
+    const string PREF_MUSIC = "pref_music_enabled";
 
     void Awake()
     {
@@ -13,7 +13,7 @@ public class MusicManager : MonoBehaviour
             musicSource = GetComponent<AudioSource>();
         }
 
-        bool enabled = PlayerPrefs.GetInt(PREF_KEY, 1) == 1;
+        bool enabled = PlayerPrefs.GetInt(PREF_MUSIC, 1) == 1;
         PlayMusic(enabled);
         if (enabled && !musicSource.isPlaying)
         {
@@ -28,7 +28,7 @@ public class MusicManager : MonoBehaviour
             musicSource.mute = !enabled;
         }
 
-        PlayerPrefs.SetInt(PREF_KEY, enabled ? 1 : 0);
+        PlayerPrefs.SetInt(PREF_MUSIC, enabled ? 1 : 0);
         PlayerPrefs.Save();
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created

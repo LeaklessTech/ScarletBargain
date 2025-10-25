@@ -20,6 +20,8 @@ public class PreferencesManager : MonoBehaviour
 
     void Awake()
     {
+        EnsurePrefsDefaults();
+
         if (resolutionDropdown == null || fullScreenToggle == null)
         {
             Debug.LogWarning("[PreferencesManager] UI refs not set. Skipping init.");
@@ -41,6 +43,11 @@ public class PreferencesManager : MonoBehaviour
     void Update()
     {
 
+    }
+
+    void OnEnable()
+    {
+        LoadPrefsIntoUI();
     }
 
     void PopulateResolutions()
@@ -119,15 +126,18 @@ public class PreferencesManager : MonoBehaviour
 
         resolutionDropdown.value = savedResIndex;
         resolutionDropdown.RefreshShownValue();
+        if (fullScreenToggle != null)
+        {
+            fullScreenToggle.isOn = savedFull;
 
-        fullScreenToggle.isOn = savedFull;
+        }
 
         if (musicToggle != null)
         {
-            musicToggle.isOn = savedMusic;
+            musicToggle.SetIsOnWithoutNotify(savedMusic);
         }
-    }    
-    
+    }
+
     void ApplyCurrentUISettings()
     {
         int index = resolutionDropdown.value;
@@ -165,7 +175,20 @@ public class PreferencesManager : MonoBehaviour
         PlayerPrefs.SetInt(PREF_MUSIC, enabled ? 1 : 0);
         PlayerPrefs.Save();
 
-        Debug.Log($"[Preferences] Music state changed.");
+        Debug.Log($"[Preferences] Music state is {enabled}.");
     }
 
+    // when I created the preferences for music on/off
+    // the music stopped working.  I'm adding this to 
+    // ensure the music defaults to on.
+
+    void EnsurePrefsDefaults()
+    {
+        if (!PlayerPrefs.HasKey(PREF_MUSIC))
+        {
+            PlayerPrefs.SetInt(PREF_MUSIC, 1);   // default ON
+            PlayerPrefs.Save();
+            Debug.Log("[Preferences] Initialized default music=ON");
+        }
+    }
 }
