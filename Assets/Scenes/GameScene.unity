@@ -592,7 +592,7 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 4
-  m_Acceleration: 16
+  m_Acceleration: 6
   avoidancePriority: 50
   m_AngularSpeed: 720
   m_StoppingDistance: 0
@@ -1524,7 +1524,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 17a02288f7aafa94781c6d8724407432, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.16
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 17a02288f7aafa94781c6d8724407432, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1632,7 +1632,6 @@ MonoBehaviour:
   walkSpeed: 2
   runSpeed: 4
   crouchSpeed: 1.2
-  jumpForce: 4.5
   gravityMultiplier: 3
   groundCheck: {fileID: 1181005244}
   groundCheckRadius: 0.2
@@ -1642,7 +1641,6 @@ MonoBehaviour:
   cam: {fileID: 119923059}
   sprintKey: 304
   crouchKey: 99
-  crouchHeightFactor: 0.2
   maxGroundAngle: 60
   groundTag: Ground
 --- !u!136 &1386689667
@@ -1924,7 +1922,6 @@ MonoBehaviour:
   walkSpeed: 2
   runSpeed: 4
   crouchSpeed: 1.2
-  jumpForce: 4.5
   gravityMultiplier: 3
   groundCheck: {fileID: 418184086}
   groundCheckRadius: 0.2
@@ -1934,7 +1931,6 @@ MonoBehaviour:
   cam: {fileID: 330585546}
   sprintKey: 304
   crouchKey: 99
-  crouchHeightFactor: 0.2
   maxGroundAngle: 60
   groundTag: Ground
 --- !u!4 &2009643949
@@ -2142,7 +2138,6 @@ MonoBehaviour:
   walkSpeed: 2
   runSpeed: 4
   crouchSpeed: 1.2
-  jumpForce: 4.5
   gravityMultiplier: 3
   groundCheck: {fileID: 35530108}
   groundCheckRadius: 0.2
@@ -2152,7 +2147,6 @@ MonoBehaviour:
   cam: {fileID: 119923059}
   sprintKey: 304
   crouchKey: 99
-  crouchHeightFactor: 0.2
   maxGroundAngle: 60
   groundTag: Ground
 --- !u!33 &3164545783801876328
