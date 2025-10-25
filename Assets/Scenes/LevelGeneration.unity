@@ -416,10 +416,13 @@ MonoBehaviour:
   MaxRoomLength: 6
   RoomBuffer: 1
   RoomCount: 25
-  retryLimit: 100
-  floorTilePrefabs:
+  RetryLimit: 50
+  FloorTilePrefabs:
+  - {fileID: 6805246545633482266, guid: 0e431421b7cf6e442952b0465061bf50, type: 3}
   - {fileID: 6805246545633482266, guid: e0eb339193887cf4a861a2d6281210a3, type: 3}
-  objectSizeOffset: 10
+  - {fileID: 6805246545633482266, guid: 94d051ddc42b25342a61d9b21ce48450, type: 3}
+  - {fileID: 6805246545633482266, guid: 4be40b0cb0fdb0841815030f59eacec0, type: 3}
+  ObjectSizeOffset: 10
   Seed: 12202512
   TilePrefab: {fileID: 6805246545633482266, guid: e0eb339193887cf4a861a2d6281210a3, type: 3}
 --- !u!4 &1309857617
