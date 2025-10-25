@@ -40,10 +40,9 @@ namespace LevelGeneration
 
         public int BaseCost { get; set; }
         public GameObject TileObject { get; set; }
-
         public Vector2Int Location;
-
         public Tile Previous { get; set; }
+        public Vector3 WorldPosition { get; set; }
 
         // we want fScore to be updated based on the changes in H and G score, so we use some backing fields
         private int _gScore;
@@ -63,15 +62,15 @@ namespace LevelGeneration
 
         public int fScore => _gScore + _hScore;
 
-        public Tile(TileType type, GameObject tileObject, (int x, int y) location)
+        public Tile(TileType type, (int x, int y) location, Vector3 worldPosition)
         {
             this.Type = type;
-
-            this.TileObject = tileObject;
 
             Location = new(location.x, location.y);
 
             gScore = int.MaxValue;
+
+            WorldPosition = worldPosition;
         }
 
         public bool RemoveWall(Wall wallToRemove)

@@ -31,17 +31,12 @@ namespace LevelGeneration
             // first convert the centers of each room to points
             List<GraphStructures.Node> roomCenters = new();
 
-            foreach(var room in placedRooms)
+            foreach(var room in _placedRooms)
             {
                 roomCenters.Add(new GraphStructures.Node(room.RoomObject.transform.position, room));
             }
 
             Graph = DelaunayTriangulation.TriangulatePoints(roomCenters);
-
-            foreach(var edge in Graph.GraphEdges)
-            {
-                Debug.DrawLine(edge.NodeA.Position, edge.NodeB.Position, Color.magenta, 40f);
-            }
         }
 
         private void CreateMST()
