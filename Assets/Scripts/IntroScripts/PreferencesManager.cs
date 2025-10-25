@@ -19,13 +19,13 @@ public class PreferencesManager : MonoBehaviour
     {
         PopulateResolutions();
         SyncUIToCurrentScreen();
-        LoadPrefsAndApply();
+        LoadPrefsIntoUI();
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        ApplyCurrentUISettings();
     }
 
     // Update is called once per frame
@@ -72,6 +72,9 @@ public class PreferencesManager : MonoBehaviour
     {
         ApplyResolution(Screen.width, Screen.height, isFull);
 
+        Debug.Log($"[PreferencesManager] Fullscreen toggle selected.");
+
+
         PlayerPrefs.SetInt("pref_fullscreen", isFull ? 1 : 0);
         PlayerPrefs.Save();
     }
@@ -94,7 +97,7 @@ public class PreferencesManager : MonoBehaviour
         resolutionDropdown.RefreshShownValue();
     }
 
-    void LoadPrefsAndApply()
+    void LoadPrefsIntoUI()
     {
         int savedResIndex = PlayerPrefs.GetInt("pref_res_index", GetCurrentResolutionIndex());
         bool savedFull = PlayerPrefs.GetInt("pref_fullscreen", Screen.fullScreen ? 1 : 0) == 1;
@@ -104,13 +107,30 @@ public class PreferencesManager : MonoBehaviour
             savedResIndex = GetCurrentResolutionIndex();
         }
 
-        var chosen = res[savedResIndex];
-        ApplyResolution(chosen.width, chosen.height, savedFull);
-
         resolutionDropdown.value = savedResIndex;
         resolutionDropdown.RefreshShownValue();
 
         fullScreenToggle.isOn = savedFull;
+    }    
+    
+    void ApplyCurrentUISettings()
+    {
+        int index = resolutionDropdown.value;
+
+        if (index < 0 || index >= res.Length)
+        {
+            index = GetCurrentResolutionIndex();
+        }
+
+        Resolution chosen = res[index];
+        bool fullscreen = fullScreenToggle.isOn;
+
+        ApplyResolution(chosen.width, chosen.height, fullscreen);
+
+        PlayerPrefs.SetInt("pref_res_index", index);
+        PlayerPrefs.SetInt("pref_fullscreen", fullscreen ? 1 : 0);
+        PlayerPrefs.Save();
+
     }
 
     int GetCurrentResolutionIndex()
