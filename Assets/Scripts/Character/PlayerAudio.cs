@@ -15,7 +15,7 @@ public class PlayerAudio : MonoBehaviour
     public AudioClip runLoopClip;
 
     [Header("footstep timing (seconds)")]
-    public float walkStepInterval = 0.46f;
+    public float walkStepInterval = 0.47f;
     public float crouchStepInterval = 0.53f;
 
     [Header("volumes")]
