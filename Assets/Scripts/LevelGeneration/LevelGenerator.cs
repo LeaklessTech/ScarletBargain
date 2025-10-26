@@ -51,6 +51,12 @@ namespace LevelGeneration
 
         public GameObject TilePrefab;
 
+        [Header("Lighting")]
+
+        [Tooltip("List of light prefabs to randomly select from. Each room/hallway uses one prefab.")]
+
+        public List<GameObject> LightPrefabs = new List<GameObject>();
+
         private Tile[,] tileGrid;
 
         private GameObject _levelObject;
@@ -93,6 +99,7 @@ namespace LevelGeneration
             RefineRooms();
             CreateHallways();
             RemoveRemainingTiles();
+            PlaceLights();
         }
 
         // clean up unused tiles
@@ -586,6 +593,248 @@ namespace LevelGeneration
         }
 
         #endregion
+
+        private void PlaceLights()
+
+        {
+
+            if (LightPrefabs == null || LightPrefabs.Count == 0)
+
+            {
+
+                Debug.LogWarning("No light prefabs assigned. Skipping light placement.");
+
+                return;
+
+            }
+
+
+
+            // Track all placed light positions globally to enforce no-adjacent rule
+
+            List<Vector2Int> placedLightPositions = new List<Vector2Int>();
+
+
+
+            // Place lights for each room (one prefab per room)
+
+            foreach (Room room in _placedRooms)
+
+            {
+
+                if (room.RoomTiles == null || room.RoomTiles.Count == 0) continue;
+
+
+
+                // Select one prefab for this entire room
+
+                GameObject roomLightPrefab = LightPrefabs[UnityEngine.Random.Range(0, LightPrefabs.Count)];
+
+
+
+                // Get candidate positions (only room tiles)
+
+                List<Vector2Int> candidates = room.RoomTiles
+
+                    .Where(t => t != null)
+
+                    .Select(t => t.Location)
+
+                    .ToList();
+
+
+
+                if (candidates.Count == 0) continue;
+
+
+
+                // Shuffle for random-ish placement
+
+                var shuffledCandidates = candidates.OrderBy(x => UnityEngine.Random.value).ToList();
+
+
+
+                // Greedily place lights, checking global adjacency (Chebyshev distance > 1)
+
+                foreach (Vector2Int pos in shuffledCandidates)
+
+                {
+
+                    bool canPlace = true;
+
+                    foreach (Vector2Int existingPos in placedLightPositions)
+
+                    {
+
+                        int dx = Mathf.Abs(pos.x - existingPos.x);
+
+                        int dy = Mathf.Abs(pos.y - existingPos.y);
+
+                        if (Mathf.Max(dx, dy) <= 1)
+
+                        {
+
+                            canPlace = false;
+
+                            break;
+
+                        }
+
+                    }
+
+
+
+                    if (canPlace)
+
+                    {
+
+                        placedLightPositions.Add(pos);
+
+
+
+                        // Spawn light as child of the tile (adjust prefab local pos for ceiling offset if needed)
+
+                        Tile tile = tileGrid[pos.x, pos.y];
+
+                        if (tile != null && tile.TileObject != null)
+
+                        {
+
+                            GameObject lightInstance = Instantiate(roomLightPrefab, tile.WorldPosition, Quaternion.identity, tile.TileObject.transform);
+
+                            lightInstance.name = "Light";
+
+                            Debug.Log($"Placed room light at {pos} using prefab {roomLightPrefab.name}");
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+
+
+            // Place lights for all hallways (one prefab for the entire hallway network)
+
+            List<Tile> hallwayTiles = new List<Tile>();
+
+            for (int x = 0; x < LevelWidth; x++)
+
+            {
+
+                for (int y = 0; y < LevelLength; y++)
+
+                {
+
+                    Tile tile = tileGrid[x, y];
+
+                    if (tile != null && tile.Type == TileType.HALLWAY)
+
+                    {
+
+                        hallwayTiles.Add(tile);
+
+                    }
+
+                }
+
+            }
+
+
+
+            if (hallwayTiles.Count > 0)
+
+            {
+
+                // Select one prefab for all hallways
+
+                GameObject hallwayLightPrefab = LightPrefabs[UnityEngine.Random.Range(0, LightPrefabs.Count)];
+
+
+
+                // Get candidate positions (only hallway tiles)
+
+                List<Vector2Int> candidates = hallwayTiles
+
+                    .Select(t => t.Location)
+
+                    .ToList();
+
+
+
+                // Shuffle for random-ish placement
+
+                var shuffledCandidates = candidates.OrderBy(x => UnityEngine.Random.value).ToList();
+
+
+
+                // Greedily place lights, checking global adjacency
+
+                foreach (Vector2Int pos in shuffledCandidates)
+
+                {
+
+                    bool canPlace = true;
+
+                    foreach (Vector2Int existingPos in placedLightPositions)
+
+                    {
+
+                        int dx = Mathf.Abs(pos.x - existingPos.x);
+
+                        int dy = Mathf.Abs(pos.y - existingPos.y);
+
+                        if (Mathf.Max(dx, dy) <= 1)
+
+                        {
+
+                            canPlace = false;
+
+                            break;
+
+                        }
+
+                    }
+
+
+
+                    if (canPlace)
+
+                    {
+
+                        placedLightPositions.Add(pos);
+
+
+
+                        // Spawn light as child of the tile
+
+                        Tile tile = tileGrid[pos.x, pos.y];
+
+                        if (tile != null && tile.TileObject != null)
+
+                        {
+
+                            GameObject lightInstance = Instantiate(hallwayLightPrefab, tile.WorldPosition, Quaternion.identity, tile.TileObject.transform);
+
+                            lightInstance.name = "Light";
+
+                            Debug.Log($"Placed hallway light at {pos} using prefab {hallwayLightPrefab.name}");
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+
+
+            Debug.Log($"Light placement complete. Total lights: {placedLightPositions.Count}");
+
+        }
 
     }
 }
