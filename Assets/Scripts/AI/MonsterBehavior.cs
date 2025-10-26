@@ -56,12 +56,10 @@ public class MonsterBehavior : MonoBehaviour
         Selector huntLook = new Selector("Succeed Hunt or Fail Hunt");
         Sequence huntSequence = new Sequence("Hunt Sequence");
         huntSequence.AddChild(new Leaf("Hunt", HuntCharacter));
-        huntSequence.AddChild(new Leaf("Consume", Consume));
         huntLook.AddChild(huntSequence);
 
         Sequence failHuntSequence = new Sequence("Failed to Hunt");
         failHuntSequence.AddChild(new Leaf("Look Around", Swivel));
-        failHuntSequence.AddChild(new Leaf("Anger", Angry));
         huntLook.AddChild(failHuntSequence);
 
         chaseSequence.AddChild(huntLook);
@@ -144,42 +142,52 @@ public class MonsterBehavior : MonoBehaviour
             agent.SetDestination(characterPosition);
         }
 
+        if (Vector3.Distance(this.transform.position, characterPosition) < 2)
+        {
+            Debug.Log("Conusmed character in hunt stage");
+            onCharacterKilled.TriggerEvent(this, huntedPlayerId);
+            onPlayMonsterAudio.TriggerEvent(this, Resources.Load<AudioClip>("Audio/monster-victory"));
+            state = ActionState.IDLE;
+            IsCharacterFound = false;
+            return Node.Status.SUCCESS; // Return failure here because 
+        }
         if (NavMeshUtilities.IsAtTargetLocation(agent))
         {
             // TODO: need to play kill animation then disable/destroy the character that was killed
             state = ActionState.IDLE;
             IsCharacterFound = false;
-            return Node.Status.SUCCESS;
+            onPlayMonsterAudio.TriggerEvent(this, Resources.Load<AudioClip>("Audio/monster-angry"));
+            return Node.Status.FAILURE;
         }
 
         return Node.Status.RUNNING;
     }
 
-    public Node.Status Consume()
-    {
+    // public Node.Status Consume()
+    // {
 
 
-        if (Vector3.Distance(this.transform.position, characterPosition) < 2)
-        {
-            Debug.Log("Conusmed character");
-            onCharacterKilled.TriggerEvent(this, huntedPlayerId);
-            onPlayMonsterAudio.TriggerEvent(this, Resources.Load<AudioClip>("Audio/monster-victory"));
-            state = ActionState.IDLE;
-        }
-        else
-        {
-            return Node.Status.FAILURE;
-        }
+    //     if (Vector3.Distance(this.transform.position, characterPosition) < 2)
+    //     {
+    //         Debug.Log("Conusmed character");
+    //         onCharacterKilled.TriggerEvent(this, huntedPlayerId);
+    //         onPlayMonsterAudio.TriggerEvent(this, Resources.Load<AudioClip>("Audio/monster-victory"));
+    //         state = ActionState.IDLE;
+    //     }
+    //     else
+    //     {
+    //         return Node.Status.FAILURE;
+    //     }
 
 
-        return Node.Status.SUCCESS;
-    }
+    //     return Node.Status.SUCCESS;
+    // }
 
-    public Node.Status Angry()
-    {
-        Debug.Log("Angry yell");
-        return Node.Status.SUCCESS;
-    }
+    // public Node.Status Angry()
+    // {
+    //     Debug.Log("Angry yell");
+    //     return Node.Status.SUCCESS;
+    // }
 
     Node.Status IsMonsterStunned()
     {
