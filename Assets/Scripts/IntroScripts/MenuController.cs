@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 public class MenuController : MonoBehaviour
 {
     public string gameSceneName = "GameScene";
+    public string homeSceneName = "IntroScene";
     public GameObject firstSelected;
     private GameObject quitConfirmPanel;
 
@@ -23,6 +24,12 @@ public class MenuController : MonoBehaviour
     public void StartGame()
     {
         SceneManager.LoadScene(gameSceneName, LoadSceneMode.Single);
+    }
+
+    public void BackToHome()
+    {
+        //reference: https://docs.unity3d.com/6000.0/Documentation/ScriptReference/SceneManagement.SceneManager.LoadScene.html
+        SceneManager.LoadScene(homeSceneName, LoadSceneMode.Single);
     }
 
     public void QuitGameImmediate()

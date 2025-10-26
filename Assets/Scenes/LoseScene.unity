@@ -2958,6 +2958,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameSceneName: GameScene
+  homeSceneName: IntroScene
   firstSelected: {fileID: 639198285}
   MenuPanel: {fileID: 800631072}
   SettingsPanel: {fileID: 1409003936}
@@ -4071,7 +4072,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1096209587}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 595147985}
+        m_TargetAssemblyTypeName: MenuController, Assembly-CSharp
+        m_MethodName: BackToHome
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 1
 --- !u!114 &1096209587
 MonoBehaviour:
   m_ObjectHideFlags: 0
