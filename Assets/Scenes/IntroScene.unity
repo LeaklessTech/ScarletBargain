@@ -3754,6 +3754,7 @@ GameObject:
   - component: {fileID: 1056383265}
   - component: {fileID: 1056383264}
   - component: {fileID: 1056383263}
+  - component: {fileID: 1056383267}
   m_Layer: 0
   m_Name: EvilAI
   m_TagString: Untagged
@@ -3845,14 +3846,41 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1056383262}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4, y: 1.6, z: 0}
+  m_LocalRotation: {x: 0.109117985, y: -0.1313414, z: 0.62152624, w: 0.76455736}
+  m_LocalPosition: {x: 4, y: 1.6, z: -0.00000004096529}
   m_LocalScale: {x: 1.575, y: 1.6, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2031275276}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 19.276, y: -3.96, z: 77.544}
+--- !u!54 &1056383267
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1056383262}
+  serializedVersion: 4
+  m_Mass: 0.3
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 1
 --- !u!1 &1098449766
 GameObject:
   m_ObjectHideFlags: 0
@@ -7727,9 +7755,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targets: []
   emissionColor: {r: 1, g: 0, b: 0.1605196, a: 1}
-  minIntensity: 0.1
-  maxIntensity: 2.5
-  baseSpeed: 3.5
+  minIntensity: 0.7
+  maxIntensity: 7
+  baseSpeed: 5
   desync: 1
   randomPhase: 10
   glitchChance: 0.07
