@@ -51,6 +51,8 @@ namespace LevelGeneration
 
         public GameObject TilePrefab;
 
+        public WaypointListReference WaypointList;
+
         private Tile[,] tileGrid;
 
         private GameObject _levelObject;
@@ -86,6 +88,7 @@ namespace LevelGeneration
 
             tileGrid = new Tile[LevelWidth, LevelLength];
 
+            WaypointList.WaypointListRef.Clear();
 
             GenerateTileGrid();
             SimulateRooms();
@@ -569,6 +572,11 @@ namespace LevelGeneration
             {
                 RemoveRoomWalls(room);
                 yield return new WaitForSeconds(.25f);
+            }
+
+            foreach (Room room in _placedRooms)
+            {
+                WaypointList.WaypointListRef.Add(new Waypoint() { Position = room.RoomObject.transform.position, Weight = 1 });
             }
 
             for (int i = 0; i < LevelLength; i++)
