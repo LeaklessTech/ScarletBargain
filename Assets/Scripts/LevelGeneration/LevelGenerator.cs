@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.AI.Navigation;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -59,7 +60,7 @@ namespace LevelGeneration
         private GameObject _hallwayObject;
 
         // For overlap checking
-        private readonly List<Room> _placedRooms = new();
+        public readonly List<Room> PlacedRooms = new();
 
         private static readonly (Tile.Wall, Vector2Int d)[] Dirs =
         {
@@ -95,6 +96,14 @@ namespace LevelGeneration
             RefineRooms();
             CreateHallways();
             RemoveRemainingTiles();
+            BakeNavmesh();
+        }
+
+        private void BakeNavmesh()
+        {
+            NavMeshSurface surface = GetComponent<NavMeshSurface>();
+
+            surface.BuildNavMesh();
         }
 
         // clean up unused tiles
@@ -216,7 +225,7 @@ namespace LevelGeneration
 
                             roomTiles.Add(tile);
                         }
-                        _placedRooms.Add(new(potentialRoom, null, roomTiles));
+                        PlacedRooms.Add(new(potentialRoom, null, roomTiles));
                         break;
                     }
                     else if (currentAttempt == RetryLimit - 1)
@@ -231,7 +240,7 @@ namespace LevelGeneration
         {
             int currentRoomIndex = 0;
 
-            foreach (var room in _placedRooms)
+            foreach (var room in PlacedRooms)
             {
                 GameObject roomObject = new($"Room {currentRoomIndex + 1}");
 
@@ -423,7 +432,7 @@ namespace LevelGeneration
 
             if (!insideMatrix) return false;
 
-            bool spacedFromOthers = _placedRooms.All(r => !Inflate(r.Bounds, RoomBuffer).Overlaps(room));
+            bool spacedFromOthers = PlacedRooms.All(r => !Inflate(r.Bounds, RoomBuffer).Overlaps(room));
             if (!spacedFromOthers) return false;
 
             return true;
@@ -550,7 +559,7 @@ namespace LevelGeneration
                         }
 
                         // create the room object at visual center
-                        GameObject roomObject = new($"Room {_placedRooms.Count + 1}");
+                        GameObject roomObject = new($"Room {PlacedRooms.Count + 1}");
                         roomObject.transform.position = combinedCenter;
                         roomObject.transform.parent = _levelObject.transform;
 
@@ -560,7 +569,7 @@ namespace LevelGeneration
                             t.SetParent(roomObject.transform, true);
                         }
 
-                        _placedRooms.Add(new(potentialRoom, roomObject, roomTiles));
+                        PlacedRooms.Add(new(potentialRoom, roomObject, roomTiles));
                         break;
                     }
                     else if (currentAttempt == RetryLimit - 1)
@@ -570,7 +579,7 @@ namespace LevelGeneration
                 }
             }
 
-            foreach (Room room in _placedRooms)
+            foreach (Room room in PlacedRooms)
             {
                 RemoveRoomWalls(room);
                 yield return new WaitForSeconds(.25f);
