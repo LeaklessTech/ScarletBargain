@@ -12,3 +12,7 @@
 - A-Star: https://en.wikipedia.org/wiki/A*_search_algorithm
 - Prim's Algorithim (MST): https://en.wikipedia.org/wiki/Prim%27s_algorithm
 - Bowyer-Watson (Delaunay Triangulation): https://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm
+
+# Audio
+- Monster roar: https://pixabay.com/sound-effects/low-monster-roar-97413/
+- Audio Stopped Coroutine (not currently used): https://gamedev.stackexchange.com/questions/169339/efficient-way-to-detect-when-audio-clip-ends
