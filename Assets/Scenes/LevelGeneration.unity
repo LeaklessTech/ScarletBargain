@@ -377,7 +377,7 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
---- !u!1 &1309857615
+--- !u!1 &1723413904
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -385,56 +385,38 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1309857617}
-  - component: {fileID: 1309857616}
+  - component: {fileID: 1723413906}
+  - component: {fileID: 1723413905}
   m_Layer: 0
-  m_Name: LevelGeneratorObject
+  m_Name: GameManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1309857616
+--- !u!114 &1723413905
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1309857615}
+  m_GameObject: {fileID: 1723413904}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b223f0d38beefb34285a2cb1cb090cc6, type: 3}
+  m_Script: {fileID: 11500000, guid: 8eeb19306f7ca61469d2d8873eb00f28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DebugActive: 0
-  AdditionalHallwayChance: 18
-  LevelWidth: 50
-  LevelLength: 50
-  MinRoomWidth: 2
-  MaxRoomWidth: 6
-  MinRoomLength: 2
-  MaxRoomLength: 6
-  RoomBuffer: 1
-  RoomCount: 25
-  RetryLimit: 50
-  FloorTilePrefabs:
-  - {fileID: 6805246545633482266, guid: 0e431421b7cf6e442952b0465061bf50, type: 3}
-  - {fileID: 6805246545633482266, guid: e0eb339193887cf4a861a2d6281210a3, type: 3}
-  - {fileID: 6805246545633482266, guid: 94d051ddc42b25342a61d9b21ce48450, type: 3}
-  - {fileID: 6805246545633482266, guid: 4be40b0cb0fdb0841815030f59eacec0, type: 3}
-  ObjectSizeOffset: 10
-  Seed: 12202512
-  TilePrefab: {fileID: 6805246545633482266, guid: e0eb339193887cf4a861a2d6281210a3, type: 3}
---- !u!4 &1309857617
+  LevelGenerator: {fileID: 8262802726317120157, guid: 2b4c70307751f214b8e3c2590a055706, type: 3}
+--- !u!4 &1723413906
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1309857615}
+  m_GameObject: {fileID: 1723413904}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -1.7015932, y: -8.630104, z: 14.898257}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -446,4 +428,4 @@ SceneRoots:
   m_Roots:
   - {fileID: 820756647}
   - {fileID: 1069239986}
-  - {fileID: 1309857617}
+  - {fileID: 1723413906}
