@@ -16,3 +16,4 @@
 # Audio
 - Monster roar: https://pixabay.com/sound-effects/low-monster-roar-97413/
 - Audio Stopped Coroutine (not currently used): https://gamedev.stackexchange.com/questions/169339/efficient-way-to-detect-when-audio-clip-ends
+- Monster angry yell: https://pixabay.com/sound-effects/attack-cannibal-beast-95140/
