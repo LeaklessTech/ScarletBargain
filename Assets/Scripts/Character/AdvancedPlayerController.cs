@@ -32,6 +32,10 @@ public class AdvancedPlayerController : MonoBehaviour
     [SerializeField, Range(0f, 89f)] private float maxGroundAngle = 60f;
     [SerializeField] private string groundTag = "Ground";
 
+    public bool IsMoving => Mathf.Abs(hInput) > 0.05f || Mathf.Abs(vInput) > 0.05f;
+    public bool IsCrouching => isCrouching;
+    public bool IsRunning => isRunning;
+
     // internal
     private Rigidbody rb;
     private CapsuleCollider col;
@@ -140,7 +144,8 @@ public class AdvancedPlayerController : MonoBehaviour
         if (moveDir != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(moveDir);
-            Quaternion next = Quaternion.Slerp(rb.rotation, targetRotation, 15f * Time.fixedDeltaTime);
+            float maxTurn = 720f * Time.fixedDeltaTime;
+            Quaternion next = Quaternion.RotateTowards(rb.rotation, targetRotation, maxTurn);
             rb.MoveRotation(next);
         }
 
