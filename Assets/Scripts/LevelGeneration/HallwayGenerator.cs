@@ -31,7 +31,7 @@ namespace LevelGeneration
             // first convert the centers of each room to points
             List<GraphStructures.Node> roomCenters = new();
 
-            foreach(var room in placedRooms)
+            foreach(var room in _placedRooms)
             {
                 roomCenters.Add(new GraphStructures.Node(room.RoomObject.transform.position, room));
             }
