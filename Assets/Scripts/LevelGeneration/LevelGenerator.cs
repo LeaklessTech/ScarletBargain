@@ -50,6 +50,8 @@ namespace LevelGeneration
 
         public GameObject TilePrefab;
 
+        public WaypointListReference WaypointList;
+
         private Tile[,] tileGrid;
 
         private GameObject _levelObject;
@@ -85,6 +87,7 @@ namespace LevelGeneration
 
             tileGrid = new Tile[LevelWidth, LevelLength];
 
+            WaypointList.WaypointListRef.Clear();
 
             GenerateTileGrid();
             SimulateRooms();
@@ -285,6 +288,9 @@ namespace LevelGeneration
                 roomObject.transform.parent = _levelObject.transform;
 
                 room.RoomObject = roomObject;
+                
+                // Create a waypoint for the center of each room
+                WaypointList.WaypointListRef.Add(new Waypoint() { Position = combinedCenter, Weight = 1 });
 
                 // parent tiles to the room object while preserving their world positions
                 foreach (var tile in tileTransforms)
