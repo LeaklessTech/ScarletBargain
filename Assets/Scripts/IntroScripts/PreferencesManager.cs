@@ -53,7 +53,7 @@ public class PreferencesManager : MonoBehaviour
     void PopulateResolutions()
     {
         // reference: https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Screen-resolutions.html
-        res = Screen.resolutions;
+        res = Screen.resolutions.GroupBy(r => (r.width, r.height)).Select(g => g.First()).ToArray();
 
         options = res.Select(r => $"{r.width} x {r.height}").ToList();
 
