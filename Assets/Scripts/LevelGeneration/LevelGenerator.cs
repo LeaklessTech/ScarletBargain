@@ -289,6 +289,9 @@ namespace LevelGeneration
                 roomObject.transform.parent = _levelObject.transform;
 
                 room.RoomObject = roomObject;
+                
+                // Create a waypoint for the center of each room
+                WaypointList.WaypointListRef.Add(new Waypoint() { Position = combinedCenter, Weight = 1 });
 
                 // parent tiles to the room object while preserving their world positions
                 foreach (var tile in tileTransforms)
@@ -572,11 +575,6 @@ namespace LevelGeneration
             {
                 RemoveRoomWalls(room);
                 yield return new WaitForSeconds(.25f);
-            }
-
-            foreach (Room room in _placedRooms)
-            {
-                WaypointList.WaypointListRef.Add(new Waypoint() { Position = room.RoomObject.transform.position, Weight = 1 });
             }
 
             for (int i = 0; i < LevelLength; i++)
