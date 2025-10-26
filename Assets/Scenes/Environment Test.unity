@@ -518,7 +518,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &523713635
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -637,6 +637,10 @@ PrefabInstance:
     - target: {fileID: 169710, guid: dc8f3955c063af240afd23143f496335, type: 3}
       propertyPath: m_Name
       value: P_Lamp (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 169710, guid: dc8f3955c063af240afd23143f496335, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 470138, guid: dc8f3955c063af240afd23143f496335, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1084,6 +1088,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: P_Lamp
       objectReference: {fileID: 0}
+    - target: {fileID: 169710, guid: dc8f3955c063af240afd23143f496335, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 470138, guid: dc8f3955c063af240afd23143f496335, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5
@@ -1162,7 +1170,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &1310574465
 Light:
   m_ObjectHideFlags: 0
@@ -1606,6 +1614,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: P_Lamp (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 169710, guid: dc8f3955c063af240afd23143f496335, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 470138, guid: dc8f3955c063af240afd23143f496335, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5
@@ -1684,7 +1696,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1804469523
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1803,6 +1815,10 @@ PrefabInstance:
     - target: {fileID: 169710, guid: dc8f3955c063af240afd23143f496335, type: 3}
       propertyPath: m_Name
       value: P_Lamp (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 169710, guid: dc8f3955c063af240afd23143f496335, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 470138, guid: dc8f3955c063af240afd23143f496335, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2005,6 +2021,75 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!1001 &2182112947135258506
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 747889730744745095, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
+      propertyPath: m_Range
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4898157653539505648, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.29078078
+      objectReference: {fileID: 0}
+    - target: {fileID: 4898157653539505648, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 9.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 4898157653539505648, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.7560031
+      objectReference: {fileID: 0}
+    - target: {fileID: 4898157653539505648, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4898157653539505648, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4898157653539505648, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4898157653539505648, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4898157653539505648, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4898157653539505648, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4898157653539505648, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5185984378753582269, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
+      propertyPath: m_Range
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5220495339764407034, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
+      propertyPath: m_Range
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7107032518334873695, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
+      propertyPath: m_Name
+      value: Illuminated Lamp
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
 --- !u!1001 &4168515463703268339
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2056,6 +2141,10 @@ PrefabInstance:
     - target: {fileID: 7107032518334873695, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
       propertyPath: m_Name
       value: P_Lamp (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7107032518334873695, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2153,3 +2242,4 @@ SceneRoots:
   - {fileID: 103071735}
   - {fileID: 957796167}
   - {fileID: 4168515463703268339}
+  - {fileID: 2182112947135258506}
