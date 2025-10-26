@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
         GenerateLevel();
         PickEndRooms();
         // Spawn objects
-
+        SpawnObjects();
         // Spawn player/monster (start game)
         SpawnEntities();
     }
@@ -30,11 +30,6 @@ public class GameManager : MonoBehaviour
         GameObject levelgen = Instantiate(LevelGenerator);
 
         RoomList = levelgen.GetComponent<LevelGenerator>().PlacedRooms;
-    }
-
-    private void SpawnObjects()
-    {
-
     }
 
     private void SpawnEntities()
