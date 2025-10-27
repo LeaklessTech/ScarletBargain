@@ -1372,6 +1372,62 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1666956025
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1666956027}
+  - component: {fileID: 1666956026}
+  m_Layer: 0
+  m_Name: PropSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1666956026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666956025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b14f2d7932104c65b5d57f960fe4780, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelRoot: {fileID: 0}
+  roomNamePrefix: Room
+  floorChildName: TileFloor
+  props:
+  - {fileID: 11400000, guid: 5e958ac67dc6e424ebd5b64da6fe376a, type: 2}
+  - {fileID: 11400000, guid: 4b77595398fec498fab55cefaa682899, type: 2}
+  - {fileID: 11400000, guid: 662a92ff1cc794e19bd3d06857ff54ed, type: 2}
+  - {fileID: 11400000, guid: bd4c76788ec4e4f23be6c63e39531832, type: 2}
+  - {fileID: 11400000, guid: 8ad40f5ac772a46bea5c8cd298855f24, type: 2}
+  - {fileID: 11400000, guid: ca41c25f9934f478da27fe4337fd5e58, type: 2}
+  - {fileID: 11400000, guid: 0a03a1f254cd844ceb41848d849d3155, type: 2}
+  targetCount: 60
+--- !u!4 &1666956027
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666956025}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.8142457, y: 0.02699995, z: -4.243912}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1723413904
 GameObject:
   m_ObjectHideFlags: 0
@@ -1405,7 +1461,7 @@ MonoBehaviour:
   MonsterPrefab: {fileID: 1970763974180988928, guid: 53e23f5d24fd729f399e0d39ee89844c, type: 3}
   PlayerPrefab: {fileID: 5770971515875987938, guid: 82e72491140bb9f479d0a14313eef034, type: 3}
   PrisonerPrefab: {fileID: 0}
-  propSpawner: {fileID: 0}
+  propSpawner: {fileID: 1666956026}
   AdditionalHallwayChance: 12.5
   LevelWidth: 10
   LevelLength: 10
@@ -1732,3 +1788,4 @@ SceneRoots:
   - {fileID: 1427623717}
   - {fileID: 1127704061}
   - {fileID: 1572145322}
+  - {fileID: 1666956027}
