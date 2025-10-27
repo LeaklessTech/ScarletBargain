@@ -1,5 +1,4 @@
 using LevelGeneration;
-using StarterAssets;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
