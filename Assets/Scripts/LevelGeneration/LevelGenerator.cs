@@ -11,47 +11,28 @@ using static LevelGeneration.Tile;
 
 namespace LevelGeneration
 {
-    public partial class LevelGenerator : MonoBehaviour
+    public partial class LevelGenerator
     {
-        [Header("Step Mode")]
-        [Tooltip("Activating this mode makes level generation run at runtime. For debugging purposes.")]
-        public bool DebugActive = false;
+        public GenerationSettings Settings { get; private set; }
 
-        [Header("Hallway Chance")]
-        [Tooltip("Odds that a hallway not in the MST gets added anyway")]
-        [Range(0f, 100f)]
-        public float AdditionalHallwayChance = 12.5f;
-
-        [Header("Level Size")]
-        public int LevelWidth = 10;
-        public int LevelLength = 10;
-
-        [Header("Room Parameters")]
-        public int MinRoomWidth = 2;
-        public int MaxRoomWidth = 5;
-
-        public int MinRoomLength = 2;
-        public int MaxRoomLength = 5;
-
-        public int RoomBuffer = 1;
-
-        public int RoomCount = 5;
-
-        [Tooltip("How many failed placement attempts before we give up on adding more rooms")]
-        public int RetryLimit = 50;
-
-        [Header("Tile Prefabs")]
-        [Tooltip("List of floor tile prefabs to randomly select from for each room")]
-        public List<GameObject> FloorTilePrefabs;
-
-        [Tooltip("World-space spacing between tiles (matches tile prefab footprint)")]
-        public int ObjectSizeOffset = 10;
-
-        public int Seed;
-
-        public GameObject TilePrefab;
-
-        public WaypointListReference WaypointList;
+        // Backwards-compatible property accessors that read from Settings.
+        // These let existing code continue to reference simple names (e.g. LevelWidth)
+        // while the actual values are stored in GenerationSettings.
+        private float AdditionalHallwayChance => Settings != null ? Settings.AdditionalHallwayChance : 12.5f;
+        private int LevelWidth => Settings != null ? Settings.LevelWidth : 10;
+        private int LevelLength => Settings != null ? Settings.LevelLength : 10;
+        private int MinRoomWidth => Settings != null ? Settings.MinRoomWidth : 2;
+        private int MaxRoomWidth => Settings != null ? Settings.MaxRoomWidth : 5;
+        private int MinRoomLength => Settings != null ? Settings.MinRoomLength : 2;
+        private int MaxRoomLength => Settings != null ? Settings.MaxRoomLength : 5;
+        private int RoomBuffer => Settings != null ? Settings.RoomBuffer : 1;
+        private int RoomCount => Settings != null ? Settings.RoomCount : 5;
+        private int RetryLimit => Settings != null ? Settings.RetryLimit : 50;
+        private List<GameObject> FloorTilePrefabs => Settings != null ? Settings.FloorTilePrefabs : new List<GameObject>();
+        private int ObjectSizeOffset => Settings != null ? Settings.ObjectSizeOffset : 10;
+        private int Seed => Settings != null ? Settings.Seed : 0;
+        private GameObject TilePrefab => Settings != null ? Settings.TilePrefab : null;
+        private WaypointListReference WaypointList => Settings != null ? Settings.WaypointListReference : null;
 
         private Tile[,] tileGrid;
 
@@ -60,7 +41,7 @@ namespace LevelGeneration
         private GameObject _hallwayObject;
 
         // For overlap checking
-        public readonly List<Room> PlacedRooms = new();
+        private readonly List<Room> _placedRooms = new();
 
         private static readonly (Tile.Wall, Vector2Int d)[] Dirs =
         {
@@ -70,25 +51,37 @@ namespace LevelGeneration
             (Wall.West,  new Vector2Int(-1,  0)),
         };
 
-        void Start()
+        public LevelGenerator(GenerationSettings settings)
+        {
+            Settings = settings;
+        }
+
+        public void GenerateLevel()
         {
             // setting a seed makes debugging easier
-            if (Seed == 0)
+            int seedValue = Settings != null ? Settings.Seed : 0;
+
+            if (seedValue == 0)
             {
                 System.Random random = new();
 
-                Seed = random.Next(0, int.MaxValue - 1);
+                seedValue = random.Next(0, int.MaxValue - 1);
 
-                UnityEngine.Random.InitState(Seed);
+                if (Settings != null)
+                    Settings.Seed = seedValue;
+
+                UnityEngine.Random.InitState(seedValue);
             }
             else
-                UnityEngine.Random.InitState(Seed);
+            {
+                UnityEngine.Random.InitState(seedValue);
+            }
 
             _levelObject = new("Level");
 
             tileGrid = new Tile[LevelWidth, LevelLength];
 
-            WaypointList.WaypointListRef.Clear();
+            //WaypointList.WaypointListRef.Clear();
 
             GenerateTileGrid();
             SimulateRooms();
@@ -96,14 +89,8 @@ namespace LevelGeneration
             RefineRooms();
             CreateHallways();
             RemoveRemainingTiles();
-            BakeNavmesh();
-        }
 
-        private void BakeNavmesh()
-        {
-            NavMeshSurface surface = GetComponent<NavMeshSurface>();
-
-            surface.BuildNavMesh();
+            GlobalVariables.rooms = _placedRooms;
         }
 
         // clean up unused tiles
@@ -128,6 +115,8 @@ namespace LevelGeneration
 
                 }
             }
+
+            _hallwayObject.transform.parent = _levelObject.transform;
         }
 
         private void RemoveRoomWalls(Room room)
@@ -181,7 +170,7 @@ namespace LevelGeneration
                     Vector3 tileLocation = tileGrid[i, j].WorldPosition;
 
                     // once we've created an instance, we need to reset the reference to that instance rather than the prefab
-                    tileGrid[i, j].TileObject = Instantiate(tilePrefab, tileLocation, Quaternion.identity);
+                    tileGrid[i, j].TileObject = GameObject.Instantiate(tilePrefab, tileLocation, Quaternion.identity);
                 }
             }
         }
@@ -225,7 +214,7 @@ namespace LevelGeneration
 
                             roomTiles.Add(tile);
                         }
-                        PlacedRooms.Add(new(potentialRoom, null, roomTiles));
+                        _placedRooms.Add(new(potentialRoom, null, roomTiles));
                         break;
                     }
                     else if (currentAttempt == RetryLimit - 1)
@@ -240,7 +229,7 @@ namespace LevelGeneration
         {
             int currentRoomIndex = 0;
 
-            foreach (var room in PlacedRooms)
+            foreach (var room in _placedRooms)
             {
                 GameObject roomObject = new($"Room {currentRoomIndex + 1}");
 
@@ -297,7 +286,7 @@ namespace LevelGeneration
                 roomObject.transform.parent = _levelObject.transform;
 
                 room.RoomObject = roomObject;
-                
+
                 // Create a waypoint for the center of each room
                 WaypointList.WaypointListRef.Add(new Waypoint() { Position = combinedCenter, Weight = 1 });
 
@@ -312,67 +301,6 @@ namespace LevelGeneration
                 currentRoomIndex++;
             }
         }
-
-        // private bool ScaleMaterials(GameObject Tile)
-        // {
-        //     float textureScale = ObjectSizeOffset / 10f;
-        //     string uvTilingProperty = "_UV_Tiling";
-
-        //     // Scale ceiling material
-        //     Transform ceilingTransform = Tile.transform.Find("Ceiling");
-        //     if (ceilingTransform != null)
-        //         return false;
-
-        //     Renderer ceilingRenderer = ceilingTransform.GetComponent<Renderer>();
-        //     if (ceilingRenderer != null)
-        //         return false;
-
-        //     Material ceilingMaterial = new Material(ceilingRenderer.sharedMaterial);
-        //     ceilingRenderer.material = ceilingMaterial;
-
-        //     if (ceilingMaterial.HasProperty(uvTilingProperty))
-        //         ceilingMaterial.SetVector(uvTilingProperty, new Vector4(textureScale, textureScale, 0, 0));
-
-
-        //     // Scale floor material
-        //     Transform floorTransform = Tile.transform.Find("TileFloor");
-        //     if (floorTransform != null)
-        //         return false;
-
-        //     Renderer floorRenderer = floorTransform.GetComponent<Renderer>();
-        //     if (floorRenderer != null)
-        //         return false;
-
-        //     Material floorMaterial = new Material(floorRenderer.sharedMaterial);
-        //     floorRenderer.material = floorMaterial;
-
-        //     if (floorMaterial.HasProperty(uvTilingProperty))
-        //         floorMaterial.SetVector(uvTilingProperty, new Vector4(textureScale, textureScale, 0, 0));
-
-
-        //     // Scale wall materials
-        //     foreach (var Wall in LevelGeneration.Tile.WallNames)
-        //     {
-        //         Transform wallTransform = Tile.transform.Find(Wall.Value);
-        //         if (wallTransform != null)
-        //             return false;
-
-        //         Renderer wallRenderer = wallTransform.GetComponent<Renderer>();
-        //         if (wallRenderer != null)
-        //             return false;
-
-        //         Material wallMaterial = new Material(wallRenderer.sharedMaterial);
-        //         wallRenderer.material = wallMaterial;
-        //         if (wallMaterial.HasProperty(uvTilingProperty))
-        //         {
-        //             wallMaterial.SetVector(uvTilingProperty, new Vector4(textureScale, textureScale, 0, 0));
-        //         }
-
-
-        //     }
-
-        //     return true;
-        // }
 
         private void ScaleMaterials(GameObject tile)
         {
@@ -432,7 +360,7 @@ namespace LevelGeneration
 
             if (!insideMatrix) return false;
 
-            bool spacedFromOthers = PlacedRooms.All(r => !Inflate(r.Bounds, RoomBuffer).Overlaps(room));
+            bool spacedFromOthers = _placedRooms.All(r => !Inflate(r.Bounds, RoomBuffer).Overlaps(room));
             if (!spacedFromOthers) return false;
 
             return true;
@@ -443,163 +371,6 @@ namespace LevelGeneration
         {
             return new RectInt(r.xMin - n, r.yMin - n, r.width + 2 * n, r.height + 2 * n);
         }
-
-
-        // disabling coroutines for now
-
-
-        // Regions are bad practice 99% of the time, but this makes collapsing them easier
-        #region Coroutines
-        // we use the coroutines to slow the generation down at edit time
-        // probably need to be later removed
-
-        private IEnumerator DebugCoroutine()
-        {
-            yield return StartCoroutine(GenerateBaseCoroutine());
-            Debug.Log("Base Generated.");
-            yield return StartCoroutine(CreateRoomsCoroutine());
-            Debug.Log("Grid Generated.");
-            yield return StartCoroutine(HallwayCoroutine());
-            Debug.Log("Hallways Generated.");
-        }
-
-        private IEnumerator GenerateBaseCoroutine()
-        {
-            for (int i = 0; i < LevelWidth; i++)
-            {
-                for (int j = 0; j < LevelLength; j++)
-                {
-                    Vector3 createAt = new Vector3(-i * ObjectSizeOffset, 0, -j * ObjectSizeOffset);
-
-                    GameObject newTileGameObject = Instantiate(TilePrefab, createAt, Quaternion.identity);
-
-                    // debug
-                    newTileGameObject.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = $"{i},{j}";
-
-                    //Tile newTile = new(Tile.TileType.EMPTY, newTileGameObject, (i, j));
-
-                    //tileGrid[i, j] = newTile;
-
-                    // enable the tile so it shows up
-                    //newTile.TileObject.SetActive(true);
-                }
-                yield return new WaitForSeconds(.1f);
-            }
-        }
-        private IEnumerator CreateRoomsCoroutine()
-        {
-            int failedPlacements = 0;
-
-            for (int currentRoom = 0; currentRoom < RoomCount; currentRoom++)
-            {
-                for (int currentAttempt = 0; currentAttempt < RetryLimit; currentAttempt++)
-                {
-                    int potentialRoomWidth = UnityEngine.Random.Range(MinRoomWidth, MaxRoomWidth + 1);
-                    int potentialRoomLength = UnityEngine.Random.Range(MinRoomLength, MaxRoomLength + 1);
-
-                    int potentialRoomX = UnityEngine.Random.Range(0, LevelWidth - potentialRoomWidth + 1);
-                    int potentialRoomY = UnityEngine.Random.Range(0, LevelLength - potentialRoomLength + 1);
-
-                    RectInt potentialRoom = new(potentialRoomX, potentialRoomY, potentialRoomWidth, potentialRoomLength);
-
-                    if (BoundsCheck(potentialRoom))
-                    {
-                        // Collect the tiles/transforms that will belong to this room
-                        List<Transform> tileTransforms = new();
-                        List<Renderer> tileRenderers = new();
-                        List<Collider> tileColliders = new();
-
-                        List<Tile> roomTiles = new();
-
-                        foreach (var position in potentialRoom.allPositionsWithin)
-                        {
-                            var tile = tileGrid[position.x, position.y];
-                            if (tile == null) continue;
-
-                            Transform t = tile.TileObject.transform;
-                            tileTransforms.Add(t);
-
-                            // prefer renderer bounds
-                            var r = tile.TileObject.GetComponent<Renderer>();
-                            if (r != null) tileRenderers.Add(r);
-
-                            var c = tile.TileObject.GetComponent<Collider>();
-                            if (c != null) tileColliders.Add(c);
-
-                            // this is important for when we pathfind hallways
-                            tile.Type = Tile.TileType.ROOM;
-
-                            roomTiles.Add(tile);
-                        }
-
-                        // compute combined center in world space
-                        Vector3 combinedCenter;
-                        if (tileRenderers.Count > 0)
-                        {
-                            Bounds combined = tileRenderers[0].bounds;
-                            for (int i = 1; i < tileRenderers.Count; i++) combined.Encapsulate(tileRenderers[i].bounds);
-                            combinedCenter = combined.center;
-                        }
-                        else if (tileColliders.Count > 0)
-                        {
-                            Bounds combined = tileColliders[0].bounds;
-                            for (int i = 1; i < tileColliders.Count; i++) combined.Encapsulate(tileColliders[i].bounds);
-                            combinedCenter = combined.center;
-                        }
-                        else if (tileTransforms.Count > 0)
-                        {
-                            // fallback: average world positions
-                            Vector3 sum = Vector3.zero;
-                            foreach (var tt in tileTransforms) sum += tt.position;
-                            combinedCenter = sum / tileTransforms.Count;
-                        }
-                        else
-                        {
-                            combinedCenter = Vector3.zero;
-                        }
-
-                        // create the room object at visual center
-                        GameObject roomObject = new($"Room {PlacedRooms.Count + 1}");
-                        roomObject.transform.position = combinedCenter;
-                        roomObject.transform.parent = _levelObject.transform;
-
-                        // parent tiles to the room object while preserving their world positions
-                        foreach (var t in tileTransforms)
-                        {
-                            t.SetParent(roomObject.transform, true);
-                        }
-
-                        PlacedRooms.Add(new(potentialRoom, roomObject, roomTiles));
-                        break;
-                    }
-                    else if (currentAttempt == RetryLimit - 1)
-                    {
-                        failedPlacements++;
-                    }
-                }
-            }
-
-            foreach (Room room in PlacedRooms)
-            {
-                RemoveRoomWalls(room);
-                yield return new WaitForSeconds(.25f);
-            }
-
-            for (int i = 0; i < LevelLength; i++)
-            {
-                for (int j = 0; j < LevelWidth; j++)
-                {
-                    if (tileGrid[i, j].Type == TileType.EMPTY)
-                        tileGrid[i, j].TileObject.SetActive(false);
-                }
-
-                yield return new WaitForSeconds(.1f);
-            }
-
-            Debug.Log($"{RoomCount - failedPlacements}/{RoomCount} Rooms were created.");
-        }
-
-        #endregion
 
     }
 }

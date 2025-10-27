@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: prisoner
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0ee4271a53950bd49bd1b5361f56fba0, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: 0ee4271a53950bd49bd1b5361f56fba0, type: 3}
       propertyPath: m_Enabled
       value: 1

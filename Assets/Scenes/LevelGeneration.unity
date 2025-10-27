@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 820756646}
   - component: {fileID: 820756645}
   - component: {fileID: 820756648}
+  - component: {fileID: 820756649}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -256,6 +257,31 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!114 &820756649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 820756644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfcffb72cee55524c8926f01f0a72ae3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  targetOffset: {x: 0, y: 1.5, z: 0}
+  mouseSensitivity: 2
+  distance: 2
+  minDistance: 0.6
+  maxDistance: 2.5
+  minPitch: -15
+  maxPitch: 30
+  obstructionMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  cameraRadius: 0.2
+  collisionPadding: 0.05
 --- !u!1 &1069239984
 GameObject:
   m_ObjectHideFlags: 0
@@ -406,7 +432,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8eeb19306f7ca61469d2d8873eb00f28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PlayerCamera: {fileID: 820756646}
   LevelGenerator: {fileID: 8262802726317120157, guid: 2b4c70307751f214b8e3c2590a055706, type: 3}
+  MonsterPrefab: {fileID: 1970763974180988928, guid: 53e23f5d24fd729f399e0d39ee89844c, type: 3}
+  PlayerPrefab: {fileID: 5770971515875987938, guid: 82e72491140bb9f479d0a14313eef034, type: 3}
+  propSpawner: {fileID: 0}
+  AdditionalHallwayChance: 12.5
+  LevelWidth: 10
+  LevelLength: 10
+  MinRoomWidth: 2
+  MaxRoomWidth: 5
+  MinRoomLength: 2
+  MaxRoomLength: 5
+  RoomBuffer: 1
+  RoomCount: 5
+  RetryLimit: 50
+  FloorTilePrefabs:
+  - {fileID: 6805246545633482266, guid: 0e431421b7cf6e442952b0465061bf50, type: 3}
+  ObjectSizeOffset: 10
+  Seed: 0
+  TilePrefab: {fileID: 6805246545633482266, guid: 0e431421b7cf6e442952b0465061bf50, type: 3}
+  WaypointList:
+    UseConstant: 0
+    Variable: {fileID: 11400000, guid: 5372321db87b80d8483796503a9060c0, type: 2}
 --- !u!4 &1723413906
 Transform:
   m_ObjectHideFlags: 0

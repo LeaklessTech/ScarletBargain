@@ -64,6 +64,12 @@ MonoBehaviour:
   ObjectSizeOffset: 10
   Seed: 0
   TilePrefab: {fileID: 6805246545633482266, guid: e0eb339193887cf4a861a2d6281210a3, type: 3}
+  WaypointList:
+    UseConstant: 0
+    ConstantValue: []
+    Variable: {fileID: 11400000, guid: 5372321db87b80d8483796503a9060c0, type: 2}
+  rooms:
+    rooms: {fileID: 11400000, guid: 02963a860295f3845b1cad5ed42b37c8, type: 2}
 --- !u!114 &7199078919717650015
 MonoBehaviour:
   m_ObjectHideFlags: 0
