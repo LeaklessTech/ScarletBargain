@@ -1402,7 +1402,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LevelGenerator: {fileID: 8262802726317120157, guid: 2b4c70307751f214b8e3c2590a055706, type: 3}
-  MonsterPrefab: {fileID: 1970763974180988928, guid: 53e23f5d24fd729f399e0d39ee89844c, type: 3}
+  MonsterPrefab: {fileID: 9214573662571422398, guid: f035a55bf8cc46b0cad0bd32ae80c12a, type: 3}
   PlayerPrefab: {fileID: 5770971515875987938, guid: 82e72491140bb9f479d0a14313eef034, type: 3}
   PrisonerPrefab: {fileID: 0}
   propSpawner: {fileID: 0}
