@@ -33,47 +33,8 @@ namespace LevelGeneration
         private int Seed => Settings != null ? Settings.Seed : 0;
         private GameObject TilePrefab => Settings != null ? Settings.TilePrefab : null;
         private WaypointListReference WaypointList => Settings != null ? Settings.WaypointListReference : null;
-
-        [Header("Level Size")]
-        public int LevelWidth = 10;
-        public int LevelLength = 10;
-
-        [Header("Room Parameters")]
-        public int MinRoomWidth = 2;
-        public int MaxRoomWidth = 5;
-
-        public int MinRoomLength = 2;
-        public int MaxRoomLength = 5;
-
-        public int RoomBuffer = 1;
-
-        public int RoomCount = 5;
-
-        [Tooltip("How many failed placement attempts before we give up on adding more rooms")]
-        public int RetryLimit = 50;
-
-        [Header("Tile Prefabs")]
-        [Tooltip("List of floor tile prefabs to randomly select from for each room")]
-        public List<GameObject> FloorTilePrefabs;
-
-        [Tooltip("World-space spacing between tiles (matches tile prefab footprint)")]
-        public int ObjectSizeOffset = 10;
-
-        public int Seed;
-
-        public GameObject TilePrefab;
-
-        [Header("Lighting")]
-
-        [Tooltip("List of light prefabs to randomly select from. Each room/hallway uses one prefab.")]
-
-        public List<GameObject> LightPrefabs = new List<GameObject>();
-
-        [Header("Doorways")]
-
-        [Tooltip("Doorway prefabs in the same order as FloorTilePrefabs (e.g. Tile 3 to Doorway 3)")]
-
-        public List<GameObject> DoorwayPrefabs = new List<GameObject>();
+        private List<GameObject> LightPrefabs => Settings != null ? Settings.LightPrefabs : new List<GameObject>();
+        private List<GameObject> DoorwayPrefabs => Settings != null ? Settings.DoorwayPrefabs : new List<GameObject>();
 
         private Tile[,] tileGrid;
 
@@ -89,7 +50,7 @@ namespace LevelGeneration
             (Wall.North, new Vector2Int(0, 1)),
             (Wall.South, new Vector2Int(0,  -1)),
             (Wall.East,  new Vector2Int(1, 0)),
-            (Wall.West,  new Vector2Int(-1,  0)),
+            (Wall.West, new Vector2Int(-1,  0)),
         };
 
         public LevelGenerator(GenerationSettings settings)
@@ -118,7 +79,7 @@ namespace LevelGeneration
                 UnityEngine.Random.InitState(seedValue);
             }
 
-            _levelObject = new("Level");
+            _levelObject = new GameObject("Level");
 
             tileGrid = new Tile[LevelWidth, LevelLength];
 
@@ -138,7 +99,7 @@ namespace LevelGeneration
         // clean up unused tiles
         private void RemoveRemainingTiles()
         {
-            _hallwayObject = new("Hallways");
+            _hallwayObject = new GameObject("Hallways");
 
             for (int i = 0; i < LevelWidth; i++)
             {
@@ -146,19 +107,21 @@ namespace LevelGeneration
                 {
                     Tile currentTile = tileGrid[i, j];
 
-                    if (currentTile.Type == TileType.EMPTY)
+                    if (currentTile?.Type == TileType.EMPTY)
                     {
-                        GameObject.Destroy(currentTile.TileObject);
+                        if (currentTile.TileObject != null)
+                            GameObject.Destroy(currentTile.TileObject);
                         tileGrid[i, j] = null;
                     }
 
-                    if (currentTile.Type == TileType.HALLWAY)
-                        currentTile.TileObject.transform.parent = _hallwayObject.transform;
+                    if (currentTile?.Type == TileType.HALLWAY && currentTile.TileObject != null)
+                        currentTile.TileObject.transform.SetParent(_hallwayObject.transform);
 
                 }
             }
 
-            _hallwayObject.transform.parent = _levelObject.transform;
+            if (_hallwayObject != null)
+                _hallwayObject.transform.SetParent(_levelObject.transform);
         }
 
         private void RemoveRoomWalls(Room room)
@@ -170,7 +133,8 @@ namespace LevelGeneration
                 var tile = tileGrid[tilePosition.x, tilePosition.y];
                 if (tile == null)
                     continue;
-                tile.TileObject.SetActive(true);
+                if (tile.TileObject != null)
+                    tile.TileObject.SetActive(true);
 
                 // For each direction, if the neighbor is ALSO inside the rect,
                 // remove this tile's wall that faces that neighbor.
@@ -208,6 +172,7 @@ namespace LevelGeneration
             {
                 for (int j = 0; j < LevelLength; j++)
                 {
+                    if (tileGrid[i, j] == null) continue;
                     GameObject tilePrefab = tileGrid[i, j].TileObject;
                     Vector3 tileLocation = tileGrid[i, j].WorldPosition;
 
@@ -221,7 +186,7 @@ namespace LevelGeneration
         {
             int failedPlacements = 0;
 
-            if (FloorTilePrefabs == null || FloorTilePrefabs.Count == 0)
+            if (FloorTilePrefabs.Count == 0)
             {
                 Debug.LogError("No floor tile prefabs assigned in LevelGenerator.");
                 return;
@@ -251,6 +216,7 @@ namespace LevelGeneration
                         foreach (var position in potentialRoom.allPositionsWithin)
                         {
                             var tile = tileGrid[position.x, position.y];
+                            if (tile == null) continue;
                             // this is important for when we pathfind hallways
                             tile.Type = Tile.TileType.ROOM;
 
@@ -275,7 +241,7 @@ namespace LevelGeneration
 
             foreach (var room in _placedRooms)
             {
-                GameObject roomObject = new($"Room {currentRoomIndex + 1}");
+                GameObject roomObject = new GameObject($"Room {currentRoomIndex + 1}");
 
                 // Collect the tiles/transforms that will belong to this room
                 List<Transform> tileTransforms = new();
@@ -286,6 +252,7 @@ namespace LevelGeneration
 
                 foreach (var tile in room.RoomTiles)
                 {
+                    if (tile?.TileObject == null) continue;
                     Transform tileTransform = tile.TileObject.transform;
                     tileTransforms.Add(tileTransform);
 
@@ -332,7 +299,8 @@ namespace LevelGeneration
                 room.RoomObject = roomObject;
 
                 // Create a waypoint for the center of each room
-                WaypointList.WaypointListRef.Add(new Waypoint() { Position = combinedCenter, Weight = 1 });
+                if (WaypointList?.WaypointListRef != null)
+                    WaypointList.WaypointListRef.Add(new Waypoint() { Position = combinedCenter, Weight = 1 });
 
                 // parent tiles to the room object while preserving their world positions
                 foreach (var tile in tileTransforms)
@@ -343,11 +311,8 @@ namespace LevelGeneration
                 RemoveRoomWalls(room);
 
                 foreach (var tile in room.RoomTiles)
-
                 {
-
                     tile.ParentRoom = room;
-
                 }
 
                 currentRoomIndex++;
@@ -433,162 +398,26 @@ namespace LevelGeneration
         // we use the coroutines to slow the generation down at edit time
         // probably need to be later removed
 
-        private IEnumerator DebugCoroutine()
-        {
-            yield return StartCoroutine(GenerateBaseCoroutine());
-            Debug.Log("Base Generated.");
-            yield return StartCoroutine(CreateRoomsCoroutine());
-            Debug.Log("Grid Generated.");
-            yield return StartCoroutine(HallwayCoroutine());
-            Debug.Log("Hallways Generated.");
-        }
+        //private IEnumerator DebugCoroutine()
+        //{
 
-        private IEnumerator GenerateBaseCoroutine()
-        {
-            for (int i = 0; i < LevelWidth; i++)
-            {
-                for (int j = 0; j < LevelLength; j++)
-                {
-                    Vector3 createAt = new Vector3(-i * ObjectSizeOffset, 0, -j * ObjectSizeOffset);
+        //    yield break;
+        //}
 
-                    GameObject newTileGameObject = Instantiate(TilePrefab, createAt, Quaternion.identity);
-
-                    // debug
-                    newTileGameObject.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = $"{i},{j}";
-
-                    //Tile newTile = new(Tile.TileType.EMPTY, newTileGameObject, (i, j));
-
-                    //tileGrid[i, j] = newTile;
-
-                    // enable the tile so it shows up
-                    //newTile.TileObject.SetActive(true);
-                }
-                yield return new WaitForSeconds(.1f);
-            }
-        }
-        private IEnumerator CreateRoomsCoroutine()
-        {
-            int failedPlacements = 0;
-
-            for (int currentRoom = 0; currentRoom < RoomCount; currentRoom++)
-            {
-                for (int currentAttempt = 0; currentAttempt < RetryLimit; currentAttempt++)
-                {
-                    int potentialRoomWidth = UnityEngine.Random.Range(MinRoomWidth, MaxRoomWidth + 1);
-                    int potentialRoomLength = UnityEngine.Random.Range(MinRoomLength, MaxRoomLength + 1);
-
-                    int potentialRoomX = UnityEngine.Random.Range(0, LevelWidth - potentialRoomWidth + 1);
-                    int potentialRoomY = UnityEngine.Random.Range(0, LevelLength - potentialRoomLength + 1);
-
-                    RectInt potentialRoom = new(potentialRoomX, potentialRoomY, potentialRoomWidth, potentialRoomLength);
-
-                    if (BoundsCheck(potentialRoom))
-                    {
-                        GameObject selectedPrefab = FloorTilePrefabs.ElementAt(UnityEngine.Random.Range(0, FloorTilePrefabs.Count));
-                        int prefabIndex = FloorTilePrefabs.IndexOf(selectedPrefab);
-
-                        // Collect the tiles/transforms that will belong to this room
-                        List<Transform> tileTransforms = new();
-                        List<Renderer> tileRenderers = new();
-                        List<Collider> tileColliders = new();
-
-                        List<Tile> roomTiles = new();
-
-                        foreach (var position in potentialRoom.allPositionsWithin)
-                        {
-                            var tile = tileGrid[position.x, position.y];
-                            if (tile == null) continue;
-
-                            Transform t = tile.TileObject.transform;
-                            tileTransforms.Add(t);
-
-                            // prefer renderer bounds
-                            var r = tile.TileObject.GetComponent<Renderer>();
-                            if (r != null) tileRenderers.Add(r);
-
-                            var c = tile.TileObject.GetComponent<Collider>();
-                            if (c != null) tileColliders.Add(c);
-
-                            // this is important for when we pathfind hallways
-                            tile.Type = Tile.TileType.ROOM;
-
-                            tile.TileObject = selectedPrefab;
-
-                            roomTiles.Add(tile);
-                        }
-
-                        // compute combined center in world space
-                        Vector3 combinedCenter;
-                        if (tileRenderers.Count > 0)
-                        {
-                            Bounds combined = tileRenderers[0].bounds;
-                            for (int i = 1; i < tileRenderers.Count; i++) combined.Encapsulate(tileRenderers[i].bounds);
-                            combinedCenter = combined.center;
-                        }
-                        else if (tileColliders.Count > 0)
-                        {
-                            Bounds combined = tileColliders[0].bounds;
-                            for (int i = 1; i < tileColliders.Count; i++) combined.Encapsulate(tileColliders[i].bounds);
-                            combinedCenter = combined.center;
-                        }
-                        else if (tileTransforms.Count > 0)
-                        {
-                            // fallback: average world positions
-                            Vector3 sum = Vector3.zero;
-                            foreach (var tt in tileTransforms) sum += tt.position;
-                            combinedCenter = sum / tileTransforms.Count;
-                        }
-                        else
-                        {
-                            combinedCenter = Vector3.zero;
-                        }
-
-                        // create the room object at visual center
-                        GameObject roomObject = new($"Room {_placedRooms.Count + 1}");
-                        roomObject.transform.position = combinedCenter;
-                        roomObject.transform.parent = _levelObject.transform;
-
-                        // parent tiles to the room object while preserving their world positions
-                        foreach (var t in tileTransforms)
-                        {
-                            t.SetParent(roomObject.transform, true);
-                        }
-
-                        _placedRooms.Add(new(potentialRoom, roomObject, roomTiles, prefabIndex));
-                        break;
-                    }
-                    else if (currentAttempt == RetryLimit - 1)
-                    {
-                        failedPlacements++;
-                    }
-                }
-            }
-
-            foreach (Room room in _placedRooms)
-            {
-                RemoveRoomWalls(room);
-                yield return new WaitForSeconds(.25f);
-            }
-
-            for (int i = 0; i < LevelLength; i++)
-            {
-                for (int j = 0; j < LevelWidth; j++)
-                {
-                    if (tileGrid[i, j].Type == TileType.EMPTY)
-                        tileGrid[i, j].TileObject.SetActive(false);
-                }
-
-                yield return new WaitForSeconds(.1f);
-            }
-
-            Debug.Log($"{RoomCount - failedPlacements}/{RoomCount} Rooms were created.");
-        }
+        //private IEnumerator GenerateBaseCoroutine()
+        //{
+        //    yield break;
+        //}
+        //private IEnumerator CreateRoomsCoroutine()
+        //{
+        //    yield break;
+        //}
 
         #endregion
 
         private void PlaceLights()
         {
-            if (LightPrefabs == null || LightPrefabs.Count == 0)
+            if (LightPrefabs.Count == 0)
             {
                 Debug.LogWarning("No light prefabs assigned. Skipping light placement.");
                 return;
@@ -642,7 +471,7 @@ namespace LevelGeneration
                             }
                             Vector3 spawnPos = tile.WorldPosition + Vector3.up * (ceilingHeight - 0.1f);
 
-                            GameObject lightInstance = Instantiate(roomLightPrefab, spawnPos, Quaternion.identity, tile.TileObject.transform);
+                            GameObject lightInstance = GameObject.Instantiate(roomLightPrefab, spawnPos, Quaternion.identity, tile.TileObject.transform);
                             lightInstance.name = "Light";
                             totalLights++;
                             Debug.Log($"Placed room light at {pos} (ceiling height: {ceilingHeight}) using prefab {roomLightPrefab.name}");
@@ -665,7 +494,7 @@ namespace LevelGeneration
                         }
                         Vector3 spawnPos = tile.WorldPosition + Vector3.up * (ceilingHeight - 0.1f);
 
-                        GameObject lightInstance = Instantiate(roomLightPrefab, spawnPos, Quaternion.identity, tile.TileObject.transform);
+                        GameObject lightInstance = GameObject.Instantiate(roomLightPrefab, spawnPos, Quaternion.identity, tile.TileObject.transform);
                         lightInstance.name = "Light";
                         totalLights++;
                         Debug.Log($"Forced central room light at {centerPos} (ceiling height: {ceilingHeight}) using prefab {roomLightPrefab.name}");
@@ -728,7 +557,7 @@ namespace LevelGeneration
                             }
                             Vector3 spawnPos = tile.WorldPosition + Vector3.up * (ceilingHeight - 0.1f);
 
-                            GameObject lightInstance = Instantiate(hallwayLightPrefab, spawnPos, Quaternion.identity, tile.TileObject.transform);
+                            GameObject lightInstance = GameObject.Instantiate(hallwayLightPrefab, spawnPos, Quaternion.identity, tile.TileObject.transform);
                             lightInstance.name = "Light";
                             totalLights++;
                             Debug.Log($"Placed hallway light at {pos} (ceiling height: {ceilingHeight}) using prefab {hallwayLightPrefab.name}");
@@ -752,88 +581,168 @@ namespace LevelGeneration
                         }
                         Vector3 spawnPos = tile.WorldPosition + Vector3.up * (ceilingHeight - 0.1f);
 
-                        GameObject lightInstance = Instantiate(hallwayLightPrefab, spawnPos, Quaternion.identity, tile.TileObject.transform);
+                        GameObject lightInstance = GameObject.Instantiate(hallwayLightPrefab, spawnPos, Quaternion.identity, tile.TileObject.transform);
                         lightInstance.name = "Light";
                         totalLights++;
                         Debug.Log($"Forced central hallway light at {centerPos} (ceiling height: {ceilingHeight}) using prefab {hallwayLightPrefab.name}");
+
                     }
+
                 }
+
             }
+
+
 
             Debug.Log($"Light placement complete. Total lights: {totalLights}");
+
         }
 
-        // NEW: Method to place doorways at hallway-room boundaries
+
+
+        // Method to place doorways at hallway-room boundaries
+
         private void PlaceDoorways()
+
         {
+
             if (DoorwayPrefabs == null || DoorwayPrefabs.Count != FloorTilePrefabs.Count)
+
             {
+
                 Debug.LogWarning("DoorwayPrefabs list must match FloorTilePrefabs in size/order. Skipping doorway placement.");
+
                 return;
+
             }
+
+
 
             int halfSize = ObjectSizeOffset / 2;
+
             int doorwayCount = 0;
 
-            // NEW: Hardcoded offsets for doorways
+
+
+            // Hardcoded offsets for doorways
+
             Vector3 doorwayRaise = Vector3.up * 2f; // Hardcoded Y raise for all doorways
+
             float roomShiftDistance = 0.25f; // Hardcoded shift towards the room
 
+
+
             // Scan all hallway tiles for adjacent rooms
+
             for (int i = 0; i < LevelWidth; i++)
+
             {
+
                 for (int j = 0; j < LevelLength; j++)
+
                 {
+
                     Tile hallwayTile = tileGrid[i, j];
+
                     if (hallwayTile == null || hallwayTile.Type != TileType.HALLWAY) continue;
 
+
+
                     foreach (var (wall, direction) in Dirs)
+
                     {
+
                         Vector2Int neighborLoc = hallwayTile.Location + direction;
+
                         if (neighborLoc.x < 0 || neighborLoc.x >= LevelWidth || neighborLoc.y < 0 || neighborLoc.y >= LevelLength) continue;
 
+
+
                         Tile neighborTile = tileGrid[neighborLoc.x, neighborLoc.y];
+
                         if (neighborTile == null || neighborTile.Type != TileType.ROOM || neighborTile.ParentRoom == null) continue;
 
+
+
                         // Match doorway to the room's floor prefab index
+
                         int prefabIndex = neighborTile.ParentRoom.FloorPrefabIndex;
+
                         GameObject doorwayPrefab = DoorwayPrefabs[prefabIndex];
 
+
+
                         // Offset to the wall edge facing the room
+
                         Vector3 offset = new Vector3(direction.x * halfSize, 0, direction.y * halfSize);
 
-                        // NEW: Apply Y raise and additional shift towards room
+
+
+                        // Apply Y raise and additional shift towards room
+
                         Vector3 shiftDir = new Vector3(direction.x, 0, direction.y).normalized;
+
                         Vector3 additionalShift = shiftDir * roomShiftDistance;
+
                         Vector3 spawnPos = hallwayTile.WorldPosition + offset + doorwayRaise + additionalShift;
 
+
+
                         // Rotation: Assume prefab faces north (+Z) by default
+
                         Quaternion rotation = Quaternion.identity;
+
                         switch (wall)
+
                         {
+
                             case Wall.South:
+
                                 rotation = Quaternion.Euler(0, 180, 0);
+
                                 break;
+
                             case Wall.East:
+
                                 rotation = Quaternion.Euler(0, 90, 0);
+
                                 break;
+
                             case Wall.West:
+
                                 rotation = Quaternion.Euler(0, -90, 0);
+
                                 break;
+
                                 // North: identity
+
                         }
 
+
+
                         // Instantiate as child of hallway tile
-                        GameObject doorwayInstance = Instantiate(doorwayPrefab, spawnPos, rotation, hallwayTile.TileObject.transform);
+
+                        GameObject doorwayInstance = GameObject.Instantiate(doorwayPrefab, spawnPos, rotation, hallwayTile.TileObject.transform);
                         doorwayInstance.name = "Doorway";
+
                         doorwayCount++;
+
                         Debug.Log($"Placed doorway {prefabIndex} ({doorwayPrefab.name}) at hallway end {hallwayTile.Location} facing {wall} into room at {neighborLoc} (pos: {spawnPos})");
+
                     }
+
                 }
+
             }
 
+
+
             Debug.Log($"Doorway placement complete. Total doorways: {doorwayCount}");
+
         }
 
+
+
     }
+
 }
