@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 public class MenuController : MonoBehaviour
 {
-    public string gameSceneName = "GameScene";
+    public string gameSceneName = "LevelGeneration";
     public string homeSceneName = "IntroScene";
 
     public GameObject firstSelected;

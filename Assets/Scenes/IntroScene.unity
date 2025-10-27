@@ -2821,7 +2821,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb537204ae765476eb0283495c6dd5ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameSceneName: GameScene
+  gameSceneName: LevelGeneration
+  homeSceneName: IntroScene
   firstSelected: {fileID: 639198285}
   MenuPanel: {fileID: 800631072}
   SettingsPanel: {fileID: 1409003936}
