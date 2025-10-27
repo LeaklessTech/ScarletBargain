@@ -61,7 +61,10 @@ public class AdvancedPlayerController : MonoBehaviour
 
     void Start()
     {
-        Instantiate(cam);
+        if (cam)
+        {
+            cam = Instantiate(cam);
+        }
 
         rb = GetComponent<Rigidbody>();
         col = GetComponent<CapsuleCollider>();

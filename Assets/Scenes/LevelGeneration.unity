@@ -138,7 +138,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &820756645
 AudioListener:
   m_ObjectHideFlags: 0
@@ -432,10 +432,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8eeb19306f7ca61469d2d8873eb00f28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerCamera: {fileID: 820756646}
   LevelGenerator: {fileID: 8262802726317120157, guid: 2b4c70307751f214b8e3c2590a055706, type: 3}
   MonsterPrefab: {fileID: 1970763974180988928, guid: 53e23f5d24fd729f399e0d39ee89844c, type: 3}
   PlayerPrefab: {fileID: 5770971515875987938, guid: 82e72491140bb9f479d0a14313eef034, type: 3}
+  PrisonerPrefab: {fileID: 0}
   propSpawner: {fileID: 0}
   AdditionalHallwayChance: 12.5
   LevelWidth: 10
@@ -452,6 +452,7 @@ MonoBehaviour:
   ObjectSizeOffset: 10
   Seed: 0
   TilePrefab: {fileID: 6805246545633482266, guid: 0e431421b7cf6e442952b0465061bf50, type: 3}
+  Camera: {fileID: 0}
   WaypointList:
     UseConstant: 0
     Variable: {fileID: 11400000, guid: 5372321db87b80d8483796503a9060c0, type: 2}
