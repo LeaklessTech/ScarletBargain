@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CharacterDeath : MonoBehaviour
 {
@@ -9,8 +10,11 @@ public class CharacterDeath : MonoBehaviour
         {
             int id = (int)data;
 
-            if(id == this.gameObject.GetInstanceID())
+            if (id == this.gameObject.GetInstanceID())
                 this.gameObject.SetActive(false);
+
+            if (this.gameObject.tag == "Player")
+                SceneManager.LoadScene("LoseScene", LoadSceneMode.Single);
         }
     }
 }
