@@ -11,18 +11,23 @@ public class PreferencesManager : MonoBehaviour
     public TMP_Dropdown resolutionDropdown;
 
     public Toggle fullScreenToggle;
+    public Toggle musicToggle;
 
     private Resolution[] res;
     private List<string> options;
 
+    const string PREF_MUSIC = "pref_music_enabled";
+
     void Awake()
     {
+        EnsurePrefsDefaults();
+
         if (resolutionDropdown == null || fullScreenToggle == null)
         {
             Debug.LogWarning("[PreferencesManager] UI refs not set. Skipping init.");
             return;
         }
-        
+
         PopulateResolutions();
         SyncUIToCurrentScreen();
         LoadPrefsIntoUI();
@@ -40,10 +45,15 @@ public class PreferencesManager : MonoBehaviour
 
     }
 
+    void OnEnable()
+    {
+        LoadPrefsIntoUI();
+    }
+
     void PopulateResolutions()
     {
         // reference: https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Screen-resolutions.html
-        res = Screen.resolutions;
+        res = Screen.resolutions.GroupBy(r => (r.width, r.height)).Select(g => g.First()).ToArray();
 
         options = res.Select(r => $"{r.width} x {r.height}").ToList();
 
@@ -107,6 +117,7 @@ public class PreferencesManager : MonoBehaviour
     {
         int savedResIndex = PlayerPrefs.GetInt("pref_res_index", GetCurrentResolutionIndex());
         bool savedFull = PlayerPrefs.GetInt("pref_fullscreen", Screen.fullScreen ? 1 : 0) == 1;
+        bool savedMusic = PlayerPrefs.GetInt(PREF_MUSIC, 1) == 1;
 
         if (savedResIndex < 0 || savedResIndex >= res.Length)
         {
@@ -115,10 +126,18 @@ public class PreferencesManager : MonoBehaviour
 
         resolutionDropdown.value = savedResIndex;
         resolutionDropdown.RefreshShownValue();
+        if (fullScreenToggle != null)
+        {
+            fullScreenToggle.isOn = savedFull;
 
-        fullScreenToggle.isOn = savedFull;
-    }    
-    
+        }
+
+        if (musicToggle != null)
+        {
+            musicToggle.SetIsOnWithoutNotify(savedMusic);
+        }
+    }
+
     void ApplyCurrentUISettings()
     {
         int index = resolutionDropdown.value;
@@ -151,4 +170,25 @@ public class PreferencesManager : MonoBehaviour
         return 0;
     }
 
+    public void OnMusicToggle(bool enabled)
+    {
+        PlayerPrefs.SetInt(PREF_MUSIC, enabled ? 1 : 0);
+        PlayerPrefs.Save();
+
+        Debug.Log($"[Preferences] Music state is {enabled}.");
+    }
+
+    // when I created the preferences for music on/off
+    // the music stopped working.  I'm adding this to 
+    // ensure the music defaults to on.
+
+    void EnsurePrefsDefaults()
+    {
+        if (!PlayerPrefs.HasKey(PREF_MUSIC))
+        {
+            PlayerPrefs.SetInt(PREF_MUSIC, 1);   // default ON
+            PlayerPrefs.Save();
+            Debug.Log("[Preferences] Initialized default music=ON");
+        }
+    }
 }

@@ -22,5 +22,10 @@ namespace LevelGeneration
             RoomTiles = roomTiles;
             FloorPrefabIndex = floorPrefabIndex;
         }
+
+        private void Create()
+        {
+
+        }
     }
 }

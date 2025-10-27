@@ -32,6 +32,8 @@ public class ThirdPersonCam : MonoBehaviour
 
     void Start()
     {
+        target = GameObject.FindGameObjectWithTag("Player").transform;
+
         if (target == null)
         {
             Debug.LogWarning("ThirdPersonCamera: target not assigned. Please assign target (CameraTarget).");
@@ -48,7 +50,8 @@ public class ThirdPersonCam : MonoBehaviour
 
     void LateUpdate()
     {
-        if (target == null) return;
+        if (target == null)
+            return;
 
         float mx = Input.GetAxis("Mouse X");
         float my = Input.GetAxis("Mouse Y");

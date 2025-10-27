@@ -23,6 +23,12 @@ public class IntroSeat : MonoBehaviour
 
     void Awake()
     {
+        //Debug.Log($"[IntroSeat] timeScale on load = {Time.timeScale}");
+
+        if (Time.timeScale == 0f)
+        {
+            Time.timeScale = 1f;
+        }
         // Capture and zero lights
         _origIntensities = new float[lights.Count];
         for (int i = 0; i < lights.Count; i++)

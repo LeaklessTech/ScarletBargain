@@ -1,9 +1,9 @@
-using Mono.Cecil.Cil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.AI.Navigation;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -11,16 +11,28 @@ using static LevelGeneration.Tile;
 
 namespace LevelGeneration
 {
-    public partial class LevelGenerator : MonoBehaviour
+    public partial class LevelGenerator
     {
-        [Header("Step Mode")]
-        [Tooltip("Activating this mode makes level generation run at runtime. For debugging purposes.")]
-        public bool DebugActive = false;
+        public GenerationSettings Settings { get; private set; }
 
-        [Header("Hallway Chance")]
-        [Tooltip("Odds that a hallway not in the MST gets added anyway")]
-        [Range(0f, 100f)]
-        public float AdditionalHallwayChance = 12.5f;
+        // Backwards-compatible property accessors that read from Settings.
+        // These let existing code continue to reference simple names (e.g. LevelWidth)
+        // while the actual values are stored in GenerationSettings.
+        private float AdditionalHallwayChance => Settings != null ? Settings.AdditionalHallwayChance : 12.5f;
+        private int LevelWidth => Settings != null ? Settings.LevelWidth : 10;
+        private int LevelLength => Settings != null ? Settings.LevelLength : 10;
+        private int MinRoomWidth => Settings != null ? Settings.MinRoomWidth : 2;
+        private int MaxRoomWidth => Settings != null ? Settings.MaxRoomWidth : 5;
+        private int MinRoomLength => Settings != null ? Settings.MinRoomLength : 2;
+        private int MaxRoomLength => Settings != null ? Settings.MaxRoomLength : 5;
+        private int RoomBuffer => Settings != null ? Settings.RoomBuffer : 1;
+        private int RoomCount => Settings != null ? Settings.RoomCount : 5;
+        private int RetryLimit => Settings != null ? Settings.RetryLimit : 50;
+        private List<GameObject> FloorTilePrefabs => Settings != null ? Settings.FloorTilePrefabs : new List<GameObject>();
+        private int ObjectSizeOffset => Settings != null ? Settings.ObjectSizeOffset : 10;
+        private int Seed => Settings != null ? Settings.Seed : 0;
+        private GameObject TilePrefab => Settings != null ? Settings.TilePrefab : null;
+        private WaypointListReference WaypointList => Settings != null ? Settings.WaypointListReference : null;
 
         [Header("Level Size")]
         public int LevelWidth = 10;
@@ -80,24 +92,37 @@ namespace LevelGeneration
             (Wall.West,  new Vector2Int(-1,  0)),
         };
 
-        void Start()
+        public LevelGenerator(GenerationSettings settings)
+        {
+            Settings = settings;
+        }
+
+        public void GenerateLevel()
         {
             // setting a seed makes debugging easier
-            if (Seed == 0)
+            int seedValue = Settings != null ? Settings.Seed : 0;
+
+            if (seedValue == 0)
             {
                 System.Random random = new();
 
-                Seed = random.Next(0, int.MaxValue - 1);
+                seedValue = random.Next(0, int.MaxValue - 1);
 
-                UnityEngine.Random.InitState(Seed);
+                if (Settings != null)
+                    Settings.Seed = seedValue;
+
+                UnityEngine.Random.InitState(seedValue);
             }
             else
-                UnityEngine.Random.InitState(Seed);
+            {
+                UnityEngine.Random.InitState(seedValue);
+            }
 
             _levelObject = new("Level");
 
             tileGrid = new Tile[LevelWidth, LevelLength];
 
+            //WaypointList.WaypointListRef.Clear();
 
             GenerateTileGrid();
             SimulateRooms();
@@ -105,8 +130,9 @@ namespace LevelGeneration
             RefineRooms();
             CreateHallways();
             RemoveRemainingTiles();
-            PlaceLights();
+            GlobalVariables.rooms = _placedRooms;
             PlaceDoorways();
+            PlaceLights();
         }
 
         // clean up unused tiles
@@ -131,6 +157,8 @@ namespace LevelGeneration
 
                 }
             }
+
+            _hallwayObject.transform.parent = _levelObject.transform;
         }
 
         private void RemoveRoomWalls(Room room)
@@ -184,7 +212,7 @@ namespace LevelGeneration
                     Vector3 tileLocation = tileGrid[i, j].WorldPosition;
 
                     // once we've created an instance, we need to reset the reference to that instance rather than the prefab
-                    tileGrid[i, j].TileObject = Instantiate(tilePrefab, tileLocation, Quaternion.identity);
+                    tileGrid[i, j].TileObject = GameObject.Instantiate(tilePrefab, tileLocation, Quaternion.identity);
                 }
             }
         }
@@ -303,6 +331,9 @@ namespace LevelGeneration
 
                 room.RoomObject = roomObject;
 
+                // Create a waypoint for the center of each room
+                WaypointList.WaypointListRef.Add(new Waypoint() { Position = combinedCenter, Weight = 1 });
+
                 // parent tiles to the room object while preserving their world positions
                 foreach (var tile in tileTransforms)
                 {
@@ -322,67 +353,6 @@ namespace LevelGeneration
                 currentRoomIndex++;
             }
         }
-
-        // private bool ScaleMaterials(GameObject Tile)
-        // {
-        //     float textureScale = ObjectSizeOffset / 10f;
-        //     string uvTilingProperty = "_UV_Tiling";
-
-        //     // Scale ceiling material
-        //     Transform ceilingTransform = Tile.transform.Find("Ceiling");
-        //     if (ceilingTransform != null)
-        //         return false;
-
-        //     Renderer ceilingRenderer = ceilingTransform.GetComponent<Renderer>();
-        //     if (ceilingRenderer != null)
-        //         return false;
-
-        //     Material ceilingMaterial = new Material(ceilingRenderer.sharedMaterial);
-        //     ceilingRenderer.material = ceilingMaterial;
-
-        //     if (ceilingMaterial.HasProperty(uvTilingProperty))
-        //         ceilingMaterial.SetVector(uvTilingProperty, new Vector4(textureScale, textureScale, 0, 0));
-
-
-        //     // Scale floor material
-        //     Transform floorTransform = Tile.transform.Find("TileFloor");
-        //     if (floorTransform != null)
-        //         return false;
-
-        //     Renderer floorRenderer = floorTransform.GetComponent<Renderer>();
-        //     if (floorRenderer != null)
-        //         return false;
-
-        //     Material floorMaterial = new Material(floorRenderer.sharedMaterial);
-        //     floorRenderer.material = floorMaterial;
-
-        //     if (floorMaterial.HasProperty(uvTilingProperty))
-        //         floorMaterial.SetVector(uvTilingProperty, new Vector4(textureScale, textureScale, 0, 0));
-
-
-        //     // Scale wall materials
-        //     foreach (var Wall in LevelGeneration.Tile.WallNames)
-        //     {
-        //         Transform wallTransform = Tile.transform.Find(Wall.Value);
-        //         if (wallTransform != null)
-        //             return false;
-
-        //         Renderer wallRenderer = wallTransform.GetComponent<Renderer>();
-        //         if (wallRenderer != null)
-        //             return false;
-
-        //         Material wallMaterial = new Material(wallRenderer.sharedMaterial);
-        //         wallRenderer.material = wallMaterial;
-        //         if (wallMaterial.HasProperty(uvTilingProperty))
-        //         {
-        //             wallMaterial.SetVector(uvTilingProperty, new Vector4(textureScale, textureScale, 0, 0));
-        //         }
-
-
-        //     }
-
-        //     return true;
-        // }
 
         private void ScaleMaterials(GameObject tile)
         {
