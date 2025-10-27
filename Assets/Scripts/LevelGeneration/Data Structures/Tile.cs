@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using LevelGeneration;
 
 namespace LevelGeneration
 {
@@ -42,6 +43,7 @@ namespace LevelGeneration
         public GameObject TileObject { get; set; }
         public Vector2Int Location;
         public Tile Previous { get; set; }
+        public Room ParentRoom { get; set; }
         public Vector3 WorldPosition { get; set; }
 
         // we want fScore to be updated based on the changes in H and G score, so we use some backing fields
