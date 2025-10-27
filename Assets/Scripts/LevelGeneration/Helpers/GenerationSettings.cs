@@ -109,4 +109,28 @@ public class GenerationSettings
         set => waypointListReference = value;
     }
 
+
+    private List<GameObject> lightPrefabs = new List<GameObject>();
+
+    public List<GameObject> LightPrefabs
+
+    {
+
+        get => lightPrefabs;
+
+        set => lightPrefabs = value ?? new List<GameObject>();
+
+    }
+
+    private List<GameObject> doorwayPrefabs = new List<GameObject>();
+
+    public List<GameObject> DoorwayPrefabs
+
+    {
+
+        get => doorwayPrefabs;
+
+        set => doorwayPrefabs = value ?? new List<GameObject>();
+
+    }
 }
