@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7aad87817da2d474b832e08a3926aa86, type: 3}
+  m_Name: locker
+  m_EditorClassIdentifier: 
+  Prefab: {fileID: 6228298977937042409, guid: 4c5e2ed93e1657e48987e24141fce4d9, type: 3}
+  YOffset: 0
+  JitterXZ: {x: 0.15, y: 0.15}
+  SnapRotation90: 1
+  Weight: 1
+  UseRendererBounds: 1
+  ManualHalfExtents: {x: 0.4, y: 0.6, z: 0.4}
+  BoundsPadding: 0.02
+  AtMostOnePerRoom: 0

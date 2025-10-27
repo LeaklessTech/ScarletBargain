@@ -20,5 +20,10 @@ namespace LevelGeneration
             this.RoomObject = roomObject;
             RoomTiles = roomTiles;
         }
+
+        private void Create()
+        {
+
+        }
     }
 }

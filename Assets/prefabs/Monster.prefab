@@ -74,7 +74,6 @@ MonoBehaviour:
   IsCharacterFound: 0
   waypointList:
     UseConstant: 0
-    ConstantValue: []
     Variable: {fileID: 11400000, guid: 5372321db87b80d8483796503a9060c0, type: 2}
 --- !u!195 &7675502468203840162
 NavMeshAgent:
@@ -118,7 +117,7 @@ MonoBehaviour:
     m_Bits: 64
   ObstructionMask:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 136
   CanSeePlayer: 0
   SearchForPlayer: 1
   Delay: 0.2

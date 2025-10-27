@@ -19,7 +19,7 @@ public class AdvancedPlayerController : MonoBehaviour
     public LayerMask groundMask;
 
     [Header("references")]
-    public Transform cam;
+    public GameObject cam;
 
     [Header("keys")]
     public KeyCode sprintKey = KeyCode.LeftShift;
@@ -30,7 +30,7 @@ public class AdvancedPlayerController : MonoBehaviour
     // private float crouchHeightFactor = 0.2f;
 
     [SerializeField, Range(0f, 89f)] private float maxGroundAngle = 60f;
-    [SerializeField] private string groundTag = "Ground";
+    //[SerializeField] private string groundTag = "Ground";
 
     public bool IsMoving => Mathf.Abs(hInput) > 0.05f || Mathf.Abs(vInput) > 0.05f;
     public bool IsCrouching => isCrouching;
@@ -61,6 +61,8 @@ public class AdvancedPlayerController : MonoBehaviour
 
     void Start()
     {
+        Instantiate(cam);
+
         rb = GetComponent<Rigidbody>();
         col = GetComponent<CapsuleCollider>();
         originalHeight = col.height;
@@ -124,9 +126,11 @@ public class AdvancedPlayerController : MonoBehaviour
     {
         if (!isActive) return;
 
+        if (cam == null) return;
+
         // move relative to camera
-        Vector3 camForward = cam.forward;
-        Vector3 camRight = cam.right;
+        Vector3 camForward = cam.transform.forward;
+        Vector3 camRight = cam.transform.right;
         camForward.y = 0f;
         camRight.y = 0f;
 
@@ -182,47 +186,47 @@ public class AdvancedPlayerController : MonoBehaviour
         */
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        ProcessGroundCollision(collision);
-    }
+    //private void OnCollisionEnter(Collision collision)
+    //{
+    //    ProcessGroundCollision(collision);
+    //}
 
-    private void OnCollisionStay(Collision collision)
-    {
-        ProcessGroundCollision(collision);
-    }
+    //private void OnCollisionStay(Collision collision)
+    //{
+    //    ProcessGroundCollision(collision);
+    //}
 
-    private void OnCollisionExit(Collision collision)
-    {
-        if (!collision.collider || !collision.collider.CompareTag(groundTag)) return;
-        _groundContacts.Remove(collision.collider);
-        isGrounded = _groundContacts.Count > 0;
-    }
+    //private void OnCollisionExit(Collision collision)
+    //{
+    //    if (!collision.collider || !collision.collider.CompareTag(groundTag)) return;
+    //    _groundContacts.Remove(collision.collider);
+    //    isGrounded = _groundContacts.Count > 0;
+    //}
 
-    private void ProcessGroundCollision(Collision collision)
-    {
-        if (!collision.collider || !collision.collider.CompareTag(groundTag)) return;
+    //private void ProcessGroundCollision(Collision collision)
+    //{
+    //    if (!collision.collider || !collision.collider.CompareTag(groundTag)) return;
 
-        bool hasValidGroundNormal = false;
-        int count = collision.contactCount;
-        for (int i = 0; i < count; i++)
-        {
-            var n = collision.GetContact(i).normal;
-            // Accept only reasonably-upward surfaces (reject walls/ceilings)
-            if (n.y >= _minGroundDot)
-            {
-                hasValidGroundNormal = true;
-                break;
-            }
-        }
+    //    bool hasValidGroundNormal = false;
+    //    int count = collision.contactCount;
+    //    for (int i = 0; i < count; i++)
+    //    {
+    //        var n = collision.GetContact(i).normal;
+    //        // Accept only reasonably-upward surfaces (reject walls/ceilings)
+    //        if (n.y >= _minGroundDot)
+    //        {
+    //            hasValidGroundNormal = true;
+    //            break;
+    //        }
+    //    }
 
-        if (hasValidGroundNormal)
-            _groundContacts.Add(collision.collider);
-        else
-            _groundContacts.Remove(collision.collider);
+    //    if (hasValidGroundNormal)
+    //        _groundContacts.Add(collision.collider);
+    //    else
+    //        _groundContacts.Remove(collision.collider);
 
-        isGrounded = _groundContacts.Count > 0;
-    }
+    //    isGrounded = _groundContacts.Count > 0;
+    //}
 
     private bool ProbeGrounded()
     {

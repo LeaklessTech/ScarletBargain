@@ -1579,7 +1579,7 @@ GameObject:
   - component: {fileID: 1549755124446250551}
   - component: {fileID: 7619586160232128948}
   - component: {fileID: 2564413192869581197}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -1699,12 +1699,11 @@ MonoBehaviour:
   groundCheckRadius: 0.2
   groundMask:
     serializedVersion: 2
-    m_Bits: 8
-  cam: {fileID: 0}
+    m_Bits: 0
+  cam: {fileID: 5166468460296535716, guid: ced01ae45ad25804ebf3731e563dd1fa, type: 3}
   sprintKey: 304
   crouchKey: 99
   maxGroundAngle: 60
-  groundTag: Ground
 --- !u!114 &2564413192869581197
 MonoBehaviour:
   m_ObjectHideFlags: 0

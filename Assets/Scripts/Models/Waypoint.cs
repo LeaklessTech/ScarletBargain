@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Waypoint : MonoBehaviour
+public class Waypoint
 {
     public int Weight { get; set; }
 
