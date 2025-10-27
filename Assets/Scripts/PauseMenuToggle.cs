@@ -4,12 +4,10 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(CanvasGroup))]
 public class PauseMenuToggle : MonoBehaviour
 {
-    private CanvasGroup canvasGroup;
+    public CanvasGroup canvasGroup;
 
     void Awake()
     {
-        canvasGroup = GetComponent<CanvasGroup>();
-
         if (canvasGroup == null)
         {
             Debug.LogError("PauseMenuToggle Script: canvasGroup not found.");

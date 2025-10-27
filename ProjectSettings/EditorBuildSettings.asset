@@ -20,6 +20,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/LevelGeneration.unity
     guid: 753142ae86382a341b1c32ab0dfafbf8
+  - enabled: 1
+    path: Assets/Scenes/WinScene.unity
+    guid: 7b7cc8641ed7c4ddcbc4940b940eec5d
+  - enabled: 1
+    path: Assets/Scenes/LoseScene.unity
+    guid: b4952a61f7bd542a591457c40faed2bb
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

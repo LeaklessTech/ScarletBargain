@@ -990,6 +990,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c03103d743e874c3b9dcd9dc28747200, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvasGroup: {fileID: 1127704063}
 --- !u!225 &1127704063
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -998,9 +999,9 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1127704057}
   m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
+  m_Alpha: 0
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!1 &1153793527
 GameObject:
@@ -1014,6 +1015,7 @@ GameObject:
   - component: {fileID: 1153793531}
   - component: {fileID: 1153793530}
   - component: {fileID: 1153793529}
+  - component: {fileID: 1153793532}
   m_Layer: 5
   m_Name: ButtonRestart
   m_TagString: Untagged
@@ -1085,9 +1087,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1534975701}
-        m_TargetAssemblyTypeName: MenuController, Assembly-CSharp
-        m_MethodName: BackToHome
+      - m_Target: {fileID: 1153793532}
+        m_TargetAssemblyTypeName: GiveUp, Assembly-CSharp
+        m_MethodName: AdmitDefeat
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1096,7 +1098,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
+        m_CallState: 1
 --- !u!114 &1153793530
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1135,6 +1137,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1153793527}
   m_CullTransparentMesh: 1
+--- !u!114 &1153793532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1153793527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f5f95b91e8c64b2391d380a0912c8a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  giveUpSceneName: LoseScene
 --- !u!1 &1427623715
 GameObject:
   m_ObjectHideFlags: 0
@@ -1277,56 +1292,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4255064d6d4294dc4a17af3644048cec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  musicSource: {fileID: 0}
---- !u!1 &1534975700
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1534975702}
-  - component: {fileID: 1534975701}
-  m_Layer: 0
-  m_Name: MenuControl
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1534975701
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1534975700}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb537204ae765476eb0283495c6dd5ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameSceneName: LevelGeneration
-  homeSceneName: IntroScene
-  firstSelected: {fileID: 0}
-  MenuPanel: {fileID: 0}
-  SettingsPanel: {fileID: 0}
---- !u!4 &1534975702
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1534975700}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.8142457, y: 0.02699995, z: -4.243912}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  musicSource: {fileID: 1427623716}
 --- !u!1 &1572145319
 GameObject:
   m_ObjectHideFlags: 0
@@ -1677,7 +1643,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Restart
+  m_text: Give up!
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1766,4 +1732,3 @@ SceneRoots:
   - {fileID: 1427623717}
   - {fileID: 1127704061}
   - {fileID: 1572145322}
-  - {fileID: 1534975702}
