@@ -624,18 +624,14 @@ namespace LevelGeneration
                 return;
             }
 
-            // Track all placed light positions globally to enforce no-adjacent rule
-            List<Vector2Int> placedLightPositions = new List<Vector2Int>();
+            int totalLights = 0;
 
-            // Place lights for each room (one prefab per room)
             foreach (Room room in _placedRooms)
             {
                 if (room.RoomTiles == null || room.RoomTiles.Count == 0) continue;
 
-                // Select one prefab for this entire room
                 GameObject roomLightPrefab = LightPrefabs[UnityEngine.Random.Range(0, LightPrefabs.Count)];
 
-                // Get candidate positions (only room tiles)
                 List<Vector2Int> candidates = room.RoomTiles
                     .Where(t => t != null)
                     .Select(t => t.Location)
@@ -643,14 +639,14 @@ namespace LevelGeneration
 
                 if (candidates.Count == 0) continue;
 
-                // Shuffle for random-ish placement
+                List<Vector2Int> placedInRoom = new List<Vector2Int>();
+
                 var shuffledCandidates = candidates.OrderBy(x => UnityEngine.Random.value).ToList();
 
-                // Greedily place lights, checking global adjacency (Chebyshev distance > 1)
                 foreach (Vector2Int pos in shuffledCandidates)
                 {
                     bool canPlace = true;
-                    foreach (Vector2Int existingPos in placedLightPositions)
+                    foreach (Vector2Int existingPos in placedInRoom)
                     {
                         int dx = Mathf.Abs(pos.x - existingPos.x);
                         int dy = Mathf.Abs(pos.y - existingPos.y);
@@ -663,29 +659,50 @@ namespace LevelGeneration
 
                     if (canPlace)
                     {
-                        placedLightPositions.Add(pos);
+                        placedInRoom.Add(pos);
 
-                        // NEW: Calculate ceiling height and spawn just below it
                         Tile tile = tileGrid[pos.x, pos.y];
                         if (tile != null && tile.TileObject != null)
                         {
                             Transform ceilingTransform = tile.TileObject.transform.Find("Ceiling");
-                            float ceilingHeight = 5f; // Fallback height (adjust to match your prefabs)
+                            float ceilingHeight = 5f;
                             if (ceilingTransform != null)
                             {
                                 ceilingHeight = ceilingTransform.localPosition.y;
                             }
-                            Vector3 spawnPos = tile.WorldPosition + Vector3.up * (ceilingHeight - 0.05f);
+                            Vector3 spawnPos = tile.WorldPosition + Vector3.up * (ceilingHeight - 0.1f);
 
                             GameObject lightInstance = Instantiate(roomLightPrefab, spawnPos, Quaternion.identity, tile.TileObject.transform);
                             lightInstance.name = "Light";
+                            totalLights++;
                             Debug.Log($"Placed room light at {pos} (ceiling height: {ceilingHeight}) using prefab {roomLightPrefab.name}");
                         }
                     }
                 }
+
+                // guarantee at least one light per room
+                if (placedInRoom.Count == 0 && candidates.Count > 0)
+                {
+                    Vector2Int centerPos = candidates[UnityEngine.Random.Range(0, candidates.Count)];
+                    Tile tile = tileGrid[centerPos.x, centerPos.y];
+                    if (tile != null && tile.TileObject != null)
+                    {
+                        Transform ceilingTransform = tile.TileObject.transform.Find("Ceiling");
+                        float ceilingHeight = 5f;
+                        if (ceilingTransform != null)
+                        {
+                            ceilingHeight = ceilingTransform.localPosition.y;
+                        }
+                        Vector3 spawnPos = tile.WorldPosition + Vector3.up * (ceilingHeight - 0.1f);
+
+                        GameObject lightInstance = Instantiate(roomLightPrefab, spawnPos, Quaternion.identity, tile.TileObject.transform);
+                        lightInstance.name = "Light";
+                        totalLights++;
+                        Debug.Log($"Forced central room light at {centerPos} (ceiling height: {ceilingHeight}) using prefab {roomLightPrefab.name}");
+                    }
+                }
             }
 
-            // Place lights for all hallways (one prefab for the entire hallway network)
             List<Tile> hallwayTiles = new List<Tile>();
             for (int x = 0; x < LevelWidth; x++)
             {
@@ -701,22 +718,20 @@ namespace LevelGeneration
 
             if (hallwayTiles.Count > 0)
             {
-                // Select one prefab for all hallways
                 GameObject hallwayLightPrefab = LightPrefabs[UnityEngine.Random.Range(0, LightPrefabs.Count)];
 
-                // Get candidate positions (only hallway tiles)
                 List<Vector2Int> candidates = hallwayTiles
                     .Select(t => t.Location)
                     .ToList();
 
-                // Shuffle for random-ish placement
+                List<Vector2Int> placedInHallways = new List<Vector2Int>();
+
                 var shuffledCandidates = candidates.OrderBy(x => UnityEngine.Random.value).ToList();
 
-                // Greedily place lights, checking global adjacency
                 foreach (Vector2Int pos in shuffledCandidates)
                 {
                     bool canPlace = true;
-                    foreach (Vector2Int existingPos in placedLightPositions)
+                    foreach (Vector2Int existingPos in placedInHallways)
                     {
                         int dx = Mathf.Abs(pos.x - existingPos.x);
                         int dy = Mathf.Abs(pos.y - existingPos.y);
@@ -729,14 +744,14 @@ namespace LevelGeneration
 
                     if (canPlace)
                     {
-                        placedLightPositions.Add(pos);
+                        placedInHallways.Add(pos);
 
-                        // NEW: Calculate ceiling height and spawn just below it
+                        // calculate ceiling height and spawn just below it
                         Tile tile = tileGrid[pos.x, pos.y];
                         if (tile != null && tile.TileObject != null)
                         {
                             Transform ceilingTransform = tile.TileObject.transform.Find("Ceiling");
-                            float ceilingHeight = 5f; // Fallback height (adjust to match your prefabs)
+                            float ceilingHeight = 5f;
                             if (ceilingTransform != null)
                             {
                                 ceilingHeight = ceilingTransform.localPosition.y;
@@ -745,13 +760,37 @@ namespace LevelGeneration
 
                             GameObject lightInstance = Instantiate(hallwayLightPrefab, spawnPos, Quaternion.identity, tile.TileObject.transform);
                             lightInstance.name = "Light";
+                            totalLights++;
                             Debug.Log($"Placed hallway light at {pos} (ceiling height: {ceilingHeight}) using prefab {hallwayLightPrefab.name}");
                         }
                     }
                 }
+
+                // guarantee at least one light for hallways if connected
+                if (placedInHallways.Count == 0 && candidates.Count > 0)
+                {
+                    // pick central tile (random for simplicity in long hallways)
+                    Vector2Int centerPos = candidates[UnityEngine.Random.Range(0, candidates.Count)];
+                    Tile tile = tileGrid[centerPos.x, centerPos.y];
+                    if (tile != null && tile.TileObject != null)
+                    {
+                        Transform ceilingTransform = tile.TileObject.transform.Find("Ceiling");
+                        float ceilingHeight = 5f;
+                        if (ceilingTransform != null)
+                        {
+                            ceilingHeight = ceilingTransform.localPosition.y;
+                        }
+                        Vector3 spawnPos = tile.WorldPosition + Vector3.up * (ceilingHeight - 0.1f);
+
+                        GameObject lightInstance = Instantiate(hallwayLightPrefab, spawnPos, Quaternion.identity, tile.TileObject.transform);
+                        lightInstance.name = "Light";
+                        totalLights++;
+                        Debug.Log($"Forced central hallway light at {centerPos} (ceiling height: {ceilingHeight}) using prefab {hallwayLightPrefab.name}");
+                    }
+                }
             }
 
-            Debug.Log($"Light placement complete. Total lights: {placedLightPositions.Count}");
+            Debug.Log($"Light placement complete. Total lights: {totalLights}");
         }
 
         // NEW: Method to place doorways at hallway-room boundaries
