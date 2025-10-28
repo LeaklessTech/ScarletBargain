@@ -1828,7 +1828,7 @@ MonoBehaviour:
   MonsterPrefab: {fileID: 9214573662571422398, guid: f035a55bf8cc46b0cad0bd32ae80c12a, type: 3}
   PlayerPrefab: {fileID: 5770971515875987938, guid: 82e72491140bb9f479d0a14313eef034, type: 3}
   PrisonerPrefab: {fileID: 1851451276828738152, guid: c23ef748b6278ed42a676ef7204fb610, type: 3}
-  LadderPrefab: {fileID: 0}
+  LadderPrefab: {fileID: 4871319229628602274, guid: ec8b6044ff6a09e4b95083ae5c81bf94, type: 3}
   propSpawner: {fileID: 1752798474}
   PrisonerChance: 5
   AdditionalHallwayChance: 12.5
