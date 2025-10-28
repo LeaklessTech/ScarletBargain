@@ -1854,9 +1854,9 @@ MonoBehaviour:
     UseConstant: 0
     Variable: {fileID: 11400000, guid: 5372321db87b80d8483796503a9060c0, type: 2}
   prisonerCount:
-    UseConstant: 1
+    UseConstant: 0
     ConstantValue: 0
-    Variable: {fileID: 0}
+    Variable: {fileID: 11400000, guid: d269df54e5b64416ca2fffb9ea2c58a1, type: 2}
 --- !u!4 &1723413906
 Transform:
   m_ObjectHideFlags: 0
