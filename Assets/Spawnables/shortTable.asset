@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: shortTable
   m_EditorClassIdentifier: 
   Prefab: {fileID: 8859491753851488919, guid: 9f830a8bddd0fbd44b46c6f367d62a4b, type: 3}
-  YOffset: 0
+  YOffset: 0.7
   JitterXZ: {x: 0.15, y: 0.15}
   SnapRotation90: 1
-  Weight: 1.5
+  Weight: 0.5
   UseRendererBounds: 1
   ManualHalfExtents: {x: 0.4, y: 0.6, z: 0.4}
   BoundsPadding: 0.02
-  AtMostOnePerRoom: 0
+  AtMostOnePerRoom: 1
