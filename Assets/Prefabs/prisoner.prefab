@@ -156,6 +156,10 @@ MonoBehaviour:
   rescueKey: 101
   playerTag: Player
   prisonerAI: {fileID: 4833457379149991679}
+  prisonerCount:
+    UseConstant: 0
+    ConstantValue: 0
+    Variable: {fileID: 11400000, guid: d269df54e5b64416ca2fffb9ea2c58a1, type: 2}
 --- !u!135 &5010656594969501144
 SphereCollider:
   m_ObjectHideFlags: 0

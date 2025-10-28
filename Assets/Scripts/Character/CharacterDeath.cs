@@ -19,7 +19,13 @@ public class CharacterDeath : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         if (id == this.gameObject.GetInstanceID())
+        {
             this.gameObject.SetActive(false);
+            if (this.gameObject.GetComponent<PrisonerAI>().isRescued)
+            {
+                this.gameObject.GetComponent<RescuablePrisoner>().prisonerCount.Variable.Variable -= 1;
+            }
+        }
 
         if (this.gameObject.tag == "Player" && id == this.gameObject.GetInstanceID())
             SceneManager.LoadScene("LoseScene", LoadSceneMode.Single);

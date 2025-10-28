@@ -1498,17 +1498,18 @@ MonoBehaviour:
   MonsterPrefab: {fileID: 9214573662571422398, guid: f035a55bf8cc46b0cad0bd32ae80c12a, type: 3}
   PlayerPrefab: {fileID: 5770971515875987938, guid: 82e72491140bb9f479d0a14313eef034, type: 3}
   PrisonerPrefab: {fileID: 1851451276828738152, guid: c23ef748b6278ed42a676ef7204fb610, type: 3}
+  LadderPrefab: {fileID: 0}
   propSpawner: {fileID: 1752798474}
   PrisonerChance: 5
   AdditionalHallwayChance: 12.5
-  LevelWidth: 25
-  LevelLength: 25
+  LevelWidth: 10
+  LevelLength: 10
   MinRoomWidth: 2
   MaxRoomWidth: 5
   MinRoomLength: 2
   MaxRoomLength: 5
   RoomBuffer: 1
-  RoomCount: 40
+  RoomCount: 10
   RetryLimit: 50
   FloorTilePrefabs:
   - {fileID: 6805246545633482266, guid: 0e431421b7cf6e442952b0465061bf50, type: 3}
@@ -1522,6 +1523,10 @@ MonoBehaviour:
   WaypointList:
     UseConstant: 0
     Variable: {fileID: 11400000, guid: 5372321db87b80d8483796503a9060c0, type: 2}
+  prisonerCount:
+    UseConstant: 1
+    ConstantValue: 0
+    Variable: {fileID: 0}
 --- !u!4 &1723413906
 Transform:
   m_ObjectHideFlags: 0

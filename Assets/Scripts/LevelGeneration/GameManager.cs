@@ -68,10 +68,14 @@ public class GameManager : MonoBehaviour
 
     public WaypointListReference WaypointList;
 
+    public FloatReference prisonerCount;
+
     private bool NavmeshNotGenerated = true;
 
     void Start()
     {
+        prisonerCount.Variable.Variable = 0;
+
         GenerateLevel();
 
         PickEndRooms();
