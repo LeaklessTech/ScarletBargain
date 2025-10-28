@@ -2823,6 +2823,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameSceneName: LevelGeneration
   homeSceneName: IntroScene
+  giveUpSceneName: LoseScene
   firstSelected: {fileID: 639198285}
   MenuPanel: {fileID: 800631072}
   SettingsPanel: {fileID: 1409003936}
@@ -4554,7 +4555,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1228947016}
         m_TargetAssemblyTypeName: PreferencesManager, Assembly-CSharp
         m_MethodName: OnResolutionChanged
-        m_Mode: 3
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
