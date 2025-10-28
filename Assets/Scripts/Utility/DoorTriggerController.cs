@@ -52,7 +52,7 @@ public class DoorTriggerController : MonoBehaviour
 
         if (other.CompareTag("Monster"))
         {
-            playerInRange = false;
+            monsterInRange = false;
             Debug.Log("Monster exited trigger zone of " + gameObject.name);
         }
     }

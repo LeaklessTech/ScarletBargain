@@ -11,7 +11,6 @@ public class CharacterDeath : MonoBehaviour
         {
             int id = (int)data;
             StartCoroutine(DeathSequence(id));
-
         }
     }
     private IEnumerator DeathSequence(int id)
@@ -22,7 +21,7 @@ public class CharacterDeath : MonoBehaviour
         if (id == this.gameObject.GetInstanceID())
             this.gameObject.SetActive(false);
 
-        if (this.gameObject.tag == "Player")
+        if (this.gameObject.tag == "Player" && id == this.gameObject.GetInstanceID())
             SceneManager.LoadScene("LoseScene", LoadSceneMode.Single);
 
     }

@@ -482,6 +482,8 @@ GameObject:
   - component: {fileID: 820756645}
   - component: {fileID: 820756648}
   - component: {fileID: 820756649}
+  - component: {fileID: 1069239987}
+  - component: {fileID: 1069239989}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -556,8 +558,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 820756644}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.00004579802, y: 0.879822, z: -0.4753034, w: -0.000038404018}
-  m_LocalPosition: {x: -122.29561, y: 147.87279, z: 19.429657}
+  m_LocalRotation: {x: -0.2955062, y: 0.5718281, z: -0.2321009, w: -0.7292585}
+  m_LocalPosition: {x: 103.418495, y: 43.383698, z: 26.48207}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -614,7 +616,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 820756644}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bfcffb72cee55524c8926f01f0a72ae3, type: 3}
   m_Name: 
@@ -763,7 +765,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1069239986}
   - component: {fileID: 1069239985}
-  - component: {fileID: 1069239987}
+  - component: {fileID: 1069239988}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -858,9 +860,24 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 820756644}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 29b003244c7c7b744a9044249336d419, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 5
+  sprintSpeed: 15
+  mouseSensitivity: 2
+--- !u!114 &1069239988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1069239984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Version: 3
@@ -874,6 +891,29 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+--- !u!114 &1069239989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 820756644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 433faa8b758afed4f9295b193c697276, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _PixelationFactor: 1
+  _ColorEmulationMode: 3
+  _FullscreenColorDepth: {x: 256, y: 256, z: 256}
+  _FullscreenDitherDepth: {x: 32, y: 32, z: 32}
+  _DitheringMatrixSize: 2
+  _DitheringScale: 1
+  _InterlacingSize: 1
+  _PostProcessShader: {fileID: 4800000, guid: 56d52fd5b7c6911468179e5a7359ce0e, type: 3}
+  _PostProcessShaderAccurate: {fileID: 4800000, guid: 2ebed186567d3c244a87538744a62920, type: 3}
+  _PixelationShader: {fileID: 4800000, guid: f2da0e2a14a532548b5db043244b3df1, type: 3}
+  _InterlacingShader: {fileID: 4800000, guid: 03ebd34214b41ef459d7ee6753b062be, type: 3}
 --- !u!1 &1127704057
 GameObject:
   m_ObjectHideFlags: 0
@@ -1179,7 +1219,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: a98a11630504e4129848b016d8fd1a61, type: 3}
+  m_Resource: {fileID: 8300000, guid: 6d5c13d85f65e544c9822bc0b2535fd9, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.35
   m_Pitch: 1
@@ -1372,6 +1412,60 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1573754763
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1573754765}
+  - component: {fileID: 1573754764}
+  m_Layer: 0
+  m_Name: PSX Shader
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1573754764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1573754763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1a4c69f7a9d3ea43907b5765229dc85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _TextureWarpingFactor: 1
+  _TextureWarpingMode: 0
+  _VertexGridResolution: 100
+  _VertexWobbleMode: 0
+  _UseRetroVertexLighting: 1
+  _RetroLightingNormalFactor: 0.5
+  _RetroLightFalloffStart: 0.5
+  _FlatShadingMode: 0
+  _TriangleSortMode: 0
+  _DepthDebugView: 0
+--- !u!4 &1573754765
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1573754763}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1723413904
 GameObject:
   m_ObjectHideFlags: 0
@@ -1401,27 +1495,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8eeb19306f7ca61469d2d8873eb00f28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LevelGenerator: {fileID: 8262802726317120157, guid: 2b4c70307751f214b8e3c2590a055706, type: 3}
   MonsterPrefab: {fileID: 9214573662571422398, guid: f035a55bf8cc46b0cad0bd32ae80c12a, type: 3}
   PlayerPrefab: {fileID: 5770971515875987938, guid: 82e72491140bb9f479d0a14313eef034, type: 3}
-  PrisonerPrefab: {fileID: 0}
+  PrisonerPrefab: {fileID: 1851451276828738152, guid: c23ef748b6278ed42a676ef7204fb610, type: 3}
   propSpawner: {fileID: 0}
+  PrisonerChance: 12.5
   AdditionalHallwayChance: 12.5
-  LevelWidth: 10
-  LevelLength: 10
+  LevelWidth: 25
+  LevelLength: 25
   MinRoomWidth: 2
   MaxRoomWidth: 5
   MinRoomLength: 2
   MaxRoomLength: 5
   RoomBuffer: 1
-  RoomCount: 5
+  RoomCount: 40
   RetryLimit: 50
   FloorTilePrefabs:
   - {fileID: 6805246545633482266, guid: 0e431421b7cf6e442952b0465061bf50, type: 3}
   ObjectSizeOffset: 10
   Seed: 0
   TilePrefab: {fileID: 6805246545633482266, guid: 0e431421b7cf6e442952b0465061bf50, type: 3}
-  Camera: {fileID: 0}
+  LightPrefabs:
+  - {fileID: 7107032518334873695, guid: 7235fc25227d4f8478df5bb3de0b8f41, type: 3}
+  DoorwayPrefabs:
+  - {fileID: 4606711401456870993, guid: 68702bb9e3e38cc4f860b7c05fd82ccd, type: 3}
   WaypointList:
     UseConstant: 0
     Variable: {fileID: 11400000, guid: 5372321db87b80d8483796503a9060c0, type: 2}
@@ -1732,3 +1829,4 @@ SceneRoots:
   - {fileID: 1427623717}
   - {fileID: 1127704061}
   - {fileID: 1572145322}
+  - {fileID: 1573754765}

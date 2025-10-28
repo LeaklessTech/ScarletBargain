@@ -6,11 +6,12 @@ TagManager:
   tags:
   - Monster
   - Waypoint
+  - Prisoner
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Door
   - Water
   - UI
   - Target

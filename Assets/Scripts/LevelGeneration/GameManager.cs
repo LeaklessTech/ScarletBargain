@@ -7,8 +7,6 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject LevelGenerator;
-
     public GameObject MonsterPrefab;
     public GameObject PlayerPrefab;
     public GameObject PrisonerPrefab;
@@ -19,6 +17,10 @@ public class GameManager : MonoBehaviour
     public PropSpawner propSpawner;
 
     public LevelGenerator level;
+
+    [Header("Prisoner Chance")]
+    [Range(0f, 100f)]
+    public float PrisonerChance = 12.5f;
 
     [Header("Hallway Chance")]
     [Tooltip("Odds that a hallway not in the MST gets added anyway")]
@@ -55,20 +57,12 @@ public class GameManager : MonoBehaviour
     public GameObject TilePrefab;
 
     [Header("Lighting")]
-
     [Tooltip("List of light prefabs to randomly select from.")]
-
     public List<GameObject> LightPrefabs = new List<GameObject>();
 
-
-
     [Header("Doorways")]
-
     [Tooltip("Doorway prefabs in the same order as FloorTilePrefabs (e.g. Tile 3 to Doorway 3)")]
-
     public List<GameObject> DoorwayPrefabs = new List<GameObject>();
-
-    public GameObject Camera;
 
     public WaypointListReference WaypointList;
 
@@ -100,7 +94,11 @@ public class GameManager : MonoBehaviour
 
         if (levelObject == null) return;
 
-        NavMeshSurface surface = levelObject.GetComponent<NavMeshSurface>() ?? levelObject.AddComponent<NavMeshSurface>();
+        NavMeshSurface surface = levelObject.AddComponent<NavMeshSurface>();
+
+        int doorLayer = 3;
+
+        surface.layerMask &= ~(1 << doorLayer);
 
         surface.BuildNavMesh();
 
@@ -143,13 +141,11 @@ public class GameManager : MonoBehaviour
         if (StartRoom?.RoomObject == null) return;
         GameObject player = Instantiate(PlayerPrefab, StartRoom.RoomObject.transform.position, Quaternion.identity);
 
-        float prisonerSpawnChance = 0.25f;
-
         int prisonerCount = 0;
 
         foreach (var room in GlobalVariables.rooms)
         {
-            if (UnityEngine.Random.Range(0f, 1f) < prisonerSpawnChance)
+            if (UnityEngine.Random.Range(0f, 1f) < PrisonerChance)
             {
                 Instantiate(PrisonerPrefab, room.RoomObject.transform.position, Quaternion.identity);
                 prisonerCount++;
@@ -176,15 +172,12 @@ public class GameManager : MonoBehaviour
         float maxDistance = 0f;
 
         Room tempStart = null;
-
         Room tempEnd = null;
 
         for (int i = 0; i < roomList.Count; i++)
-
         {
 
             for (int j = 0; j < roomList.Count; j++)
-
             {
 
                 if (i == j) continue;
@@ -193,14 +186,9 @@ public class GameManager : MonoBehaviour
 
                 Vector3 roomBLocation = roomList[j].RoomObject.transform.position;
 
-
-
                 float distance = (roomALocation - roomBLocation).sqrMagnitude;
 
-
-
                 if (distance > maxDistance)
-
                 {
 
                     maxDistance = distance;
@@ -216,33 +204,20 @@ public class GameManager : MonoBehaviour
         }
 
 
-
         StartRoom = tempStart;
-
         EndRoom = tempEnd;
-
     }
 
 
 
     void SpawnObjects()
-
     {
-
         if (propSpawner == null)
-
         {
-
             Debug.LogWarning("PropSpawner reference not set.");
-
             return;
-
         }
-
-
-
         propSpawner.SpawnNow();
-
     }
 
 }
