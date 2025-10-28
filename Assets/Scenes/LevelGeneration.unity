@@ -870,7 +870,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8805c9a6fa8f64e12b26880e7fdee1a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  overlay: {fileID: 0}
+  overlay: {fileID: 1030784086}
   showSeconds: 7
 --- !u!1 &1069239984
 GameObject:
