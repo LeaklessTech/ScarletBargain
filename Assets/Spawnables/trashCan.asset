@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: trashCan
   m_EditorClassIdentifier: 
   Prefab: {fileID: 7826889984973843266, guid: 9c7ddbd4e1e420e499a374e4556b2c71, type: 3}
-  YOffset: 0.4
+  YOffset: 1
   JitterXZ: {x: 0.15, y: 0.15}
   SnapRotation90: 1
   Weight: 0.1

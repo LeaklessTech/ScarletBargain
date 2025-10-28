@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: longTable
   m_EditorClassIdentifier: 
   Prefab: {fileID: 1994319381440499703, guid: ea4fda82b181c284f84b42b153ee1222, type: 3}
-  YOffset: 0.3
+  YOffset: 0.5
   JitterXZ: {x: 0.15, y: 0.15}
   SnapRotation90: 1
   Weight: 0.3
