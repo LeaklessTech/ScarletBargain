@@ -34,12 +34,15 @@ public class MonsterBehavior : MonoBehaviour
     ActionState state = ActionState.IDLE;
 
     System.Random rnd = new System.Random();
+    
+    private Animator animator;
 
     void Start()
     {
         // FieldOfView.OnPlayerFound += TriggerHunt;
         agent = this.GetComponent<NavMeshAgent>();
-        anim = this.GetComponentInChildren<Animator>();
+        animator = this.GetComponent<Animator>();
+        anim = this.GetComponent<Animator>();
 
         // AI Behavior Setup
         Tree = new BehaviorTree("Base Tree", Policies.RunForever);
@@ -79,6 +82,14 @@ public class MonsterBehavior : MonoBehaviour
 
     void Update()
     {
+        if (animator)
+        {
+            Vector3 vel = agent.velocity;
+            float horizontalSpeed = new Vector3(vel.x, 0f, vel.z).magnitude;
+            animator.SetFloat("Speed", horizontalSpeed, 0.1f, Time.deltaTime);
+        }
+
+
         TreeStatus = Tree.Process();
     }
 
@@ -97,7 +108,7 @@ public class MonsterBehavior : MonoBehaviour
         if (!AnimatorIsPlaying("Swivel"))
         {
             state = ActionState.IDLE;
-            anim.Play("MonsterIdle");
+            anim.Play("Idle");
             return Node.Status.SUCCESS;
         }
 

@@ -54,6 +54,20 @@ public class GameManager : MonoBehaviour
 
     public GameObject TilePrefab;
 
+    [Header("Lighting")]
+
+    [Tooltip("List of light prefabs to randomly select from.")]
+
+    public List<GameObject> LightPrefabs = new List<GameObject>();
+
+
+
+    [Header("Doorways")]
+
+    [Tooltip("Doorway prefabs in the same order as FloorTilePrefabs (e.g. Tile 3 to Doorway 3)")]
+
+    public List<GameObject> DoorwayPrefabs = new List<GameObject>();
+
     public GameObject Camera;
 
     public WaypointListReference WaypointList;
@@ -84,7 +98,9 @@ public class GameManager : MonoBehaviour
     {
         GameObject levelObject = GameObject.Find("Level");
 
-        NavMeshSurface surface = (NavMeshSurface)levelObject.AddComponent(typeof(NavMeshSurface));
+        if (levelObject == null) return;
+
+        NavMeshSurface surface = levelObject.GetComponent<NavMeshSurface>() ?? levelObject.AddComponent<NavMeshSurface>();
 
         surface.BuildNavMesh();
 
@@ -110,17 +126,21 @@ public class GameManager : MonoBehaviour
             ObjectSizeOffset = this.ObjectSizeOffset,
             Seed = this.Seed,
             TilePrefab = this.TilePrefab,
+            LightPrefabs = this.LightPrefabs,
+            DoorwayPrefabs = this.DoorwayPrefabs,
             WaypointListReference = this.WaypointList
         };
 
-        LevelGenerator generator = new(settings);
+        level = new LevelGenerator(settings); // Store reference if needed
 
-        generator.GenerateLevel();
+        level.GenerateLevel();
     }
 
     private void SpawnEntities()
     {
+        if (EndRoom?.RoomObject == null) return;
         Instantiate(MonsterPrefab, EndRoom.RoomObject.transform.position, Quaternion.identity);
+        if (StartRoom?.RoomObject == null) return;
         GameObject player = Instantiate(PlayerPrefab, StartRoom.RoomObject.transform.position, Quaternion.identity);
 
         float prisonerSpawnChance = 0.25f;
@@ -129,7 +149,7 @@ public class GameManager : MonoBehaviour
 
         foreach (var room in GlobalVariables.rooms)
         {
-            if(Random.Range(0, 1f) < prisonerSpawnChance)
+            if (UnityEngine.Random.Range(0f, 1f) < prisonerSpawnChance)
             {
                 Instantiate(PrisonerPrefab, room.RoomObject.transform.position, Quaternion.identity);
                 prisonerCount++;
@@ -145,40 +165,84 @@ public class GameManager : MonoBehaviour
     // in a larger set (eg. 1000+) we'd want to calculate the convex hull
     private void PickEndRooms()
     {
-        List<Room> RoomList = GlobalVariables.rooms;
+        List<Room> roomList = GlobalVariables.rooms;
 
-        if (RoomList == null || RoomList.Count < 2)
+        if (roomList == null || roomList.Count < 2)
+        {
             Debug.Log("End rooms can't be chosen. Too few rooms, or PlacedRooms is null");
-
-        float maxDistance = 0f;
-
-        for (int i = 0; i < RoomList.Count; i++)
-        {
-            for (int j = 0; j < RoomList.Count; j++)
-            {
-                Vector3 roomALocation = RoomList[i].RoomObject.transform.position;
-                Vector3 roomBLocation = RoomList[j].RoomObject.transform.position;
-
-                float distance = (roomALocation - roomBLocation).sqrMagnitude;
-
-                if (distance > maxDistance)
-                {
-                    maxDistance = distance;
-                    StartRoom = RoomList[i];
-                    EndRoom = RoomList[j];
-                }
-            }
-        }
-    }
-
-    void SpawnObjects()
-    {
-        if (propSpawner == null)
-        {
-            Debug.LogWarning("PropSpawner reference not set.");
             return;
         }
 
-        propSpawner.SpawnNow();
+        float maxDistance = 0f;
+
+        Room tempStart = null;
+
+        Room tempEnd = null;
+
+        for (int i = 0; i < roomList.Count; i++)
+
+        {
+
+            for (int j = 0; j < roomList.Count; j++)
+
+            {
+
+                if (i == j) continue;
+
+                Vector3 roomALocation = roomList[i].RoomObject.transform.position;
+
+                Vector3 roomBLocation = roomList[j].RoomObject.transform.position;
+
+
+
+                float distance = (roomALocation - roomBLocation).sqrMagnitude;
+
+
+
+                if (distance > maxDistance)
+
+                {
+
+                    maxDistance = distance;
+
+                    tempStart = roomList[i];
+
+                    tempEnd = roomList[j];
+
+                }
+
+            }
+
+        }
+
+
+
+        StartRoom = tempStart;
+
+        EndRoom = tempEnd;
+
     }
+
+
+
+    void SpawnObjects()
+
+    {
+
+        if (propSpawner == null)
+
+        {
+
+            Debug.LogWarning("PropSpawner reference not set.");
+
+            return;
+
+        }
+
+
+
+        propSpawner.SpawnNow();
+
+    }
+
 }
