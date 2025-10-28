@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
     public GameObject PlayerPrefab;
     public GameObject PrisonerPrefab;
 
+    public GameObject LadderPrefab;
+
     public Room StartRoom;
     public Room EndRoom;
 
@@ -84,8 +86,14 @@ public class GameManager : MonoBehaviour
         {
             CreateNavmesh();
             SpawnEntities();
+            SpawnLadder();
         }
             
+    }
+
+    private void SpawnLadder()
+    {
+        Instantiate(LadderPrefab, EndRoom.RoomObject.transform.position + new Vector3(0,2,0), Quaternion.identity);
     }
 
     private void CreateNavmesh()
