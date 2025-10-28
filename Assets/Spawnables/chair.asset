@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: chair
   m_EditorClassIdentifier: 
   Prefab: {fileID: 2743044596151549495, guid: 6498adaa7cd2d41499ad451f9804705c, type: 3}
-  YOffset: 0
-  JitterXZ: {x: 0.15, y: 0.15}
+  YOffset: 0.7
+  JitterXZ: {x: 1, y: 1}
   SnapRotation90: 1
-  Weight: 2
+  Weight: 0.1
   UseRendererBounds: 1
   ManualHalfExtents: {x: 0.4, y: 0.6, z: 0.4}
   BoundsPadding: 0.02
-  AtMostOnePerRoom: 0
+  AtMostOnePerRoom: 1

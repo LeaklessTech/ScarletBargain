@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: locker
   m_EditorClassIdentifier: 
   Prefab: {fileID: 6228298977937042409, guid: 4c5e2ed93e1657e48987e24141fce4d9, type: 3}
-  YOffset: 0
+  YOffset: 0.6
   JitterXZ: {x: 0.15, y: 0.15}
   SnapRotation90: 1
-  Weight: 1
+  Weight: 0.5
   UseRendererBounds: 1
   ManualHalfExtents: {x: 0.4, y: 0.6, z: 0.4}
   BoundsPadding: 0.02
-  AtMostOnePerRoom: 0
+  AtMostOnePerRoom: 1
