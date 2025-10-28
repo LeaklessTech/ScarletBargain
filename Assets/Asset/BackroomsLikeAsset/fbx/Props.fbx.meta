@@ -1,7 +1,14 @@
 fileFormatVersion: 2
 guid: 1b52a805e5e0c9e4992e1cd5a7ef5d45
+AssetOrigin:
+  serializedVersion: 1
+  productId: 254543
+  packageName: Backrooms like asset pack
+  packageVersion: 1.0
+  assetPath: Assets/Asset/BackroomsLikeAsset/fbx/Props.fbx
+  uploadId: 594866
 ModelImporter:
-  serializedVersion: 22103
+  serializedVersion: 22200
   internalIDToNameTable: []
   externalObjects:
   - first:
@@ -21,8 +28,6 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -37,7 +42,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages: []
     globalScale: 1
@@ -45,6 +50,7 @@ ModelImporter:
     addColliders: 0
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
+    importPhysicalCameras: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1
@@ -111,10 +117,3 @@ ModelImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 254543
-  packageName: Backrooms like asset pack
-  packageVersion: 1.0
-  assetPath: Assets/Asset/BackroomsLikeAsset/fbx/Props.fbx
-  uploadId: 594866
