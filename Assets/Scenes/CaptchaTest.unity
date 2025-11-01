@@ -326,6 +326,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb218743974caeb5d9dd190857922390, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ToggleList: []
 --- !u!1 &268417031
 GameObject:
   m_ObjectHideFlags: 0
