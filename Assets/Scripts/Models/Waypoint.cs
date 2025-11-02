@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
 
-public class Waypoint : MonoBehaviour
+public class Waypoint
 {
-    public int Weight;
+    public int Weight { get; set; }
 
-    public Vector3 Position { get { return this.gameObject.transform.position; } }
+    public Vector3 Position { get; set; }
 }

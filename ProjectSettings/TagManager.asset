@@ -5,20 +5,20 @@ TagManager:
   serializedVersion: 3
   tags:
   - Monster
-  - Ground
   - Waypoint
+  - Prisoner
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Ground
+  - Door
   - Water
   - UI
   - Target
   - Obstruction
   - 
   - 
-  - 
+  - Props
   - 
   - 
   - 
@@ -46,10 +46,3 @@ TagManager:
     locked: 0
   m_RenderingLayers:
   - Default
-  - Light Layer 1
-  - Light Layer 2
-  - Light Layer 3
-  - Light Layer 4
-  - Light Layer 5
-  - Light Layer 6
-  - Light Layer 7

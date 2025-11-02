@@ -49,6 +49,8 @@ public class FieldOfView : MonoBehaviour
         {
             rangeChecks = rangeChecks.OrderBy(target => Vector3.Distance(target.gameObject.transform.position, transform.position)).ToList();
             TargetRef = rangeChecks.FirstOrDefault().gameObject;
+
+            bool hidden = TargetRef.GetComponent<AdvancedPlayerController>()?.IsCrouching ?? false;
             Transform target = TargetRef.transform;
             Vector3 directionToTarget = (target.position - transform.position).normalized;
 
@@ -56,7 +58,7 @@ public class FieldOfView : MonoBehaviour
             {
                 float distanceToTarget = Vector3.Distance(transform.position, target.position);
 
-                if (!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, ObstructionMask))
+                if (!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, ObstructionMask) && !hidden)
                 {
                     CanSeePlayer = true;
                     onPlayerFound.TriggerEvent(this, new CharacterPosition{ position = target.transform.position, objectId = TargetRef.GetInstanceID() });

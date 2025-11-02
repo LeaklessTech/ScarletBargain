@@ -1,16 +1,39 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class CharacterDeath : MonoBehaviour
 {
     public void TriggerDeath(Component sender, object data)
     {
         // Debug.Log("I GOT KILLED. this instance: " + this.gameObject.GetInstanceID() + " and the instance id passed in: " + ((int)data));
-        if(data is int)
+        if (data is int)
         {
             int id = (int)data;
-
-            if(id == this.gameObject.GetInstanceID())
-                this.gameObject.SetActive(false);
+            StartCoroutine(DeathSequence(id));
         }
     }
+    private IEnumerator DeathSequence(int id)
+    {
+        // just a little delay for the user to take it in
+        yield return new WaitForSeconds(1f);
+
+        if (this.gameObject.tag == "Prisoner" && id == this.gameObject.GetInstanceID())
+        {
+            this.gameObject.SetActive(false);
+            if (this.gameObject.GetComponent<PrisonerAI>().isRescued)
+            {
+                this.gameObject.GetComponent<RescuablePrisoner>().prisonerCount.Variable.Variable -= 1;
+            }
+        }
+
+        if (this.gameObject.tag == "Player" && id == this.gameObject.GetInstanceID())
+        {
+            this.gameObject.SetActive(false);
+            SceneManager.LoadScene("LoseScene", LoadSceneMode.Single);
+        }
+
+    }
 }
+
+

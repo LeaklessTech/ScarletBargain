@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using LevelGeneration;
 
 namespace LevelGeneration
 {
@@ -12,7 +13,7 @@ namespace LevelGeneration
         public enum TileType { HALLWAY, ROOM, EMPTY }
         public enum Wall { North, South, East, West}
 
-        private static readonly Dictionary<Wall, string> WallNames = new()
+        public static readonly Dictionary<Wall, string> WallNames = new()
         {
             { Wall.North, "NorthWall"},
             { Wall.South, "SouthWall"},
@@ -40,10 +41,10 @@ namespace LevelGeneration
 
         public int BaseCost { get; set; }
         public GameObject TileObject { get; set; }
-
         public Vector2Int Location;
-
         public Tile Previous { get; set; }
+        public Room ParentRoom { get; set; }
+        public Vector3 WorldPosition { get; set; }
 
         // we want fScore to be updated based on the changes in H and G score, so we use some backing fields
         private int _gScore;
@@ -63,15 +64,15 @@ namespace LevelGeneration
 
         public int fScore => _gScore + _hScore;
 
-        public Tile(TileType type, GameObject tileObject, (int x, int y) location)
+        public Tile(TileType type, (int x, int y) location, Vector3 worldPosition)
         {
             this.Type = type;
-
-            this.TileObject = tileObject;
 
             Location = new(location.x, location.y);
 
             gScore = int.MaxValue;
+
+            WorldPosition = worldPosition;
         }
 
         public bool RemoveWall(Wall wallToRemove)

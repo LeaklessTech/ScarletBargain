@@ -4,19 +4,19 @@ public class ThirdPersonCam : MonoBehaviour
 {
     [Header("Target")]
     public Transform target;
-    public Vector3 targetOffset = new Vector3(0f, 1.2f, 0f);
+    public Vector3 targetOffset = new Vector3(0f, 1.5f, 0f);
 
     [Header("Orbit & Input")]
     public float mouseSensitivity = 2f;
 
     [Header("Distance")]
-    public float distance = 4.5f;
+    public float distance = 2f;
     public float minDistance = 0.6f;
-    public float maxDistance = 6f;
+    public float maxDistance = 2.5f;
 
     [Header("Pitch Limits")]
-    public float minPitch = -30f;
-    public float maxPitch = 60f;
+    public float minPitch = -15f;
+    public float maxPitch = 30f;
 
     [Header("Collision (occlusion)")]
     public LayerMask obstructionMask = ~0; // default: everything
@@ -32,6 +32,8 @@ public class ThirdPersonCam : MonoBehaviour
 
     void Start()
     {
+        target = GameObject.FindGameObjectWithTag("Player").transform;
+
         if (target == null)
         {
             Debug.LogWarning("ThirdPersonCamera: target not assigned. Please assign target (CameraTarget).");
@@ -48,7 +50,8 @@ public class ThirdPersonCam : MonoBehaviour
 
     void LateUpdate()
     {
-        if (target == null) return;
+        if (target == null)
+            return;
 
         float mx = Input.GetAxis("Mouse X");
         float my = Input.GetAxis("Mouse Y");

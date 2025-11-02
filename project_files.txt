@@ -1,0 +1,185 @@
+Assets/Prefabs:
+character.prefab
+character.prefab.meta
+Monster.prefab
+Monster.prefab.meta
+SeatWithPerson.prefab
+SeatWithPerson.prefab.meta
+Tile 0.prefab
+Tile 0.prefab.meta
+Tile 1.prefab
+Tile 1.prefab.meta
+Tile 2.prefab
+Tile 2.prefab.meta
+Tile 3.prefab
+Tile 3.prefab.meta
+Tile 4.prefab
+Tile 4.prefab.meta
+WaypointsManager.prefab
+WaypointsManager.prefab.meta
+
+Assets/Scenes:
+ai-testing
+ai-testing.meta
+ai-testing.unity
+ai-testing.unity.meta
+Environment Test.unity
+Environment Test.unity.meta
+GameScene
+GameScene.meta
+GameScene.unity
+GameScene.unity.meta
+IntroScene
+IntroScene.meta
+IntroScene.unity
+IntroScene.unity.meta
+LevelGeneration.unity
+LevelGeneration.unity.meta
+PreferenceScene.unity
+PreferenceScene.unity.meta
+
+Assets/Scenes/ai-testing:
+NavMesh-Geometry.asset
+NavMesh-Geometry.asset.meta
+
+Assets/Scenes/GameScene:
+NavMesh-NavMeshBake.asset
+NavMesh-NavMeshBake.asset.meta
+
+Assets/Scenes/IntroScene:
+Main Camera Profile.asset
+Main Camera Profile.asset.meta
+
+Assets/Scripts:
+AI
+AI.meta
+CameraMove.cs
+CameraMove.cs.meta
+Character
+Character.meta
+IntroScripts
+IntroScripts.meta
+LevelGeneration
+LevelGeneration.meta
+Models
+Models.meta
+SceneLoader.cs
+SceneLoader.cs.meta
+Utils
+Utils.meta
+
+Assets/Scripts/AI:
+BehaviorTree.cs
+BehaviorTree.cs.meta
+Leaf.cs
+Leaf.cs.meta
+Monster.cs
+Monster.cs.meta
+MonsterBehavior.cs
+MonsterBehavior.cs.meta
+Node.cs
+Node.cs.meta
+Policy.cs
+Policy.cs.meta
+Selector.cs
+Selector.cs.meta
+Sequence.cs
+Sequence.cs.meta
+
+Assets/Scripts/Character:
+AdvancedPlayerController.cs
+AdvancedPlayerController.cs.meta
+CharacterDeath.cs
+CharacterDeath.cs.meta
+deprecated
+deprecated.meta
+HidingSpot.cs
+HidingSpot.cs.meta
+PartyManager.cs
+PartyManager.cs.meta
+PrisonerAI.cs
+PrisonerAI.cs.meta
+RescuablePrisoner.cs
+RescuablePrisoner.cs.meta
+ThirdPersonCam.cs
+ThirdPersonCam.cs.meta
+
+Assets/Scripts/Character/deprecated:
+PlayerRigidbodyController.cs
+PlayerRigidbodyController.cs.meta
+
+Assets/Scripts/IntroScripts:
+AttachTwitch.cs
+AttachTwitch.cs.meta
+FastTwitch.cs
+FastTwitch.cs.meta
+IntroSeat.cs
+IntroSeat.cs.meta
+LEDBlinker.cs
+LEDBlinker.cs.meta
+LightFlicker.cs
+LightFlicker.cs.meta
+LightPulseAndBlink.cs
+LightPulseAndBlink.cs.meta
+MenuController.cs
+MenuController.cs.meta
+RagdollPhysicsToggle.cs
+RagdollPhysicsToggle.cs.meta
+
+Assets/Scripts/LevelGeneration:
+Data Structures
+Data Structures.meta
+HallwayGenerator.cs
+HallwayGenerator.cs.meta
+Helpers
+Helpers.meta
+LevelGenerator.cs
+LevelGenerator.cs.meta
+
+Assets/Scripts/LevelGeneration/Data Structures:
+Edge.cs
+Edge.cs.meta
+Node.cs
+Node.cs.meta
+Room.cs
+Room.cs.meta
+Tile.cs
+Tile.cs.meta
+Triangle.cs
+Triangle.cs.meta
+
+Assets/Scripts/LevelGeneration/Helpers:
+AStar.cs
+AStar.cs.meta
+DelaunayTriangulation.cs
+DelaunayTriangulation.cs.meta
+PrimsMST.cs
+PrimsMST.cs.meta
+PriorityQueue.cs
+PriorityQueue.cs.meta
+
+Assets/Scripts/Models:
+CharacterPosition.cs
+CharacterPosition.cs.meta
+Waypoint.cs
+Waypoint.cs.meta
+
+Assets/Scripts/Utils:
+FieldOfView.cs
+FieldOfView.cs.meta
+GameEvent.cs
+GameEvent.cs.meta
+GameEventListener.cs
+GameEventListener.cs.meta
+GameObjectListReference.cs
+GameObjectListReference.cs.meta
+GameObjectListVariable.cs
+GameObjectListVariable.cs.meta
+NavMeshUtilities.cs
+NavMeshUtilities.cs.meta
+WaypointListReference.cs
+WaypointListReference.cs.meta
+WaypointListVariable.cs
+WaypointListVariable.cs.meta
+WaypointsManager.cs
+WaypointsManager.cs.meta

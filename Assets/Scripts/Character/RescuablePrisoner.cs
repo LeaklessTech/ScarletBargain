@@ -16,6 +16,8 @@ public class RescuablePrisoner : MonoBehaviour
     bool playerNearby;
     Transform nearestPlayer;
 
+    public FloatReference prisonerCount;
+
     void Reset()
     {
         // auto assign the PrisonerAI if present
@@ -48,6 +50,7 @@ public class RescuablePrisoner : MonoBehaviour
         // only allow rescue for unrescued prisoners
         if (!prisonerAI.isRescued && Input.GetKeyDown(rescueKey))
         {
+            prisonerCount.Variable.Variable += 1;
             // add to the party manager
             PartyManager mgr = PartyManager.instance;
             if (mgr != null)
