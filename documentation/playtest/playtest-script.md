@@ -3,6 +3,8 @@
 ## Introduction:
 Hello! I am taking a class in video game design, and we have an assignment to playtest our game. Our team name is Leakless and we would love to get your feedback on our game.
 
+**https://docs.google.com/spreadsheets/d/1LB7VW-PtsZMkuztLj2xiKii-J9BS0j7KygoVYHVkbR8/edit?usp=sharing**
+
 First of all, do you consent to playtest our game?  [capture yes / no] 
 
 ## Player Information:
