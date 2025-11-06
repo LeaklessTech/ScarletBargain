@@ -49,7 +49,7 @@ Ease of controlling character [note results]
 
 Are there any open ended comments you would like to provide the Leakless team about the game?  
 
-[note comments]
+[note comments - if we have different versions of the release, note the version that was used in the playtest.]
 
 ## Closing:
 
