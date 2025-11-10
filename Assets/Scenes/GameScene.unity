@@ -840,6 +840,10 @@ MonoBehaviour:
   rescueKey: 101
   playerTag: Player
   prisonerAI: {fileID: 849277524}
+  prisonerCount:
+    UseConstant: 1
+    ConstantValue: 0
+    Variable: {fileID: 0}
 --- !u!1 &876787070
 GameObject:
   m_ObjectHideFlags: 0
@@ -871,6 +875,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hideKey: 122
+  hidePosition: {fileID: 0}
+  hideTransitionSpeed: 5
+  isOccupied: 0
 --- !u!65 &876787072
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1653,7 +1660,6 @@ MonoBehaviour:
   sprintKey: 304
   crouchKey: 99
   maxGroundAngle: 60
-  groundTag: Ground
 --- !u!4 &2009643949
 Transform:
   m_ObjectHideFlags: 0
@@ -1807,6 +1813,56 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15175a320333384b8491237d2a6e4b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!136 &3145265438224728245
+CapsuleCollider:
+  m_ObjectHideFlags: 8
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &3145265438224728246
+Rigidbody:
+  m_ObjectHideFlags: 8
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!4 &4134735685597097875 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4402241387057462203, guid: e59f8ff08fdc71143adb8e310b079adc, type: 3}
@@ -1997,8 +2053,34 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5770971515875987938, guid: 82e72491140bb9f479d0a14313eef034, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9154947512173369844}
   m_SourcePrefab: {fileID: 100100000, guid: 82e72491140bb9f479d0a14313eef034, type: 3}
+--- !u!1 &9154947512173369843 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5770971515875987938, guid: 82e72491140bb9f479d0a14313eef034, type: 3}
+  m_PrefabInstance: {fileID: 9154947512173369842}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &9154947512173369844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9154947512173369843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d0952c9b3bf54f4d917ece0c9a7e57d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hideKey: 101
+  exitHideDelay: 0
+  hideTransitionSpeed: 5
+  hidePrompt: {fileID: 0}
+  hideText: Press Z to Hide
+  exitText: Press Z to Exit
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

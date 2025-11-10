@@ -1835,9 +1835,9 @@ MonoBehaviour:
   LevelWidth: 10
   LevelLength: 10
   MinRoomWidth: 2
-  MaxRoomWidth: 5
+  MaxRoomWidth: 2
   MinRoomLength: 2
-  MaxRoomLength: 5
+  MaxRoomLength: 3
   RoomBuffer: 1
   RoomCount: 10
   RetryLimit: 50

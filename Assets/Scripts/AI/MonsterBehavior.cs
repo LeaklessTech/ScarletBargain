@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
@@ -139,11 +139,28 @@ public class MonsterBehavior : MonoBehaviour
 
     public Node.Status HuntCharacter()
     {
-
         if (characterPosition == null || characterPosition == UnityEngine.Vector3.zero)
         {
             state = ActionState.IDLE;
             return Node.Status.FAILURE;
+        }
+
+        // Get player reference
+        GameObject playerObj = GameObject.FindWithTag("Player");
+        if (playerObj == null)
+        {
+            Debug.LogWarning("[MONSTER_DEBUG] HuntCharacter: No player found—skipping chase.");
+            return Node.Status.FAILURE;
+        }
+
+        var playerHiding = playerObj.GetComponent<PlayerHiding>();
+        if (playerHiding != null && playerHiding.IsHidden)
+        {
+            // Ignore hidden: Drop chase, resume patrol (feels like "lost sight")
+            Debug.Log("[MONSTER_DEBUG] Player hidden—monster loses interest and resumes patrol.");
+            IsCharacterFound = false;
+            state = ActionState.IDLE;
+            return Node.Status.FAILURE; // Fails huntLook → Bubbles to patrol
         }
 
         // If the monster has not lost sight of the character then keep trying to find them
@@ -155,12 +172,12 @@ public class MonsterBehavior : MonoBehaviour
 
         if (Vector3.Distance(this.transform.position, characterPosition) < 2)
         {
-            Debug.Log("Conusmed character in hunt stage");
+            Debug.Log("Consumed character in hunt stage");
             onCharacterKilled.TriggerEvent(this, huntedPlayerId);
             onPlayMonsterAudio.TriggerEvent(this, Resources.Load<AudioClip>("Audio/monster-victory"));
             state = ActionState.IDLE;
             IsCharacterFound = false;
-            return Node.Status.SUCCESS; // Return failure here because 
+            return Node.Status.SUCCESS;
         }
         if (NavMeshUtilities.IsAtTargetLocation(agent))
         {
