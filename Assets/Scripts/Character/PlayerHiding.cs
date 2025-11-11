@@ -113,7 +113,7 @@ public class PlayerHiding : MonoBehaviour
         // Force crouch animation directly (bypasses ToggleCrouch)
         if (animator != null)
         {
-            animator.SetBool("Crouched", true);
+            animator.SetBool("IsCrawling", true);
         }
 
         // Optional prompt
@@ -134,7 +134,7 @@ public class PlayerHiding : MonoBehaviour
         // Restore crouch animation directly
         if (animator != null)
         {
-            animator.SetBool("Crouched", wasCrouching);
+            animator.SetBool("IsCrawling", false);
         }
 
         // Notify spot (frees occupancy)
