@@ -1,6 +1,7 @@
-using PSXShaderKit;
+﻿using PSXShaderKit;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 [RequireComponent(typeof(Rigidbody))]
@@ -60,6 +61,26 @@ public class AdvancedPlayerController : MonoBehaviour
     // for animation Speed param calculation
     private Vector3 _lastRbPos;
 
+    // stamina
+    public float maxStamina = 6f;
+    public float staminaDrainRate = 1f;
+    public float staminaRegenRate = 1f;
+    public float minRunStamina = 2f;
+    public Slider staminaSlider;
+
+    // tracks current stamina value
+    private float currentStamina;
+
+    // true if player is exhausted (cannot run until stamina is >2 again)
+    private bool staminaDepleted;
+
+    // gets current stamina normalized 0-1 for ui
+    public float GetStaminaNormalized()
+    {
+        if (maxStamina <= 0f) return 0f;
+        return Mathf.Clamp01(currentStamina / maxStamina);
+    }
+
     void Start()
     {
         if (cam)
@@ -84,6 +105,20 @@ public class AdvancedPlayerController : MonoBehaviour
         _lastRbPos = rb.position;
         if (!cam)
             Debug.LogWarning("AdvancedPlayerController: 'cam' reference is not set.", this);
+
+        // initialize stamina to full
+        currentStamina = maxStamina;
+
+        // the player starts with full stamina, so they are not exhausted
+        staminaDepleted = false;
+
+        // if a UI slider is assigned, configure its range and initial value
+        if (staminaSlider != null)
+        {
+            staminaSlider.minValue = 0f;
+            staminaSlider.maxValue = 1f;
+            staminaSlider.value = 1f;
+        }
     }
 
     private void OnValidate()
@@ -110,9 +145,13 @@ public class AdvancedPlayerController : MonoBehaviour
         {
             ToggleCrouch();
         }
-            
-        // sprint is held down
-        isRunning = Input.GetKey(sprintKey) && !isCrouching;
+
+        // determine if the player wants to run (sprint key held and not crouching)
+        bool wantsToRun = Input.GetKey(sprintKey) && !isCrouching;
+        // is the character currently moving? we only allow sprinting when actually moving
+        bool isCurrentlyMoving = IsMoving;
+
+        HandleStaminaAndRunning(wantsToRun, isCurrentlyMoving);
 
         // jump request
         /*
@@ -124,7 +163,14 @@ public class AdvancedPlayerController : MonoBehaviour
 
         // kills any tilt creep
         rb.angularVelocity = Vector3.zero;
+
+        // update the stamina UI slider if assigned
+        if (staminaSlider != null)
+        {
+            staminaSlider.value = GetStaminaNormalized();
+        }
     }
+
 
     void FixedUpdate()
     {
@@ -242,6 +288,55 @@ public class AdvancedPlayerController : MonoBehaviour
         // short capsule just beneath the feet
         return Physics.CheckCapsule(bottom + Vector3.up * 0.02f, bottom + Vector3.up * 0.04f,
                                     radius, groundMask, QueryTriggerInteraction.Ignore);
+    }
+
+    private void HandleStaminaAndRunning(bool wantsToRun, bool isCurrentlyMoving)
+    {
+        // if the stamina system is disabled (maxStamina <= 0) just reflect the input state
+        if (maxStamina <= 0f)
+        {
+            isRunning = wantsToRun && isCurrentlyMoving;
+            return;
+        }
+
+        if (staminaDepleted)
+        {
+            // cannot sprint while exhausted
+            isRunning = false;
+            // regenerate stamina at the defined rate
+            currentStamina += staminaRegenRate * Time.deltaTime;
+            if (currentStamina > maxStamina)
+                currentStamina = maxStamina;
+            // once regained enough stamina we can exit the exhausted state
+            if (currentStamina >= minRunStamina)
+            {
+                staminaDepleted = false;
+            }
+            return;
+        }
+
+        // not exhausted: determine if the player is attempting to sprint
+        if (wantsToRun && isCurrentlyMoving && currentStamina > 0f)
+        {
+            // the player is running; set the flag and drain stamina
+            isRunning = true;
+            currentStamina -= staminaDrainRate * Time.deltaTime;
+            // check for exhaustion
+            if (currentStamina <= 0f)
+            {
+                currentStamina = 0f;
+                staminaDepleted = true;
+                isRunning = false;
+            }
+        }
+        else
+        {
+            // the player is not sprinting
+            isRunning = false;
+            currentStamina += staminaRegenRate * Time.deltaTime;
+            if (currentStamina > maxStamina)
+                currentStamina = maxStamina;
+        }
     }
 
 
