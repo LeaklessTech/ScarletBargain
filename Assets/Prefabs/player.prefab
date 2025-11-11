@@ -1130,6 +1130,8 @@ MonoBehaviour:
   cam: {fileID: 5166468460296535716, guid: ced01ae45ad25804ebf3731e563dd1fa, type: 3}
   sprintKey: 304
   crouchKey: 99
+  jumpAnimationTrigger: Jump
+  requireGroundedForJump: 0
   maxGroundAngle: 60
   maxStamina: 6
   staminaDrainRate: 1

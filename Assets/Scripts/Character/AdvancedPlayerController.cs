@@ -12,7 +12,6 @@ public class AdvancedPlayerController : MonoBehaviour
     public float walkSpeed = 2f;
     public float runSpeed = 4f;
     public float crouchSpeed = 1.2f;
-    // public float jumpForce = 4.5f;
     public float gravityMultiplier = 3f;
 
     [Header("ground check")]
@@ -28,8 +27,8 @@ public class AdvancedPlayerController : MonoBehaviour
     public KeyCode crouchKey = KeyCode.C;
     // public KeyCode interactKey = KeyCode.E;
 
-    // [SerializeField, Range(0f, 1f)]
-    // private float crouchHeightFactor = 0.2f;
+    public string jumpAnimationTrigger = "Jump";
+    public bool requireGroundedForJump = false;
 
     [SerializeField, Range(0f, 89f)] private float maxGroundAngle = 60f;
     //[SerializeField] private string groundTag = "Ground";
@@ -153,13 +152,11 @@ public class AdvancedPlayerController : MonoBehaviour
 
         HandleStaminaAndRunning(wantsToRun, isCurrentlyMoving);
 
-        // jump request
-        /*
+        // jump
         if (Input.GetButtonDown("Jump"))
         {
-            wantJump = true;
+            TryPlayJumpAnimation();
         }
-        */
 
         // kills any tilt creep
         rb.angularVelocity = Vector3.zero;
@@ -217,23 +214,11 @@ public class AdvancedPlayerController : MonoBehaviour
             isGrounded = ProbeGrounded();
         }
 
-        // jumping
-        /*
-        if (wantJump && isGrounded && !isHiding)
-        {
-            // apply instantaneous vertical velocity for jumping
-            Vector3 vel = rb.linearVelocity;
-            vel.y = jumpForce;
-            rb.linearVelocity = vel;
-        }
-        wantJump = false;
-
         // apply extra gravity when falling for a snappier feel
         if (rb.linearVelocity.y < 0f)
         {
             rb.linearVelocity += Vector3.up * Physics.gravity.y * (gravityMultiplier - 1f) * Time.fixedDeltaTime;
         }
-        */
     }
 
     //private void OnCollisionEnter(Collision collision)
@@ -349,20 +334,6 @@ public class AdvancedPlayerController : MonoBehaviour
         {
             animator.SetBool("Crouched", isCrouching);
         }
-
-
-        /*
-        if (isCrouching)
-        {
-            col.height = originalHeight * crouchHeightFactor;
-            col.center = new Vector3(originalCenter.x, originalCenter.y * crouchHeightFactor, originalCenter.z);
-        }
-        else
-        {
-            col.height = originalHeight;
-            col.center = originalCenter;
-        }
-        */
     }
 
     public void SetActive(bool active)
@@ -390,5 +361,23 @@ public class AdvancedPlayerController : MonoBehaviour
     public bool IsHiding()
     {
         return isHiding;
+    }
+
+    private void TryPlayJumpAnimation()
+    {
+        // if there is no animator, nothing to play
+        if (animator == null) return;
+
+        // jump animation only plays when grounded
+        if (requireGroundedForJump && !isGrounded) return;
+
+        // avoid jumping while hiding
+        if (isHiding) return;
+
+        // trigger jump in animator param set in 'jumpAnimationTrigger'
+        if (!string.IsNullOrEmpty(jumpAnimationTrigger))
+        {
+            animator.SetTrigger(jumpAnimationTrigger);
+        }
     }
 }
