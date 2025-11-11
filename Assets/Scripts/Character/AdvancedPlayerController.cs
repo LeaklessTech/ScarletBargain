@@ -67,6 +67,9 @@ public class AdvancedPlayerController : MonoBehaviour
     public float minRunStamina = 2f;
     public Slider staminaSlider;
 
+    public float jumpStaminaCost = 2f;
+    public float minJumpStamina = 2f;
+
     // tracks current stamina value
     private float currentStamina;
 
@@ -368,11 +371,23 @@ public class AdvancedPlayerController : MonoBehaviour
         // if there is no animator, nothing to play
         if (animator == null) return;
 
-        // jump animation only plays when grounded
+        // jump animation only plays when grounded (if selected)
         if (requireGroundedForJump && !isGrounded) return;
 
         // avoid jumping while hiding
         if (isHiding) return;
+
+        // stamina check
+        if (maxStamina > 0f)
+        {
+            if (currentStamina < minJumpStamina)
+                return;                             // not enough stamina
+            currentStamina -= jumpStaminaCost;      // drain stamina
+            if (currentStamina < 0f) currentStamina = 0f;
+            if (currentStamina <= 0f) staminaDepleted = true;
+            if (staminaSlider != null)
+                staminaSlider.value = GetStaminaNormalized();
+        }
 
         // trigger jump in animator param set in 'jumpAnimationTrigger'
         if (!string.IsNullOrEmpty(jumpAnimationTrigger))
