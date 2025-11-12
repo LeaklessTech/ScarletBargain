@@ -54,6 +54,12 @@ public class FieldOfView : MonoBehaviour
             Transform target = TargetRef.transform;
             Vector3 directionToTarget = (target.position - transform.position).normalized;
 
+            // if target is actually a prisoner then do not eat them if they haven't been resuced yet
+            if (TargetRef.tag == "Prisoner")
+            {
+                hidden = !TargetRef.GetComponent<PrisonerAI>().isRescued;
+            }
+
             if (Vector3.Angle(transform.forward, directionToTarget) < Angle / 2)
             {
                 float distanceToTarget = Vector3.Distance(transform.position, target.position);
