@@ -368,6 +368,9 @@ public class AdvancedPlayerController : MonoBehaviour
 
     private void TryPlayJumpAnimation()
     {
+        // cannot jump while crouched
+        if (isCrouching) return;
+
         // if there is no animator, nothing to play
         if (animator == null) return;
 
