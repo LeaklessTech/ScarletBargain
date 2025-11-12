@@ -512,6 +512,8 @@ MonoBehaviour:
   waypointList:
     UseConstant: 0
     Variable: {fileID: 11400000, guid: 5372321db87b80d8483796503a9060c0, type: 2}
+  ScanRadius: 75
+  BotPrefab: {fileID: 8329922771217900141, guid: d5ff52d87f07274b2af571a50b239ab6, type: 3}
 --- !u!114 &1081640753208932801
 MonoBehaviour:
   m_ObjectHideFlags: 0

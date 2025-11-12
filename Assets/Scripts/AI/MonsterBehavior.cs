@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
@@ -34,8 +35,12 @@ public class MonsterBehavior : MonoBehaviour
     ActionState state = ActionState.IDLE;
 
     System.Random rnd = new System.Random();
-    
+
     private Animator animator;
+
+    public int ScanRadius = 0;
+    [SerializeField] public GameObject BotPrefab;
+
 
     void Start()
     {
@@ -70,7 +75,8 @@ public class MonsterBehavior : MonoBehaviour
         // Patrol Sequence
         Sequence patrolSequence = new Sequence("Patrol Sequence");
         patrolSequence.AddChild(new Leaf("Patrol", Patrol));
-        patrolSequence.AddChild(new Leaf("Look Around", Swivel));
+        // patrolSequence.AddChild(new Leaf("Look Around", Swivel));
+        patrolSequence.AddChild(new Leaf("Scan", Scan));
 
 
         Tree.AddChild(stunSequence);
@@ -128,6 +134,47 @@ public class MonsterBehavior : MonoBehaviour
             state = ActionState.IDLE;
             return Node.Status.SUCCESS;
         }
+
+        return Node.Status.RUNNING;
+    }
+
+    public Node.Status Scan()
+    {
+        if (state == ActionState.IDLE && !IsCharacterFound)
+        {
+            
+            state = ActionState.WORKING;
+
+            List<Waypoint> targetList = new List<Waypoint>();
+            // send out bots
+            foreach (var waypoint in waypointList.WaypointListRef)
+            {
+                if (Math.Pow(waypoint.Position.x - this.transform.position.x, 2) + Math.Pow(waypoint.Position.z - this.transform.position.z, 2) < Math.Pow(ScanRadius, 2))
+                {
+                    targetList.Add(waypoint);
+                }
+            }
+
+            targetList = targetList.OrderBy(x => Vector3.Distance(x.Position, this.transform.position)).ToList();
+            targetList.RemoveAt(0); // remove target that monster is standing on
+
+            foreach (var target in targetList)
+            {
+                GameObject instance = Instantiate(BotPrefab.gameObject, this.transform.position, Quaternion.identity) as GameObject;
+                instance.GetComponent<NavMeshAgent>().SetDestination(target.Position);
+            }
+
+        }
+
+        // if all bots finished or player found
+        if (GameObject.FindGameObjectsWithTag("Bot").Count() == 0 || IsCharacterFound)
+        {
+            // reset done scanning
+            state = ActionState.IDLE;
+            return Node.Status.SUCCESS;
+        }
+        
+        
 
         return Node.Status.RUNNING;
     }
