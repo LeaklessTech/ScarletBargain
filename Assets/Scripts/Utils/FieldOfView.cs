@@ -48,7 +48,7 @@ public class FieldOfView : MonoBehaviour
         if (rangeChecks.Count != 0)
         {
             // Eat the closest prisoner, only eat the player when no prisoners remain
-            rangeChecks = rangeChecks.OrderBy(target => Vector3.Distance(target.gameObject.transform.position, transform.position)).OrderBy(target => target.tag == "Prisoner").ToList();
+            rangeChecks = rangeChecks.OrderBy(target => Vector3.Distance(target.gameObject.transform.position, transform.position)).ToList();
 
             TargetRef = rangeChecks.FirstOrDefault().gameObject;
 

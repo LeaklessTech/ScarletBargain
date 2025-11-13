@@ -21,6 +21,7 @@ public class MonsterBehavior : MonoBehaviour
 
     private NavMeshAgent agent;
     private Animator anim;
+    private FieldOfView fov;
 
     public WaypointListReference waypointList;
     private UnityEngine.Vector3 characterPosition;
@@ -44,7 +45,7 @@ public class MonsterBehavior : MonoBehaviour
 
     void Start()
     {
-        // FieldOfView.OnPlayerFound += TriggerHunt;
+        fov = this.GetComponent<FieldOfView>();
         agent = this.GetComponent<NavMeshAgent>();
         animator = this.GetComponent<Animator>();
         anim = this.GetComponent<Animator>();
@@ -200,7 +201,7 @@ public class MonsterBehavior : MonoBehaviour
             agent.SetDestination(characterPosition);
         }
 
-        if (Vector3.Distance(this.transform.position, characterPosition) < 2)
+        if (Vector3.Distance(this.transform.position, characterPosition) < 2 && fov.CanSeePlayer)
         {
             Debug.Log("Conusmed character in hunt stage");
             onCharacterKilled.TriggerEvent(this, huntedPlayerId);
@@ -211,7 +212,6 @@ public class MonsterBehavior : MonoBehaviour
         }
         if (NavMeshUtilities.IsAtTargetLocation(agent))
         {
-            // TODO: need to play kill animation then disable/destroy the character that was killed
             state = ActionState.IDLE;
             IsCharacterFound = false;
             onPlayMonsterAudio.TriggerEvent(this, Resources.Load<AudioClip>("Audio/monster-angry"));
