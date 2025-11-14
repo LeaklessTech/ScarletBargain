@@ -1,6 +1,7 @@
-using PSXShaderKit;
+﻿using PSXShaderKit;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 [RequireComponent(typeof(Rigidbody))]
@@ -11,7 +12,6 @@ public class AdvancedPlayerController : MonoBehaviour
     public float walkSpeed = 2f;
     public float runSpeed = 4f;
     public float crouchSpeed = 1.2f;
-    // public float jumpForce = 4.5f;
     public float gravityMultiplier = 3f;
 
     [Header("ground check")]
@@ -27,8 +27,8 @@ public class AdvancedPlayerController : MonoBehaviour
     public KeyCode crouchKey = KeyCode.C;
     // public KeyCode interactKey = KeyCode.E;
 
-    // [SerializeField, Range(0f, 1f)]
-    // private float crouchHeightFactor = 0.2f;
+    public string jumpAnimationTrigger = "Jump";
+    public bool requireGroundedForJump = false;
 
     [SerializeField, Range(0f, 89f)] private float maxGroundAngle = 60f;
     //[SerializeField] private string groundTag = "Ground";
@@ -60,6 +60,29 @@ public class AdvancedPlayerController : MonoBehaviour
     // for animation Speed param calculation
     private Vector3 _lastRbPos;
 
+    // stamina
+    public float maxStamina = 6f;
+    public float staminaDrainRate = 1f;
+    public float staminaRegenRate = 1f;
+    public float minRunStamina = 2f;
+    public Slider staminaSlider;
+
+    public float jumpStaminaCost = 2f;
+    public float minJumpStamina = 2f;
+
+    // tracks current stamina value
+    private float currentStamina;
+
+    // true if player is exhausted (cannot run until stamina is >2 again)
+    private bool staminaDepleted;
+
+    // gets current stamina normalized 0-1 for ui
+    public float GetStaminaNormalized()
+    {
+        if (maxStamina <= 0f) return 0f;
+        return Mathf.Clamp01(currentStamina / maxStamina);
+    }
+
     void Start()
     {
         if (cam)
@@ -84,6 +107,20 @@ public class AdvancedPlayerController : MonoBehaviour
         _lastRbPos = rb.position;
         if (!cam)
             Debug.LogWarning("AdvancedPlayerController: 'cam' reference is not set.", this);
+
+        // initialize stamina to full
+        currentStamina = maxStamina;
+
+        // the player starts with full stamina, so they are not exhausted
+        staminaDepleted = false;
+
+        // if a UI slider is assigned, configure its range and initial value
+        if (staminaSlider != null)
+        {
+            staminaSlider.minValue = 0f;
+            staminaSlider.maxValue = 1f;
+            staminaSlider.value = 1f;
+        }
     }
 
     private void OnValidate()
@@ -110,21 +147,30 @@ public class AdvancedPlayerController : MonoBehaviour
         {
             ToggleCrouch();
         }
-            
-        // sprint is held down
-        isRunning = Input.GetKey(sprintKey) && !isCrouching;
 
-        // jump request
-        /*
+        // determine if the player wants to run (sprint key held and not crouching)
+        bool wantsToRun = Input.GetKey(sprintKey) && !isCrouching;
+        // is the character currently moving? we only allow sprinting when actually moving
+        bool isCurrentlyMoving = IsMoving;
+
+        HandleStaminaAndRunning(wantsToRun, isCurrentlyMoving);
+
+        // jump
         if (Input.GetButtonDown("Jump"))
         {
-            wantJump = true;
+            TryPlayJumpAnimation();
         }
-        */
 
         // kills any tilt creep
         rb.angularVelocity = Vector3.zero;
+
+        // update the stamina UI slider if assigned
+        if (staminaSlider != null)
+        {
+            staminaSlider.value = GetStaminaNormalized();
+        }
     }
+
 
     void FixedUpdate()
     {
@@ -171,23 +217,11 @@ public class AdvancedPlayerController : MonoBehaviour
             isGrounded = ProbeGrounded();
         }
 
-        // jumping
-        /*
-        if (wantJump && isGrounded && !isHiding)
-        {
-            // apply instantaneous vertical velocity for jumping
-            Vector3 vel = rb.linearVelocity;
-            vel.y = jumpForce;
-            rb.linearVelocity = vel;
-        }
-        wantJump = false;
-
         // apply extra gravity when falling for a snappier feel
         if (rb.linearVelocity.y < 0f)
         {
             rb.linearVelocity += Vector3.up * Physics.gravity.y * (gravityMultiplier - 1f) * Time.fixedDeltaTime;
         }
-        */
     }
 
     //private void OnCollisionEnter(Collision collision)
@@ -244,6 +278,55 @@ public class AdvancedPlayerController : MonoBehaviour
                                     radius, groundMask, QueryTriggerInteraction.Ignore);
     }
 
+    private void HandleStaminaAndRunning(bool wantsToRun, bool isCurrentlyMoving)
+    {
+        // if the stamina system is disabled (maxStamina <= 0) just reflect the input state
+        if (maxStamina <= 0f)
+        {
+            isRunning = wantsToRun && isCurrentlyMoving;
+            return;
+        }
+
+        if (staminaDepleted)
+        {
+            // cannot sprint while exhausted
+            isRunning = false;
+            // regenerate stamina at the defined rate
+            currentStamina += staminaRegenRate * Time.deltaTime;
+            if (currentStamina > maxStamina)
+                currentStamina = maxStamina;
+            // once regained enough stamina we can exit the exhausted state
+            if (currentStamina >= minRunStamina)
+            {
+                staminaDepleted = false;
+            }
+            return;
+        }
+
+        // not exhausted: determine if the player is attempting to sprint
+        if (wantsToRun && isCurrentlyMoving && currentStamina > 0f)
+        {
+            // the player is running; set the flag and drain stamina
+            isRunning = true;
+            currentStamina -= staminaDrainRate * Time.deltaTime;
+            // check for exhaustion
+            if (currentStamina <= 0f)
+            {
+                currentStamina = 0f;
+                staminaDepleted = true;
+                isRunning = false;
+            }
+        }
+        else
+        {
+            // the player is not sprinting
+            isRunning = false;
+            currentStamina += staminaRegenRate * Time.deltaTime;
+            if (currentStamina > maxStamina)
+                currentStamina = maxStamina;
+        }
+    }
+
 
     void ToggleCrouch()
     {
@@ -254,20 +337,6 @@ public class AdvancedPlayerController : MonoBehaviour
         {
             animator.SetBool("Crouched", isCrouching);
         }
-
-
-        /*
-        if (isCrouching)
-        {
-            col.height = originalHeight * crouchHeightFactor;
-            col.center = new Vector3(originalCenter.x, originalCenter.y * crouchHeightFactor, originalCenter.z);
-        }
-        else
-        {
-            col.height = originalHeight;
-            col.center = originalCenter;
-        }
-        */
     }
 
     public void SetActive(bool active)
@@ -295,5 +364,38 @@ public class AdvancedPlayerController : MonoBehaviour
     public bool IsHiding()
     {
         return isHiding;
+    }
+
+    private void TryPlayJumpAnimation()
+    {
+        // cannot jump while crouched
+        if (isCrouching) return;
+
+        // if there is no animator, nothing to play
+        if (animator == null) return;
+
+        // jump animation only plays when grounded (if selected)
+        if (requireGroundedForJump && !isGrounded) return;
+
+        // avoid jumping while hiding
+        if (isHiding) return;
+
+        // stamina check
+        if (maxStamina > 0f)
+        {
+            if (currentStamina < minJumpStamina)
+                return;                             // not enough stamina
+            currentStamina -= jumpStaminaCost;      // drain stamina
+            if (currentStamina < 0f) currentStamina = 0f;
+            if (currentStamina <= 0f) staminaDepleted = true;
+            if (staminaSlider != null)
+                staminaSlider.value = GetStaminaNormalized();
+        }
+
+        // trigger jump in animator param set in 'jumpAnimationTrigger'
+        if (!string.IsNullOrEmpty(jumpAnimationTrigger))
+        {
+            animator.SetTrigger(jumpAnimationTrigger);
+        }
     }
 }
