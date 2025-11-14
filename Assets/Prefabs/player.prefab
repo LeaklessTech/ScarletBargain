@@ -1006,6 +1006,7 @@ GameObject:
   - component: {fileID: 6152658289243318632}
   - component: {fileID: 1609976191278226246}
   - component: {fileID: 5809001298466854851}
+  - component: {fileID: -4189177680320813375}
   m_Layer: 6
   m_Name: player
   m_TagString: Player
@@ -1203,6 +1204,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdae9081ee0db9f75b4e8c9e0309d3a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-4189177680320813375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2801975844695402759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a28798b0ea031d43b915831efa64064, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilityKey: 113
+  timeScaleMultiplier: 0.5
+  abilityDuration: 5
+  cooldownDuration: 60
+  cooldownImage: {fileID: 0}
 --- !u!1 &2899427028012832272
 GameObject:
   m_ObjectHideFlags: 0

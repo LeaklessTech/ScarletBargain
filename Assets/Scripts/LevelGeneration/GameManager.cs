@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
 
     public PropSpawner propSpawner;
 
+    public UnityEngine.UI.Image TimeSlowImage;
+
     public LevelGenerator level;
 
     [Header("Prisoner Chance")]
@@ -157,6 +159,8 @@ public class GameManager : MonoBehaviour
         {
             player.AddComponent<TimeSlowAbility>();
         }
+
+        player.GetComponent<TimeSlowAbility>().cooldownImage = TimeSlowImage;
 
         int prisonerCount = 0;
 
