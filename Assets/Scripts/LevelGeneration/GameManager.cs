@@ -72,8 +72,28 @@ public class GameManager : MonoBehaviour
 
     private bool NavmeshNotGenerated = true;
 
+    [Header("Prisoners / Progression")]
+    [Tooltip("How many prisoners the first level has")]
+    public int InitialPrisonerCOunt = 4;
+    private int prisonersToSpawnThisLevel;
+    
+    public int PrisonersThisLevel => prisonersToSpawnThisLevel;
+
+
     void Start()
     {
+        int previousSaved = Mathf.RoundToInt(prisonerCount.Variable.Variable);
+
+        if (LevelState.CurrentLevel == 1 || previousSaved <= 0)
+        {
+            prisonersToSpawnThisLevel = InitialPrisonerCOunt;
+        }
+        else
+        {
+            prisonersToSpawnThisLevel = previousSaved;
+        }
+        Debug.Log($"Level {LevelState.CurrentLevel}: spawning {prisonersToSpawnThisLevel} prisoners (previousSaved={previousSaved}).");
+
         prisonerCount.Variable.Variable = 0;
 
         GenerateLevel();
@@ -153,19 +173,43 @@ public class GameManager : MonoBehaviour
         if (StartRoom?.RoomObject == null) return;
         GameObject player = Instantiate(PlayerPrefab, StartRoom.RoomObject.transform.position, Quaternion.identity);
 
-        int prisonerCount = 0;
+        List<Room> candidateRooms = new List<Room>(GlobalVariables.rooms);
 
-        foreach (var room in GlobalVariables.rooms)
+        if (candidateRooms.Count == 0)
         {
-            if (UnityEngine.Random.Range(0f, 1f) < PrisonerChance)
-            {
-                Instantiate(PrisonerPrefab, room.RoomObject.transform.position, Quaternion.identity);
-                prisonerCount++;
-            }
+            Debug.LogWarning("No rooms available to spawn prisoners.");
+            return;
         }
 
-        Debug.Log($"{prisonerCount} of {GlobalVariables.rooms.Count} possible prisoners spawned.");
+        candidateRooms.Remove(StartRoom);
+        candidateRooms.Remove(EndRoom);
+        if (candidateRooms.Count == 0)
+        {
+            candidateRooms = new List<Room>(GlobalVariables.rooms);
+        }
+
+        ShuffleRooms(candidateRooms);
+
+        int spawnCount = Mathf.Min(prisonersToSpawnThisLevel, candidateRooms.Count);
+        for (int i = 0; i < spawnCount; i++)
+        {
+            Room room = candidateRooms[i];
+            Instantiate(PrisonerPrefab, room.RoomObject.transform.position, Quaternion.identity);
+        }
+
+        Debug.Log($"Spawned {spawnCount} prisoners this level (target {prisonersToSpawnThisLevel}).");
     }
+
+    //https://en.wikipedia.org/wiki/Fisher–Yates_shuffle\
+    private void ShuffleRooms(List<Room> rooms)
+    {
+        for (int i = 0; i < rooms.Count - 1; i++)
+        {
+            int j = UnityEngine.Random.Range(i, rooms.Count);
+            (rooms[i], rooms[j]) = (rooms[j], rooms[i]);
+        }
+    }
+
 
     // designate two rooms as the start and the end
     // right now, this is just going off euclidean distance
