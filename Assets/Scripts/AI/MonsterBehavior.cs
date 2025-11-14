@@ -42,9 +42,18 @@ public class MonsterBehavior : MonoBehaviour
     public int ScanRadius = 0;
     [SerializeField] public GameObject BotPrefab;
 
+    public AudioSource footstepSource;
+
+    private float stepTimer = 0.2f;
+    private float currStep;
+
+    public AudioClip footstepClip;
+
 
     void Start()
     {
+        currStep = stepTimer;
+
         fov = this.GetComponent<FieldOfView>();
         agent = this.GetComponent<NavMeshAgent>();
         animator = this.GetComponent<Animator>();
@@ -94,6 +103,29 @@ public class MonsterBehavior : MonoBehaviour
             Vector3 vel = agent.velocity;
             float horizontalSpeed = new Vector3(vel.x, 0f, vel.z).magnitude;
             animator.SetFloat("Speed", horizontalSpeed, 0.1f, Time.deltaTime);
+        }
+
+        
+
+        // discrete footsteps when moving
+        // if (footstepSource && gameObject.GetComponent<Rigidbody>().linearVelocity.magnitude > 1)
+        if (footstepSource && gameObject.GetComponent<NavMeshAgent>().speed > 1)
+        {
+            currStep -= Time.deltaTime;
+            if (currStep <= 0f)
+            {
+                AudioClip clip = footstepClip;
+                if (clip)
+                {
+                    footstepSource.pitch = UnityEngine.Random.Range(0.2f, 0.4f);
+                    footstepSource.PlayOneShot(clip);
+                }
+                currStep = stepTimer;
+            }
+        }
+        else
+        {
+            stepTimer = 0.2f;
         }
 
 
