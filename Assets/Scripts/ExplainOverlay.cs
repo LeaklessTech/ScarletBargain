@@ -50,7 +50,7 @@ public class ExplainOverlay : MonoBehaviour
 
         messageText.text =
             $"There are {totalLevels} levels in this prison, \n " +
-            "you are on level {currentLevel}.\n" +
+            $"you are on level {currentLevel}.\n" +
             "Find the prisoners \n" +
             "and avoid the monster \n" + "\n" +
             "\"C\" to crouch and hide \n" +
