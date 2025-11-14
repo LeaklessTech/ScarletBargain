@@ -152,6 +152,11 @@ public class GameManager : MonoBehaviour
         Instantiate(MonsterPrefab, EndRoom.RoomObject.transform.position, Quaternion.identity);
         if (StartRoom?.RoomObject == null) return;
         GameObject player = Instantiate(PlayerPrefab, StartRoom.RoomObject.transform.position, Quaternion.identity);
+        
+        if (player.GetComponent<TimeSlowAbility>() == null)
+        {
+            player.AddComponent<TimeSlowAbility>();
+        }
 
         int prisonerCount = 0;
 
