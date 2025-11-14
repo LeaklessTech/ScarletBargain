@@ -1,23 +1,28 @@
 using UnityEngine;
+using System.Collections;
 using TMPro;
 
 public class PlayerHiding : MonoBehaviour
 {
     [Header("Hiding")]
     [SerializeField] private KeyCode hideKey = KeyCode.E;
-    [SerializeField] private float exitHideDelay = 0f; // 0 = no auto-exit, e.g., 10f for 10-sec timer
-    [SerializeField] private float hideTransitionSpeed = 5f; // Lerp speed to hide spot (0 = instant)
+    [SerializeField] private float exitHideDelay = 0f;
+    [SerializeField] private float hideTransitionSpeed = 5f; // lerp speed to hide spot
+    [SerializeField] private float exitTransitionSpeed = 5f; // lerp speed back from hide spot
 
     [Header("UI (Optional - Set to null to disable)")]
-    [SerializeField] private TextMeshProUGUI hidePrompt; // World Space UI Text for "Press E to Hide"
+    [SerializeField] private TextMeshProUGUI hidePrompt; // world space UI text for "Press E to Hide"
     [SerializeField] private string hideText = "Press E to Hide";
     [SerializeField] private string exitText = "Press E to Exit";
 
     private AdvancedPlayerController playerController;
     private Animator animator;
     private HidingSpot currentHidingSpot;
-    private bool wasCrouching = false; // Track prior state via public getter
+    private bool wasCrouching = false;
     private float hideTimer = 0f;
+    private Vector3 entryPosition; // store position when entering hide
+    private bool isExitingHide = false; // flag for exit crawl phase
+    private Vector3 exitTargetPosition; // target for exit lerp (starts as entryPosition)
 
     public bool IsHidden => playerController?.IsHiding() ?? false;
 
@@ -39,15 +44,13 @@ public class PlayerHiding : MonoBehaviour
 
     private void Update()
     {
-        // Handle input (centralized here; overrides HidingSpot's Update if conflicting)
-        if (Input.GetKeyDown(hideKey))
+        if (Input.GetKeyDown(hideKey) && !isExitingHide)
         {
             // HIDE_DEBUG: Log key press with spot details
             Debug.Log($"[HIDE_DEBUG] Hide key ({hideKey}) pressed. Current hidden state: {IsHidden}. Spot available: {currentHidingSpot != null} (spot: {(currentHidingSpot != null ? currentHidingSpot.GetSpotName() : "None")})");
 
             if (!IsHidden && currentHidingSpot != null)
             {
-                // Check spot occupancy
                 if (currentHidingSpot.TryEnterHideSpot(this))
                 {
                     EnterHideSpot(currentHidingSpot);
@@ -69,8 +72,7 @@ public class PlayerHiding : MonoBehaviour
             }
         }
 
-        // While hidden: Lerp position and check auto-exit
-        if (IsHidden && currentHidingSpot != null)
+        if (IsHidden && currentHidingSpot != null && !isExitingHide)
         {
             Transform targetPos = currentHidingSpot.HidePosition;
             if (targetPos != null)
@@ -94,59 +96,91 @@ public class PlayerHiding : MonoBehaviour
                 }
             }
         }
+
+        if (isExitingHide)
+        {
+            if (exitTransitionSpeed > 0)
+            {
+                transform.position = Vector3.Lerp(transform.position, exitTargetPosition, exitTransitionSpeed * Time.deltaTime);
+            }
+            else
+            {
+                transform.position = exitTargetPosition;
+            }
+
+            if (Vector3.Distance(transform.position, exitTargetPosition) < 0.1f)
+            {
+                CompleteExitHideSpot();
+            }
+        }
     }
 
-    // Called by HidingSpot on input
     public void EnterHideSpot(HidingSpot spot)
     {
         if (IsHidden || spot == null || playerController == null) return;
 
         currentHidingSpot = spot;
         hideTimer = 0f;
+        entryPosition = transform.position; // store the position where hiding started
 
-        // Track prior crouch state (public getter)
         wasCrouching = playerController.IsCrouching;
 
-        // Use controller's hiding (sets kinematic)
         playerController.EnterHideSpot();
 
-        // Force crouch animation directly (bypasses ToggleCrouch)
+        if (animator != null)
+        {
+            animator.SetBool("IsCrawling", true);
+            animator.speed = 1f;
+        }
+
+        UpdatePrompt(exitText, true);
+
+        // HIDE_DEBUG: Log successful hide start
+        Debug.Log($"[HIDE_DEBUG] Hiding started! Stored entry pos: {entryPosition}. Lerping to {spot.GetSpotName()} at {spot.HidePosition.position}. Kinematic: {playerController.gameObject.GetComponent<Rigidbody>().isKinematic}, Crawl anim: true");
+    }
+
+    public void ExitHideSpot()
+    {
+        if (!IsHidden || playerController == null || isExitingHide) return;
+
+        isExitingHide = true;
+        exitTargetPosition = entryPosition;
+
+        if (animator != null)
+        {
+            animator.speed = -1f;
+        }
+
         if (animator != null)
         {
             animator.SetBool("IsCrawling", true);
         }
 
-        // Optional prompt
-        UpdatePrompt(exitText, true);
-
-        // HIDE_DEBUG: Log successful hide start
-        Debug.Log($"[HIDE_DEBUG] Hiding started! Lerping to {spot.GetSpotName()} at {spot.HidePosition.position}. Kinematic: {playerController.gameObject.GetComponent<Rigidbody>().isKinematic}, Crouch anim: true");
+        // HIDE_DEBUG: Log exit start
+        Debug.Log($"[HIDE_DEBUG] Exit crawl started! Lerping back to {entryPosition} (distance from hide: {Vector3.Distance(transform.position, entryPosition):F2}). Anim speed: {animator?.speed}");
     }
 
-    // Called by HidingSpot on input or trigger exit
-    public void ExitHideSpot()
+    private void CompleteExitHideSpot()
     {
-        if (!IsHidden || playerController == null) return;
+        isExitingHide = false;
 
-        // Use controller's unhiding (unsets kinematic)
         playerController.ExitHideSpot();
 
-        // Restore crouch animation directly
         if (animator != null)
         {
             animator.SetBool("IsCrawling", false);
+            animator.speed = 1f;
         }
 
-        // Notify spot (frees occupancy)
         currentHidingSpot?.ExitHideSpot(this);
         currentHidingSpot = null;
         hideTimer = 0f;
 
-        // Hide prompt
+        // hide prompt
         UpdatePrompt(null, false);
 
-        // HIDE_DEBUG: Log exit
-        Debug.Log($"[HIDE_DEBUG] Hiding ended! Restored crouch: {wasCrouching}. Kinematic: {playerController.gameObject.GetComponent<Rigidbody>().isKinematic}");
+        // HIDE_DEBUG: Log exit complete
+        Debug.Log($"[HIDE_DEBUG] Exit crawl complete! Position restored to {transform.position} (target was {entryPosition}). Kinematic: {playerController.gameObject.GetComponent<Rigidbody>().isKinematic}, Crawl anim: false");
     }
 
     public void SetCurrentSpot(HidingSpot spot)
@@ -156,26 +190,22 @@ public class PlayerHiding : MonoBehaviour
         Debug.Log($"[HIDE_DEBUG] Current hiding spot set to: {(spot != null ? spot.GetSpotName() : "None")}");
     }
 
-    // Optional: Called by HidingSpot OnTriggerEnter (for prompt only)
     public void ShowHidePrompt(HidingSpot spot)
     {
-        if (IsHidden || hidePrompt == null) return;
+        if (IsHidden || isExitingHide || hidePrompt == null) return;
 
         SetCurrentSpot(spot);
         UpdatePrompt(hideText, true);
     }
 
-    // Optional: Called by HidingSpot OnTriggerExit
     public void HidePrompt()
     {
-        if (!IsHidden && hidePrompt != null)
+        if (!IsHidden && !isExitingHide && hidePrompt != null)
         {
             hidePrompt.gameObject.SetActive(false);
         }
-        // Don't null spot here—let SetCurrentSpot(null) handle in OnTriggerExit
     }
 
-    // Internal: Update prompt text/position
     private void UpdatePrompt(string text, bool active)
     {
         if (hidePrompt == null) return;
