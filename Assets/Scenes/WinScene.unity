@@ -4769,6 +4769,16 @@ MonoBehaviour:
   resolutionDropdown: {fileID: 1265965089}
   fullScreenToggle: {fileID: 19854487}
   musicToggle: {fileID: 1888241150}
+--- !u!4 &1237206912 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1971424070855566656, guid: 16aeb480fc7aa4cb3b7fdb295613c7bc, type: 3}
+  m_PrefabInstance: {fileID: 1172601248}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1259518927 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8652572185416991279, guid: 4a199765c0a8e4cb7a9d6f101e2dfd22, type: 3}
+  m_PrefabInstance: {fileID: 298773333}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1265965087
 GameObject:
   m_ObjectHideFlags: 0
@@ -5200,6 +5210,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1338669856}
   m_CullTransparentMesh: 1
+--- !u!4 &1346257833 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5334661384987730702, guid: 2f65fc8c6a6854f8296af5897c7d239c, type: 3}
+  m_PrefabInstance: {fileID: 703647082}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1398859218
 GameObject:
   m_ObjectHideFlags: 0
@@ -5298,10 +5313,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prisonerRoots:
   - {fileID: 1538726606}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 1237206912}
+  - {fileID: 2133561553}
+  - {fileID: 1259518927}
+  - {fileID: 1346257833}
   lights: []
   settleTime: 2.5
   fadeUpTime: 1.5
@@ -8187,6 +8202,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2042121245}
   m_CullTransparentMesh: 1
+--- !u!4 &2133561553 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 702472172597687937, guid: bd58483a2c7a14334addb18dc24bd9c1, type: 3}
+  m_PrefabInstance: {fileID: 1857320004}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
