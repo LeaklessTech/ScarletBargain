@@ -31,14 +31,20 @@ On a scale from 1 - 5, how much do you agree with the following statements:
 **Question 1.5**
 "I felt that the gameplay was smooth and easy to control." [1 - 5]
 
+**Question 1.6**
+"I would like to play the game again." [1 - 5]
+
+**Question 1.7**
+"I felt like my decisions had an impact on the outcome of the game." [1 - 5]
 
 ## Qualitative Questions
+A series of open-ended questions.
 
 **Question 2.1**
 What was your first impression?
 
 **Question 2.2**
-Was the object clear?
+Was the objective of the game clear?
 
 **Question 2.3**
 Did you find the game's premise exciting?
