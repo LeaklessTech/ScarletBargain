@@ -47,12 +47,20 @@ public class FieldOfView : MonoBehaviour
 
         if (rangeChecks.Count != 0)
         {
+            // Eat the closest prisoner, only eat the player when no prisoners remain
             rangeChecks = rangeChecks.OrderBy(target => Vector3.Distance(target.gameObject.transform.position, transform.position)).ToList();
+
             TargetRef = rangeChecks.FirstOrDefault().gameObject;
 
             bool hidden = TargetRef.GetComponent<AdvancedPlayerController>()?.IsCrouching ?? false;
             Transform target = TargetRef.transform;
             Vector3 directionToTarget = (target.position - transform.position).normalized;
+
+            // if target is actually a prisoner then do not eat them if they haven't been resuced yet
+            if (TargetRef.tag == "Prisoner")
+            {
+                hidden = !TargetRef.GetComponent<PrisonerAI>().isRescued;
+            }
 
             if (Vector3.Angle(transform.forward, directionToTarget) < Angle / 2)
             {
