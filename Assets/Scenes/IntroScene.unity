@@ -3025,9 +3025,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: npc_csl_00_character_01f_01_right
       objectReference: {fileID: 0}
+    - target: {fileID: 3841647232765844703, guid: 0baa268801c0040248f5d5271ec0e5a2, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 177111cbe08a046a5b9be5730267873a, type: 2}
     - target: {fileID: 7030497095953059046, guid: 0baa268801c0040248f5d5271ec0e5a2, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8584607236156035843, guid: 0baa268801c0040248f5d5271ec0e5a2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3070,7 +3074,11 @@ PrefabInstance:
       value: -2.764
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5975627441864231715, guid: 0baa268801c0040248f5d5271ec0e5a2, type: 3}
+    - {fileID: 4558047646399824122, guid: 0baa268801c0040248f5d5271ec0e5a2, type: 3}
+    - {fileID: 6712577642047433145, guid: 0baa268801c0040248f5d5271ec0e5a2, type: 3}
+    - {fileID: 3392690754463352171, guid: 0baa268801c0040248f5d5271ec0e5a2, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1346246097219065447, guid: 0baa268801c0040248f5d5271ec0e5a2, type: 3}
@@ -6746,8 +6754,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e61cd07699ca456798976682e05807f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationDegrees: 6
-  jitterSpeed: 15
+  rotationDegrees: 3
+  jitterSpeed: 10
   randomOffset: 100
 --- !u!1 &1338669856
 GameObject:
@@ -6923,10 +6931,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prisonerRoots:
   - {fileID: 1538726606}
-  - {fileID: 0}
+  - {fileID: 2108822166}
   - {fileID: 1336098310}
   - {fileID: 1728263886}
-  - {fileID: 0}
+  - {fileID: 1799650844}
   lights: []
   settleTime: 2.5
   fadeUpTime: 1.5
@@ -9246,6 +9254,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7325917028660630138, guid: 0baa268801c0040248f5d5271ec0e5a2, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7926c3c5a48fff94b8a971336c59cbcb, type: 2}
     - target: {fileID: 8584607236156035843, guid: 0baa268801c0040248f5d5271ec0e5a2, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.289
