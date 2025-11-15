@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
@@ -20,6 +21,7 @@ public class MonsterBehavior : MonoBehaviour
 
     private NavMeshAgent agent;
     private Animator anim;
+    private FieldOfView fov;
 
     public WaypointListReference waypointList;
     private UnityEngine.Vector3 characterPosition;
@@ -34,12 +36,25 @@ public class MonsterBehavior : MonoBehaviour
     ActionState state = ActionState.IDLE;
 
     System.Random rnd = new System.Random();
-    
+
     private Animator animator;
+
+    public int ScanRadius = 0;
+    [SerializeField] public GameObject BotPrefab;
+
+    public AudioSource footstepSource;
+
+    private float stepTimer = 0.2f;
+    private float currStep;
+
+    public AudioClip footstepClip;
+
 
     void Start()
     {
-        // FieldOfView.OnPlayerFound += TriggerHunt;
+        currStep = stepTimer;
+
+        fov = this.GetComponent<FieldOfView>();
         agent = this.GetComponent<NavMeshAgent>();
         animator = this.GetComponent<Animator>();
         anim = this.GetComponent<Animator>();
@@ -70,7 +85,8 @@ public class MonsterBehavior : MonoBehaviour
         // Patrol Sequence
         Sequence patrolSequence = new Sequence("Patrol Sequence");
         patrolSequence.AddChild(new Leaf("Patrol", Patrol));
-        patrolSequence.AddChild(new Leaf("Look Around", Swivel));
+        // patrolSequence.AddChild(new Leaf("Look Around", Swivel));
+        patrolSequence.AddChild(new Leaf("Scan", Scan));
 
 
         Tree.AddChild(stunSequence);
@@ -87,6 +103,29 @@ public class MonsterBehavior : MonoBehaviour
             Vector3 vel = agent.velocity;
             float horizontalSpeed = new Vector3(vel.x, 0f, vel.z).magnitude;
             animator.SetFloat("Speed", horizontalSpeed, 0.1f, Time.deltaTime);
+        }
+
+        
+
+        // discrete footsteps when moving
+        // if (footstepSource && gameObject.GetComponent<Rigidbody>().linearVelocity.magnitude > 1)
+        if (footstepSource && gameObject.GetComponent<NavMeshAgent>().speed > 1)
+        {
+            currStep -= Time.deltaTime;
+            if (currStep <= 0f)
+            {
+                AudioClip clip = footstepClip;
+                if (clip)
+                {
+                    footstepSource.pitch = UnityEngine.Random.Range(0.2f, 0.4f);
+                    footstepSource.PlayOneShot(clip);
+                }
+                currStep = stepTimer;
+            }
+        }
+        else
+        {
+            stepTimer = 0.2f;
         }
 
 
@@ -132,6 +171,47 @@ public class MonsterBehavior : MonoBehaviour
         return Node.Status.RUNNING;
     }
 
+    public Node.Status Scan()
+    {
+        if (state == ActionState.IDLE && !IsCharacterFound)
+        {
+            
+            state = ActionState.WORKING;
+
+            List<Waypoint> targetList = new List<Waypoint>();
+            // send out bots
+            foreach (var waypoint in waypointList.WaypointListRef)
+            {
+                if (Math.Pow(waypoint.Position.x - this.transform.position.x, 2) + Math.Pow(waypoint.Position.z - this.transform.position.z, 2) < Math.Pow(ScanRadius, 2))
+                {
+                    targetList.Add(waypoint);
+                }
+            }
+
+            targetList = targetList.OrderBy(x => Vector3.Distance(x.Position, this.transform.position)).ToList();
+            targetList.RemoveAt(0); // remove target that monster is standing on
+
+            foreach (var target in targetList)
+            {
+                GameObject instance = Instantiate(BotPrefab.gameObject, this.transform.position, Quaternion.identity) as GameObject;
+                instance.GetComponent<NavMeshAgent>().SetDestination(target.Position);
+            }
+
+        }
+
+        // if all bots finished or player found
+        if (GameObject.FindGameObjectsWithTag("Bot").Count() == 0 || IsCharacterFound)
+        {
+            // reset done scanning
+            state = ActionState.IDLE;
+            return Node.Status.SUCCESS;
+        }
+        
+        
+
+        return Node.Status.RUNNING;
+    }
+
     public Node.Status DestroyItem()
     {
         throw new NotImplementedException();
@@ -139,11 +219,28 @@ public class MonsterBehavior : MonoBehaviour
 
     public Node.Status HuntCharacter()
     {
-
         if (characterPosition == null || characterPosition == UnityEngine.Vector3.zero)
         {
             state = ActionState.IDLE;
             return Node.Status.FAILURE;
+        }
+
+        // Get player reference
+        GameObject playerObj = GameObject.FindWithTag("Player");
+        if (playerObj == null)
+        {
+            Debug.LogWarning("[MONSTER_DEBUG] HuntCharacter: No player found—skipping chase.");
+            return Node.Status.FAILURE;
+        }
+
+        var playerHiding = playerObj.GetComponent<PlayerHiding>();
+        if (playerHiding != null && playerHiding.IsHidden)
+        {
+            // Ignore hidden: Drop chase, resume patrol (feels like "lost sight")
+            Debug.Log("[MONSTER_DEBUG] Player hidden—monster loses interest and resumes patrol.");
+            IsCharacterFound = false;
+            state = ActionState.IDLE;
+            return Node.Status.FAILURE; // Fails huntLook → Bubbles to patrol
         }
 
         // If the monster has not lost sight of the character then keep trying to find them
@@ -153,18 +250,17 @@ public class MonsterBehavior : MonoBehaviour
             agent.SetDestination(characterPosition);
         }
 
-        if (Vector3.Distance(this.transform.position, characterPosition) < 2)
+        if (Vector3.Distance(this.transform.position, characterPosition) < 2 && fov.CanSeePlayer)
         {
-            Debug.Log("Conusmed character in hunt stage");
+            Debug.Log("Consumed character in hunt stage");
             onCharacterKilled.TriggerEvent(this, huntedPlayerId);
             onPlayMonsterAudio.TriggerEvent(this, Resources.Load<AudioClip>("Audio/monster-victory"));
             state = ActionState.IDLE;
             IsCharacterFound = false;
-            return Node.Status.SUCCESS; // Return failure here because 
+            return Node.Status.SUCCESS;
         }
         if (NavMeshUtilities.IsAtTargetLocation(agent))
         {
-            // TODO: need to play kill animation then disable/destroy the character that was killed
             state = ActionState.IDLE;
             IsCharacterFound = false;
             onPlayMonsterAudio.TriggerEvent(this, Resources.Load<AudioClip>("Audio/monster-angry"));

@@ -449,7 +449,7 @@ namespace LevelGeneration
                     {
                         int dx = Mathf.Abs(pos.x - existingPos.x);
                         int dy = Mathf.Abs(pos.y - existingPos.y);
-                        if (Mathf.Max(dx, dy) <= 1)
+                        if ((dx == 1 && dy == 0) || (dx == 0 && dy == 1))
                         {
                             canPlace = false;
                             break;
@@ -534,7 +534,7 @@ namespace LevelGeneration
                     {
                         int dx = Mathf.Abs(pos.x - existingPos.x);
                         int dy = Mathf.Abs(pos.y - existingPos.y);
-                        if (Mathf.Max(dx, dy) <= 1)
+                        if ((dx == 1 && dy == 0) || (dx == 0 && dy == 1))
                         {
                             canPlace = false;
                             break;
