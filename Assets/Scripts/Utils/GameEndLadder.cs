@@ -36,6 +36,19 @@ public class GameEndLadder : MonoBehaviour
     {
         if (playerInRange && Input.GetKeyDown(KeyCode.E))
         {
+            HandleEscape();
+        }
+    }
+
+    private void HandleEscape()
+    {
+        if (LevelState.CurrentLevel < LevelState.TotalLevels)
+        {
+            LevelState.CurrentLevel++;
+            SceneManager.LoadScene("LevelGeneration", LoadSceneMode.Single);
+        }
+        else
+        {
             SceneManager.LoadScene("WinScene", LoadSceneMode.Single);
         }
     }
