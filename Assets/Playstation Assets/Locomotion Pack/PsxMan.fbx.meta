@@ -15,7 +15,7 @@ ModelImporter:
     resampleCurves: 1
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
-    motionNodeName: 
+    motionNodeName: <Root Transform>
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -363,7 +363,7 @@ ModelImporter:
     - name: mixamorig:RightFoot
       parentName: mixamorig:RightLeg
       position: {x: -0.00000025250483, y: 0.3575792, z: 0.0000004870817}
-      rotation: {x: 0.50736725, y: 0.19705418, z: -0.091265514, w: 0.8339178}
+      rotation: {x: 0.50736725, y: 0.19705415, z: -0.091265514, w: 0.8339177}
       scale: {x: 1, y: 1, z: 1}
     - name: mixamorig:RightToeBase
       parentName: mixamorig:RightFoot
@@ -453,7 +453,7 @@ ModelImporter:
     - name: mixamorig:RightArm
       parentName: mixamorig:RightShoulder
       position: {x: 1.4396656e-11, y: 0.087495975, z: -6.3333894e-10}
-      rotation: {x: -0.060608268, y: 0.007443813, z: 0.003970167, w: 0.998126}
+      rotation: {x: -0.06060827, y: 0.007443813, z: 0.0039701676, w: 0.998126}
       scale: {x: 1, y: 1, z: 1}
     - name: mixamorig:RightForeArm
       parentName: mixamorig:RightArm
