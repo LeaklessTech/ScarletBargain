@@ -245,6 +245,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2e0d875d64a33524cabd442b36bfb234, type: 3}
       insertIndex: -1
       addedObject: {fileID: 9148580356623542381}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2e0d875d64a33524cabd442b36bfb234, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4732050674937146293}
   m_SourcePrefab: {fileID: 100100000, guid: 2e0d875d64a33524cabd442b36bfb234, type: 3}
 --- !u!1 &3683324690902113704 stripped
 GameObject:
@@ -350,6 +353,7 @@ MonoBehaviour:
   jumpAnimationTrigger: Jump
   requireGroundedForJump: 0
   maxGroundAngle: 60
+  isHiding: 0
   maxStamina: 6
   staminaDrainRate: 1
   staminaRegenRate: 1
@@ -411,3 +415,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdae9081ee0db9f75b4e8c9e0309d3a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4732050674937146293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3683324690902113704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4a2b5f9b9ef8f93f85b37262104a5f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEvent: {fileID: 11400000, guid: af0ece34110b4d47197815df5aec01bc, type: 2}
+  onEventTriggered:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 9148580356623542381}
+        m_TargetAssemblyTypeName: CharacterDeath, Assembly-CSharp
+        m_MethodName: TriggerDeath
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
