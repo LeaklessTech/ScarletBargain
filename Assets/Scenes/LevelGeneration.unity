@@ -1084,6 +1084,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   overlay: {fileID: 1030784086}
+  messageText: {fileID: 0}
   showSeconds: 7
 --- !u!1 &1051333236
 GameObject:
@@ -1756,8 +1757,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 32
-  m_fontSizeBase: 32
+  m_fontSize: 28
+  m_fontSizeBase: 28
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2250,6 +2251,7 @@ MonoBehaviour:
     UseConstant: 0
     ConstantValue: 0
     Variable: {fileID: 11400000, guid: d269df54e5b64416ca2fffb9ea2c58a1, type: 2}
+  InitialPrisonerCOunt: 4
 --- !u!4 &1723413906
 Transform:
   m_ObjectHideFlags: 0
