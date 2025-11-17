@@ -19,6 +19,9 @@ public class TimeSlowAbility : MonoBehaviour
     public AudioClip timeSlowSound;
     public AudioSource audioSource;
 
+    public AudioSource runningFootstepAudio;
+    private float originalRunningFootstepPitch = 1f;
+
     // internal
     private bool isAbilityActive;
     private bool isOnCooldown;
@@ -86,12 +89,24 @@ public class TimeSlowAbility : MonoBehaviour
         Time.timeScale = timeScaleMultiplier;
         Time.fixedDeltaTime = originalFixedDeltaTime * timeScaleMultiplier;
 
+        if (runningFootstepAudio != null)
+        {
+            originalRunningFootstepPitch = runningFootstepAudio.pitch;
+            runningFootstepAudio.pitch = originalRunningFootstepPitch * timeScaleMultiplier;
+        }
+
         // wait for the duration in real time so it's unaffected by the slowed timescale
         yield return new WaitForSecondsRealtime(abilityDuration);
 
         // restore og time
         Time.timeScale = originalTimeScale;
         Time.fixedDeltaTime = originalFixedDeltaTime;
+
+        // restore running footstep pitch
+        if (runningFootstepAudio != null)
+        {
+            runningFootstepAudio.pitch = originalRunningFootstepPitch;
+        }
 
         isAbilityActive = false;
 

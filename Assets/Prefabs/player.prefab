@@ -1225,6 +1225,7 @@ MonoBehaviour:
   cooldownImage: {fileID: 0}
   timeSlowSound: {fileID: 8300000, guid: d2d2ae4e0fb42c54095af2a10e946d31, type: 3}
   audioSource: {fileID: 0}
+  runningFootstepAudio: {fileID: 5481500077226306540}
 --- !u!114 &5651160856439225943
 MonoBehaviour:
   m_ObjectHideFlags: 0
