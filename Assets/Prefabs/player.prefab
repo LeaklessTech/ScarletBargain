@@ -1007,6 +1007,8 @@ GameObject:
   - component: {fileID: 1609976191278226246}
   - component: {fileID: 5809001298466854851}
   - component: {fileID: -4189177680320813375}
+  - component: {fileID: 5651160856439225943}
+  - component: {fileID: -7659578795856397642}
   m_Layer: 6
   m_Name: player
   m_TagString: Player
@@ -1221,6 +1223,47 @@ MonoBehaviour:
   abilityDuration: 5
   cooldownDuration: 60
   cooldownImage: {fileID: 0}
+  timeSlowSound: {fileID: 8300000, guid: d2d2ae4e0fb42c54095af2a10e946d31, type: 3}
+  audioSource: {fileID: 0}
+--- !u!114 &5651160856439225943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2801975844695402759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 813e3111e4fac7e4c9605f501381449c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilityKey: 102
+  speedMultiplier: 1.5
+  abilityDuration: 5
+  cooldownDuration: 60
+  cooldownImage: {fileID: 0}
+  stimSound: {fileID: 8300000, guid: 93d31c7d3d8199b409d380ccef8e940d, type: 3}
+  audioSource: {fileID: 0}
+--- !u!114 &-7659578795856397642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2801975844695402759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a9ffaf8952148b4584a5606a3c9e206, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilityKey: 114
+  freezeRange: 10
+  freezeDuration: 5
+  cooldownDuration: 60
+  cooldownImage: {fileID: 0}
+  goldenColour: {r: 0.9433962, g: 0.6656296, b: 0, a: 1}
+  hourglassSound: {fileID: 8300000, guid: 1fe20e9634460b6438134a6705c0b7c5, type: 3}
+  audioSource: {fileID: 0}
 --- !u!1 &2899427028012832272
 GameObject:
   m_ObjectHideFlags: 0

@@ -18,7 +18,9 @@ public class GameManager : MonoBehaviour
 
     public PropSpawner propSpawner;
 
-    public UnityEngine.UI.Image TimeSlowImage;
+    public UnityEngine.UI.Image TimeSlowOverlay;
+    public UnityEngine.UI.Image StimOverlay;
+    public UnityEngine.UI.Image HourglassOverlay;
 
     public LevelGenerator level;
 
@@ -160,7 +162,19 @@ public class GameManager : MonoBehaviour
             player.AddComponent<TimeSlowAbility>();
         }
 
-        player.GetComponent<TimeSlowAbility>().cooldownImage = TimeSlowImage;
+        if (player.GetComponent<StimAbility>() == null)
+        {
+            player.AddComponent<StimAbility>();
+        }
+
+        if (player.GetComponent<HourglassAbility>() == null)
+        {
+            player.AddComponent<HourglassAbility>();
+        }
+
+        player.GetComponent<TimeSlowAbility>().cooldownImage = TimeSlowOverlay;
+        player.GetComponent<StimAbility>().cooldownImage = StimOverlay;
+        player.GetComponent<HourglassAbility>().cooldownImage = HourglassOverlay;
 
         int prisonerCount = 0;
 
