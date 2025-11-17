@@ -1135,6 +1135,8 @@ MonoBehaviour:
   crouchKey: 99
   jumpAnimationTrigger: Jump
   requireGroundedForJump: 0
+  jumpSound: {fileID: 8300000, guid: 6f382d20497063b44aa6cca44ac8942e, type: 3}
+  jumpAudioSource: {fileID: 0}
   maxGroundAngle: 60
   maxStamina: 6
   staminaDrainRate: 1
