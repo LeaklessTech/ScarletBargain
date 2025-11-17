@@ -1009,7 +1009,6 @@ GameObject:
   - component: {fileID: -4189177680320813375}
   - component: {fileID: 5651160856439225943}
   - component: {fileID: -7659578795856397642}
-  - component: {fileID: 4240171838872680069}
   m_Layer: 6
   m_Name: player
   m_TagString: Player
@@ -1268,16 +1267,6 @@ MonoBehaviour:
   goldenColour: {r: 0.9433962, g: 0.6656296, b: 0, a: 1}
   hourglassSound: {fileID: 8300000, guid: 1fe20e9634460b6438134a6705c0b7c5, type: 3}
   audioSource: {fileID: 0}
-  m_Script: {fileID: 11500000, guid: 9d0952c9b3bf54f4d917ece0c9a7e57d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hideKey: 101
-  exitHideDelay: 0
-  hideTransitionSpeed: 5
-  exitTransitionSpeed: 5
-  hidePrompt: {fileID: 0}
-  hideText: Press E to Hide
-  exitText: Press E to Exit
 --- !u!1 &2899427028012832272
 GameObject:
   m_ObjectHideFlags: 0
@@ -1799,6 +1788,8 @@ MonoBehaviour:
   crouchKey: 99
   jumpAnimationTrigger: Jump
   requireGroundedForJump: 0
+  jumpSound: {fileID: 0}
+  jumpAudioSource: {fileID: 0}
   maxGroundAngle: 60
   maxStamina: 6
   staminaDrainRate: 1
@@ -2062,7 +2053,7 @@ AudioSource:
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 0.1
-  m_Pitch: 0.64238226
+  m_Pitch: 0.87277657
   Loop: 0
   Mute: 0
   Spatialize: 0
