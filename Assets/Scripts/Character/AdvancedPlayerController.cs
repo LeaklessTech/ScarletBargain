@@ -211,13 +211,27 @@ public class AdvancedPlayerController : MonoBehaviour
             rb.MoveRotation(next);
         }
 
-        // gets speed with planar and tells animator controller the speed parameter, apparently using planar is more robust than linearvelocity
+        // Set animator velx / vely based on character input (camera-relative input converted to local space).
+        // Using local X,Z of the camera-relative move direction gives consistent forward/strafe values for the animator.
         if (animator)
         {
-            Vector3 delta = rb.position - _lastRbPos;
-            float planarSpeed = new Vector3(delta.x, 0f, delta.z).magnitude / Time.fixedDeltaTime;
-            animator.SetFloat("Speed", planarSpeed, 0.3f, Time.deltaTime);
+            Vector3 localMove = transform.InverseTransformDirection(moveDir);
+            float velx = localMove.x; // strafe (-1..1)
+            float vely = localMove.z; // forward/back (-1..1)
+
+            // Smooth the animator parameters for nicer transitions
+            const float damping = 0.1f;
+            animator.SetFloat("velx", velx, damping, Time.deltaTime);
+            animator.SetFloat("vely", vely, damping, Time.deltaTime);
         }
+
+        //if (animator)
+        //{
+        //    Vector3 delta = rb.position - _lastRbPos;
+        //    float planarSpeed = new Vector3(delta.x, 0f, delta.z).magnitude / Time.fixedDeltaTime;
+        //    animator.SetFloat("Speed", planarSpeed, 0.3f, Time.deltaTime);
+        //}
+
         _lastRbPos = rb.position;
 
         if (!isGrounded)

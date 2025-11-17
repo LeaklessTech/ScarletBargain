@@ -932,6 +932,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hideKey: 122
+  hidePosition: {fileID: 0}
+  hideTransitionSpeed: 5
+  isOccupied: 0
 --- !u!65 &876787072
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1915,8 +1918,34 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: c23ef748b6278ed42a676ef7204fb610, type: 3}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5770971515875987938, guid: 82e72491140bb9f479d0a14313eef034, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9154947512173369844}
+  m_SourcePrefab: {fileID: 100100000, guid: 82e72491140bb9f479d0a14313eef034, type: 3}
+--- !u!1 &9154947512173369843 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5770971515875987938, guid: 82e72491140bb9f479d0a14313eef034, type: 3}
+  m_PrefabInstance: {fileID: 9154947512173369842}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &9154947512173369844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9154947512173369843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d0952c9b3bf54f4d917ece0c9a7e57d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hideKey: 101
+  exitHideDelay: 0
+  hideTransitionSpeed: 5
+  hidePrompt: {fileID: 0}
+  hideText: Press Z to Hide
+  exitText: Press Z to Exit
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

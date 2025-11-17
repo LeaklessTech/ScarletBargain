@@ -37,6 +37,12 @@ On a scale from 1 - 5, how much do you agree with the following statements:
 **Question 1.7**
 "I felt like my decisions had an impact on the outcome of the game." [1 - 5]
 
+**Question 1.8**
+"I enjoyed playing the game." [1 - 5]
+
+**Question 1.9**
+"I felt immersed in the game world." [1 - 5]
+
 ## Qualitative Questions
 A series of open-ended questions.
 
@@ -44,16 +50,24 @@ A series of open-ended questions.
 What was your first impression?
 
 **Question 2.2**
-Was the objective of the game clear?
+In your own words, what was the game objective?
 
 **Question 2.3**
-Did you find the game's premise exciting?
+Did you find the game's premise exciting?  Why or why not?
 
 **Question 2.4**
 Did the controls make sense? How did they feel?
 
 **Question 2.5**
-Did anything feel clunky or awkward?
+Did anything feel clunky or awkward?  If so, what?
 
 **Question 2.6**
-Did you feel immersed?
+Did you feel immersed?  If so, what contributed to that feeling?  If not, what pulled you out of the experience?
+
+**Question 2.7**
+Did the game feel too easy, too hard, or about right?
+
+**Question 2.8**
+If you could change one thing to make the game more fun, what would you change?
+
+
