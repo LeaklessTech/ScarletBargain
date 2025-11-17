@@ -30,6 +30,9 @@ public class AdvancedPlayerController : MonoBehaviour
     public string jumpAnimationTrigger = "Jump";
     public bool requireGroundedForJump = false;
 
+    public AudioClip jumpSound;
+    public AudioSource jumpAudioSource;
+
     [SerializeField, Range(0f, 89f)] private float maxGroundAngle = 60f;
     //[SerializeField] private string groundTag = "Ground";
 
@@ -120,6 +123,11 @@ public class AdvancedPlayerController : MonoBehaviour
             staminaSlider.minValue = 0f;
             staminaSlider.maxValue = 1f;
             staminaSlider.value = 1f;
+        }
+
+        if (jumpSound != null && jumpAudioSource == null)
+        {
+            jumpAudioSource = gameObject.AddComponent<AudioSource>();
         }
     }
 
@@ -237,48 +245,6 @@ public class AdvancedPlayerController : MonoBehaviour
             rb.linearVelocity += Vector3.up * Physics.gravity.y * (gravityMultiplier - 1f) * Time.fixedDeltaTime;
         }
     }
-
-    //private void OnCollisionEnter(Collision collision)
-    //{
-    //    ProcessGroundCollision(collision);
-    //}
-
-    //private void OnCollisionStay(Collision collision)
-    //{
-    //    ProcessGroundCollision(collision);
-    //}
-
-    //private void OnCollisionExit(Collision collision)
-    //{
-    //    if (!collision.collider || !collision.collider.CompareTag(groundTag)) return;
-    //    _groundContacts.Remove(collision.collider);
-    //    isGrounded = _groundContacts.Count > 0;
-    //}
-
-    //private void ProcessGroundCollision(Collision collision)
-    //{
-    //    if (!collision.collider || !collision.collider.CompareTag(groundTag)) return;
-
-    //    bool hasValidGroundNormal = false;
-    //    int count = collision.contactCount;
-    //    for (int i = 0; i < count; i++)
-    //    {
-    //        var n = collision.GetContact(i).normal;
-    //        // Accept only reasonably-upward surfaces (reject walls/ceilings)
-    //        if (n.y >= _minGroundDot)
-    //        {
-    //            hasValidGroundNormal = true;
-    //            break;
-    //        }
-    //    }
-
-    //    if (hasValidGroundNormal)
-    //        _groundContacts.Add(collision.collider);
-    //    else
-    //        _groundContacts.Remove(collision.collider);
-
-    //    isGrounded = _groundContacts.Count > 0;
-    //}
 
     private bool ProbeGrounded()
     {
@@ -411,5 +377,7 @@ public class AdvancedPlayerController : MonoBehaviour
         {
             animator.SetTrigger(jumpAnimationTrigger);
         }
+
+        jumpAudioSource.PlayOneShot(jumpSound);
     }
 }

@@ -18,6 +18,10 @@ public class GameManager : MonoBehaviour
 
     public PropSpawner propSpawner;
 
+    public UnityEngine.UI.Image TimeSlowOverlay;
+    public UnityEngine.UI.Image StimOverlay;
+    public UnityEngine.UI.Image HourglassOverlay;
+
     public LevelGenerator level;
 
     [Header("Prisoner Chance")]
@@ -172,6 +176,25 @@ public class GameManager : MonoBehaviour
         Instantiate(MonsterPrefab, EndRoom.RoomObject.transform.position, Quaternion.identity);
         if (StartRoom?.RoomObject == null) return;
         GameObject player = Instantiate(PlayerPrefab, StartRoom.RoomObject.transform.position, Quaternion.identity);
+        
+        if (player.GetComponent<TimeSlowAbility>() == null)
+        {
+            player.AddComponent<TimeSlowAbility>();
+        }
+
+        if (player.GetComponent<StimAbility>() == null)
+        {
+            player.AddComponent<StimAbility>();
+        }
+
+        if (player.GetComponent<HourglassAbility>() == null)
+        {
+            player.AddComponent<HourglassAbility>();
+        }
+
+        player.GetComponent<TimeSlowAbility>().cooldownImage = TimeSlowOverlay;
+        player.GetComponent<StimAbility>().cooldownImage = StimOverlay;
+        player.GetComponent<HourglassAbility>().cooldownImage = HourglassOverlay;
 
         List<Room> candidateRooms = new List<Room>(GlobalVariables.rooms);
 
