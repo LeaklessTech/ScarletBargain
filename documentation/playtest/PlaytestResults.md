@@ -53,6 +53,55 @@ During the gameplay portion of our playtest we do not instruct the player in wha
 After the playtester has excited the game the condutor of the playtest will begin asking them questions. There are two sets of questions that the playtesters are asked. One set of quantitative questions which are scored on a Likert scale (1-5, 1 being Strongly Disagree, 5 being Strongly Agree). The second set of questions are qualitative, the player is asked about an aspect of the game and are given free reign to answer how they please.
 
 # Results Summary/Analysis
+**Playtesters:** 10 (6 Male / 4 Female)  
+**Age range:** 22–65 (mean 32.4)  
+**Escaped:** 8/10 (80%)
+
+## Quantitative Scores (1–5 Likert)
+
+| Question                                               | Average | Notes                                      |
+|--------------------------------------------------------|---------|--------------------------------------------|
+| Q1.4 – Clarity of objective                            | **4.3** | Highest score – everyone instantly understood |
+| Q1.6 – Would play again                                | **3.8** |                                            |
+| Q1.8 – Enjoyed playing                                 | **3.8** |                                            |
+| Q1.3 – Game was challenging                            | 3.1     |                                            |
+| Q1.1 – Felt fearful of the monster                     | 3.0     |                                            |
+| Q1.5 – Controls felt smooth                            | 3.0     |                                            |
+| Q1.7 – Decisions had impact                            | 2.8     |                                            |
+| Q1.2 – Felt it was important to save prisoners         | 2.4     | Second-lowest                              |
+| Q1.9 – Felt immersed                                   | 2.25    | Lowest                                     |
+
+## Key Insights
+
+- **Core loop is instantly understood and liked** – high clarity (4.3), strong enjoyment & replay intent (3.8).
+- **Emotional stakes are weak** – saving prisoners felt unimportant (2.4), low immersion (2.25), decisions impact low (2.8).
+- **Controls rating improved** rated at 3.0 on average, but multiple players reported issues.
+- The three testers who **failed to escape** (1 mid-age casual gamer + 2 older lower skill Mac users) gave **higher-than-average scores** on fear (3.3 vs 2.9), challenge (4.0 vs 2.7), & controls (3.7 vs 2.7) – **while matching on enjoyment/replay** → chase is fun & engaging when it catches you, but skilled players evade too easily.
+
+## Conclusions from open-ended questions
+
+### Most Frequent Issues / Requests
+1. **Camera / mouse control bad or broken** – 7 mentions  
+2. **Technical bugs & polish issues** (crouch, sprint, UI, volume, cursor lock, multi-monitor, accidental quit, doors/walls, headbob) – 8 mentions  
+3. **Want more interactables** (items to pick up/use, safes, power-ups, shields, distractions) – 5 mentions  
+4. **Prisoner interaction feels empty/broken** (no feedback, laggy following, no real rescue sense/outcomes) – 4 mentions  
+5. **Monster not scary/threatening** (easy to evade, dumb AI, quiet footsteps, predictable) – 4 mentions  
+6. **World feels bare/empty/prototype-y** (lack of details/content) – 4 mentions  
+7. **More rooms/variety/content depth/enemies/goals** – 4 mentions  
+8. **Audio polish / better soundtrack/volume** – 3 mentions  
+
+### Positive Themes
+- Objective **instantly clear to all 10 testers**
+- Several praised retro/spooky art style & backrooms-like premise (mixed: some saw as fresh take, one as low inspiration)
+- Genuine urgency/excitement/chase fun when monster engaged
+- Difficulty mostly "about right"; one failure called "too hard"
+
+## Key Takeaways
+
+### High Priority Changes
+1. Fix camera/mouse (sensitivity, cursor lock, multi-monitor, stability)
+2. Comprehensive bug squash (crouch/sprint/UI/quit key/doors/walls/headbob/controls consistency)
+3. Polish prisoner rescue (clear feedback/join cues, counter, voice lines, smoother following, save outcomes/rewards)
 
 ## Aspects that meet design requirements
 
