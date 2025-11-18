@@ -58,5 +58,11 @@ After the playtester has excited the game the condutor of the playtest will begi
 
 ## Aspects that do not meet design requirements
 
+# Action Items / Future Work
+The behavior where pressing “X” instantly closes the game should be removed or remapped and replaced with an explicit quit flow. The pause overlay should be the only path to quit, with a required confirmation step. This change reduces frustraion with the controls, addressing feedback from players who accidentally closed the game mid-run.
 
-# Action Items
+Prisoner interactions should become visually clear and satisfying, with feedback when a rescue occurs. When the player frees a prisoner, the game should trigger a distinct sound, a brief visual highlight, and/or update a visible HUD element such as “Prisoners Following: 2/5.” This removes ambiguity about whether prisoners are actually following and makes rescuing them feel like a concrete, rewarding action.
+
+A simple, persistent objectives and controls screen should be introduced so players can recheck what they are supposed to do. Tutorial messages should remain visible long enough to be read comfortably (perhaps pausing the start of the game), and afterward the player should be able to press a key to bring up a compact summary (for example, “Goal: Rescue prisoners and reach the ladder”) plus a short control reference. This can be integrated into the existing pause overlay or implemented as a small new overlay.
+
+The level layout and environment should be enriched so the space feels less empty and offers more meaningful choices. Adding more hiding spaces and props that suggest a functioning facility will address the “bare” or “early in development” impressions. Enhancing the algorithm to place these elements so players choose between routes, hiding spots, and riskier options will make navigation and moment-to-moment decisions more engaging while they rescue prisoners and evade the monster.
