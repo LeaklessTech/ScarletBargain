@@ -48,16 +48,16 @@ public class ExplainOverlay : MonoBehaviour
         int totalLevels = LevelState.TotalLevels;
         int prisonersThisLevel = gm.PrisonersThisLevel;
 
-        messageText.text =
-            $"There are {totalLevels} levels in this prison, \n " +
-            $"you are on level {currentLevel}.\n" +
-            "Find the prisoners \n" +
-            "and avoid the monster \n" + "\n" +
-            "\"C\" to crouch and hide \n" +
-            "\"E\" to have a prisoner follow \n" + "\n" +
-            "escape via the ladder, \n" +
+        // messageText.text =
+        //     $"There are {totalLevels} levels in this prison, \n " +
+        //     $"you are on level {currentLevel}.\n" +
+        //     "Find the prisoners \n" +
+        //     "and avoid the monster \n" + "\n" +
+        //     "\"C\" to crouch and hide \n" +
+        //     "\"E\" to have a prisoner follow \n" + "\n" +
+        //     "escape via the ladder, \n" +
             
-            $"See if you can escape with {prisonersThisLevel} prisoners.";
+        //     $"See if you can escape with {prisonersThisLevel} prisoners.";
     }
 
 }
