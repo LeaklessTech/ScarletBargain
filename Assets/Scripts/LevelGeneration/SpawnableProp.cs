@@ -31,7 +31,10 @@ public class SpawnableProp : ScriptableObject
     [Tooltip("Extra padding added to half extents for safety.")]
     public float BoundsPadding = 0.02f;
 
-    [Header("Uniqueness")]
+    [Header("Uniqueness & Guarantees")]
     [Tooltip("If true, at most one of this prop per room.")]
     public bool AtMostOnePerRoom = false;
+
+    [Tooltip("GUARANTEES at least one of this prop spawns in EVERY room that has a floor.")]
+    public bool MustSpawnInEveryRoom = false;
 }
