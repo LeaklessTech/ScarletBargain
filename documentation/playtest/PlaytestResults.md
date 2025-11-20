@@ -103,10 +103,6 @@ After the playtester has excited the game the condutor of the playtest will begi
 2. Comprehensive bug squash (crouch/sprint/UI/quit key/doors/walls/headbob/controls consistency)
 3. Polish prisoner rescue (clear feedback/join cues, counter, voice lines, smoother following, save outcomes/rewards)
 
-## Aspects that meet design requirements
-
-## Aspects that do not meet design requirements
-
 # Action Items / Future Work
 The behavior where pressing “X” instantly closes the game should be removed or remapped and replaced with an explicit quit flow. The pause overlay should be the only path to quit, with a required confirmation step. This change reduces frustraion with the controls, addressing feedback from players who accidentally closed the game mid-run.
 
