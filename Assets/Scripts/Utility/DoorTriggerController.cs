@@ -3,57 +3,44 @@ using UnityEngine;
 public class DoorTriggerController : MonoBehaviour
 {
     private Animator animator;
-    private bool playerInRange = false;
-    private bool monsterInRange = false;
+    private int agentsInRange = 0;
 
     void Start()
     {
-        // get animator
         animator = GetComponent<Animator>();
     }
 
     void Update()
     {
-        // update isOpen
-        if(playerInRange || monsterInRange)
-        {
-            animator.SetBool("isOpen", true);
-        }
-        else
-        {
-            animator.SetBool("isOpen", false);
-        }
+        animator.SetBool("isOpen", agentsInRange > 0);
+    }
+
+    private void CalculateDoorDirection(Transform target)
+    {
+        Vector3 directionToTarget = target.position - transform.position;
+        float dot = Vector3.Dot(transform.forward, directionToTarget);
+        animator.SetFloat("DotProduct", dot);
     }
 
     void OnTriggerEnter(Collider other)
     {
-        // check if triggered
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") || other.CompareTag("Monster"))
         {
-            playerInRange = true;
-            Debug.Log("Player entered trigger zone of " + gameObject.name);
-        }
+            agentsInRange++;
 
-        if (other.CompareTag("Monster"))
-        {
-            monsterInRange = true;
-            Debug.Log("Monster entered trigger zone of " + gameObject.name);
+            CalculateDoorDirection(other.transform);
+
+            Debug.Log($"{other.name} entered. Agents in range: {agentsInRange}");
         }
     }
 
     void OnTriggerExit(Collider other)
     {
-        // check if untriggered
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") || other.CompareTag("Monster"))
         {
-            playerInRange = false;
-            Debug.Log("Player exited trigger zone of " + gameObject.name);
-        }
+            agentsInRange = Mathf.Max(0, agentsInRange - 1);
 
-        if (other.CompareTag("Monster"))
-        {
-            monsterInRange = false;
-            Debug.Log("Monster exited trigger zone of " + gameObject.name);
+            Debug.Log($"{other.name} exited. Agents in range: {agentsInRange}");
         }
     }
 }
