@@ -16,7 +16,11 @@ public class PropSpawner : MonoBehaviour
 
     Transform level;
     readonly List<Transform> floors = new();
-    readonly Dictionary<Transform, List<Transform>> roomToFloors = new(); // Room → List of its floors
+    readonly Dictionary<Transform, List<Transform>> roomToFloors = new();
+    readonly List<Bounds> placedBounds = new();
+    readonly Dictionary<SpawnableProp, Vector3> halfCache = new();
+
+    const int MaxPlacementAttempts = 12;
 
     public void SpawnNow()
     {
@@ -31,6 +35,8 @@ public class PropSpawner : MonoBehaviour
 
         floors.Clear();
         roomToFloors.Clear();
+        placedBounds.Clear();
+        halfCache.Clear();
 
         for (int i = 0; i < level.childCount; i++)
         {
@@ -72,12 +78,14 @@ public class PropSpawner : MonoBehaviour
             foreach (var mustProp in mustSpawnProps)
             {
                 var floor = roomFloors[Random.Range(0, roomFloors.Count)];
-                var pos = JitterOnFloor(floor, mustProp.YOffset, mustProp.JitterXZ);
-                var yaw = mustProp.SnapRotation90 ? 90f * Random.Range(0, 4) : Random.Range(0f, 360f);
-                var rot = Quaternion.Euler(0f, yaw, 0f);
-
-                Instantiate(mustProp.Prefab, pos, rot, roomRoot).name = mustProp.Prefab.name;
-                spawnedCount++;
+                if (TrySpawnPropOnFloor(mustProp, floor, roomRoot))
+                {
+                    spawnedCount++;
+                }
+                else
+                {
+                    Debug.LogWarning($"PropSpawner: Failed to place guaranteed prop {mustProp.name} in {roomRoot.name} without overlapping.");
+                }
             }
         }
 
@@ -88,16 +96,17 @@ public class PropSpawner : MonoBehaviour
             if (p == null || p.Prefab == null) continue;
 
             var floor = floors[Random.Range(0, floors.Count)];
-            var pos = JitterOnFloor(floor, p.YOffset, p.JitterXZ);
-            var yaw = p.SnapRotation90 ? 90f * Random.Range(0, 4) : Random.Range(0f, 360f);
-            var rot = Quaternion.Euler(0f, yaw, 0f);
             var room = FindRoomRoot(floor) ?? propsRoot;
 
-            Instantiate(p.Prefab, pos, rot, room).name = p.Prefab.name;
-            spawnedCount++;
+            if (TrySpawnPropOnFloor(p, floor, room))
+            {
+                spawnedCount++;
+            }
+            else
+            {
+                Debug.LogWarning($"PropSpawner: Skipped prop {p.name} because no position was found.");
+            }
         }
-
-        Debug.Log($"PropSpawner: Spawned {spawnedCount} props ({mustSpawnProps.Count} types guaranteed per room)");
     }
 
     void CollectFloors(Transform root, List<Transform> into)
@@ -140,6 +149,41 @@ public class PropSpawner : MonoBehaviour
         return pos;
     }
 
+    bool TrySpawnPropOnFloor(SpawnableProp prop, Transform floor, Transform parent)
+    {
+        if (prop?.Prefab == null || floor == null || parent == null)
+            return false;
+
+        Vector3 half = GetHalfExtents(prop);
+
+        for (int attempt = 0; attempt < MaxPlacementAttempts; attempt++)
+        {
+            var pos = JitterOnFloor(floor, prop.YOffset, prop.JitterXZ);
+            var candidate = new Bounds(pos, half * 2f);
+            if (IsOverlapping(candidate))
+                continue;
+
+            float yaw = prop.SnapRotation90 ? 90f * Random.Range(0, 4) : Random.Range(0f, 360f);
+            var rot = Quaternion.Euler(0f, yaw, 0f);
+
+            Instantiate(prop.Prefab, pos, rot, parent).name = prop.Prefab.name;
+            placedBounds.Add(candidate);
+            return true;
+        }
+
+        return false;
+    }
+
+    bool IsOverlapping(Bounds candidate)
+    {
+        for (int i = 0; i < placedBounds.Count; i++)
+        {
+            if (candidate.Intersects(placedBounds[i]))
+                return true;
+        }
+        return false;
+    }
+
     SpawnableProp PickWeighted(IList<SpawnableProp> list)
     {
         float total = 0f;
@@ -159,5 +203,45 @@ public class PropSpawner : MonoBehaviour
                 return p;
         }
         return list[list.Count - 1];
+    }
+
+    Vector3 GetHalfExtents(SpawnableProp prop)
+    {
+        if (prop == null)
+            return new Vector3(0.5f, 0.5f, 0.5f);
+
+        if (halfCache.TryGetValue(prop, out var cached))
+            return cached;
+
+        Vector3 half = prop.ManualHalfExtents;
+
+        if (prop.UseRendererBounds && prop.Prefab != null)
+        {
+            var renderers = prop.Prefab.GetComponentsInChildren<Renderer>(true);
+            if (renderers != null && renderers.Length > 0)
+            {
+                var combined = renderers[0].bounds;
+                for (int i = 1; i < renderers.Length; i++)
+                {
+                    if (renderers[i] != null)
+                        combined.Encapsulate(renderers[i].bounds);
+                }
+                half = combined.extents;
+            }
+        }
+
+        half = new Vector3(Mathf.Abs(half.x), Mathf.Abs(half.y), Mathf.Abs(half.z));
+
+        float padding = Mathf.Max(0f, prop.BoundsPadding);
+        half += new Vector3(padding, padding, padding);
+
+        half = new Vector3(
+            Mathf.Max(half.x, 0.01f),
+            Mathf.Max(half.y, 0.01f),
+            Mathf.Max(half.z, 0.01f)
+        );
+
+        halfCache[prop] = half;
+        return half;
     }
 }
