@@ -971,6 +971,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d5ff52d87f07274b2af571a50b239ab6, type: 3}
+--- !u!1001 &568880589269250414
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2094071504757356926, guid: f60696f2ffbe062b1ba26211a84586cb, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2094071504757356926, guid: f60696f2ffbe062b1ba26211a84586cb, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2094071504757356926, guid: f60696f2ffbe062b1ba26211a84586cb, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2094071504757356926, guid: f60696f2ffbe062b1ba26211a84586cb, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2094071504757356926, guid: f60696f2ffbe062b1ba26211a84586cb, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2094071504757356926, guid: f60696f2ffbe062b1ba26211a84586cb, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2094071504757356926, guid: f60696f2ffbe062b1ba26211a84586cb, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2094071504757356926, guid: f60696f2ffbe062b1ba26211a84586cb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2094071504757356926, guid: f60696f2ffbe062b1ba26211a84586cb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2094071504757356926, guid: f60696f2ffbe062b1ba26211a84586cb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2295526144277661505, guid: f60696f2ffbe062b1ba26211a84586cb, type: 3}
+      propertyPath: m_Name
+      value: EnergyBall
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f60696f2ffbe062b1ba26211a84586cb, type: 3}
 --- !u!1001 &1349940702591598954
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1118,3 +1175,4 @@ SceneRoots:
   - {fileID: 1987389790}
   - {fileID: 4271128429648712946}
   - {fileID: 231598727124393215}
+  - {fileID: 568880589269250414}
