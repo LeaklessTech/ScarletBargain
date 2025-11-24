@@ -4496,6 +4496,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8ad40f5ac772a46bea5c8cd298855f24, type: 2}
   - {fileID: 11400000, guid: ca41c25f9934f478da27fe4337fd5e58, type: 2}
   - {fileID: 11400000, guid: 0a03a1f254cd844ceb41848d849d3155, type: 2}
+  - {fileID: 11400000, guid: 9be9abe8fb3307c45a7b1a7d2bc8e70e, type: 2}
   targetCount: 25
 --- !u!4 &1752798475
 Transform:
