@@ -17,8 +17,12 @@ public class PropSpawner : MonoBehaviour
     Transform level;
     readonly List<Transform> floors = new();
     readonly Dictionary<Transform, List<Transform>> roomToFloors = new();
-    readonly List<Bounds> placedBounds = new();
+
+    readonly List<Vector2> placedCentersXZ = new();
+    readonly List<float> placedRadii = new();
+
     readonly Dictionary<SpawnableProp, Vector3> halfCache = new();
+    readonly Dictionary<SpawnableProp, float> radiusCache = new();
 
     const int MaxPlacementAttempts = 12;
 
@@ -35,8 +39,12 @@ public class PropSpawner : MonoBehaviour
 
         floors.Clear();
         roomToFloors.Clear();
-        placedBounds.Clear();
+
+        placedCentersXZ.Clear();
+        placedRadii.Clear();
+
         halfCache.Clear();
+        radiusCache.Clear();
 
         for (int i = 0; i < level.childCount; i++)
         {
@@ -154,36 +162,46 @@ public class PropSpawner : MonoBehaviour
         if (prop?.Prefab == null || floor == null || parent == null)
             return false;
 
-        Vector3 half = GetHalfExtents(prop);
+        float radius = GetFootprintRadius(prop);
 
         for (int attempt = 0; attempt < MaxPlacementAttempts; attempt++)
         {
             var pos = JitterOnFloor(floor, prop.YOffset, prop.JitterXZ);
-            var candidate = new Bounds(pos, half * 2f);
-            if (IsOverlapping(candidate))
+
+            if (IsOverlappingXZ(pos, radius))
                 continue;
 
             float yaw = prop.SnapRotation90 ? 90f * Random.Range(0, 4) : Random.Range(0f, 360f);
             var rot = Quaternion.Euler(0f, yaw, 0f);
 
             Instantiate(prop.Prefab, pos, rot, parent).name = prop.Prefab.name;
-            placedBounds.Add(candidate);
+            placedCentersXZ.Add(new Vector2(pos.x, pos.z));
+            placedRadii.Add(radius);
+            
             return true;
         }
 
         return false;
     }
 
-    bool IsOverlapping(Bounds candidate)
+    bool IsOverlappingXZ(Vector3 position, float radius)
     {
-        for (int i = 0; i < placedBounds.Count; i++)
+        Vector2 c = new Vector2(position.x, position.z);
+
+        for (int i = 0; i < placedCentersXZ.Count; i++)
         {
-            if (candidate.Intersects(placedBounds[i]))
+            var p = placedCentersXZ[i];
+            float radiusOther = placedRadii[i];
+
+            float minDist = radius + radiusOther;
+            float minDistSq = minDist * minDist;
+
+            if ((c - p).sqrMagnitude < minDistSq)
                 return true;
         }
+
         return false;
     }
-
     SpawnableProp PickWeighted(IList<SpawnableProp> list)
     {
         float total = 0f;
@@ -243,5 +261,21 @@ public class PropSpawner : MonoBehaviour
 
         halfCache[prop] = half;
         return half;
+    }
+
+        float GetFootprintRadius(SpawnableProp prop)
+    {
+        if (prop == null)
+            return 0.5f;
+
+        if (radiusCache.TryGetValue(prop, out float cached))
+            return cached;
+
+        Vector3 half = GetHalfExtents(prop);
+        // Distance from center to a corner in XZ -> safe for any rotation.
+        float radius = new Vector2(half.x, half.z).magnitude;
+
+        radiusCache[prop] = radius;
+        return radius;
     }
 }
