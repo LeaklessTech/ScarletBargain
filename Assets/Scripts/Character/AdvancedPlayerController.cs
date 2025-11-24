@@ -70,7 +70,7 @@ public class AdvancedPlayerController : MonoBehaviour
     public float minRunStamina = 2f;
     public Slider staminaSlider;
 
-    public float jumpStaminaCost = 2f;
+    public float jumpStaminaCost = 1f;
     public float minJumpStamina = 2f;
 
     // tracks current stamina value
