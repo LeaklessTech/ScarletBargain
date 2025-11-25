@@ -8,6 +8,7 @@ public class ThirdPersonCam : MonoBehaviour
 
     [Header("Orbit & Input")]
     public float mouseSensitivity = 2f;
+    public bool lockCursorOnStart = true;
 
     [Header("Distance")]
     public float distance = 2f;
@@ -44,8 +45,7 @@ public class ThirdPersonCam : MonoBehaviour
         Vector3 e = transform.eulerAngles;
         yaw = e.y;
         pitch = e.x;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        SetCursorLocked(lockCursorOnStart);
     }
 
     void LateUpdate()
@@ -88,12 +88,12 @@ public class ThirdPersonCam : MonoBehaviour
         Vector3 lookTarget = targetPos;
         Quaternion desiredRot = Quaternion.LookRotation(lookTarget - transform.position, Vector3.up);
         transform.rotation = Quaternion.Slerp(transform.rotation, desiredRot, 1f - Mathf.Exp(-20f * Time.deltaTime));
+    }
 
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
+    public void SetCursorLocked(bool locked)
+    {
+        Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
+        Cursor.visible = !locked;
     }
 
     void OnDrawGizmosSelected()

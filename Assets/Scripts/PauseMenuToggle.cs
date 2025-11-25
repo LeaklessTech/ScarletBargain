@@ -1,17 +1,22 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(CanvasGroup))]
 public class PauseMenuToggle : MonoBehaviour
 {
-    public CanvasGroup canvasGroup;
+    [SerializeField] CanvasGroup canvasGroup;
+    [SerializeField] ThirdPersonCam thirdPersonCamera;
+
+    bool isPaused;
 
     void Awake()
     {
         if (canvasGroup == null)
-        {
-            Debug.LogError("PauseMenuToggle Script: canvasGroup not found.");
-        }
+            canvasGroup = GetComponent<CanvasGroup>();
+
+        if (thirdPersonCamera == null)
+            thirdPersonCamera = FindObjectOfType<ThirdPersonCam>();
+
+        SetPaused(false);
     }
 
     // Update is called once per frame
@@ -19,20 +24,60 @@ public class PauseMenuToggle : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.Escape))
         {
-            if (canvasGroup.interactable)
-            {
-                canvasGroup.interactable = false;
-                canvasGroup.blocksRaycasts = false;
-                canvasGroup.alpha = 0f;
-                Time.timeScale = 1f;
-            }
-            else
-            {
-                canvasGroup.interactable = true;
-                canvasGroup.blocksRaycasts = true;
-                canvasGroup.alpha = 1f;
-                Time.timeScale = 0f;
-            }
+            TogglePause();
+        }
+    }
+
+    public void TogglePause()
+    {
+        SetPaused(!isPaused);
+    }
+
+    void SetPaused(bool paused)
+    {
+        isPaused = paused;
+
+        if (canvasGroup != null)
+        {
+            canvasGroup.interactable = paused;
+            canvasGroup.blocksRaycasts = paused;
+            canvasGroup.alpha = paused ? 1f : 0f;
+        }
+
+        Time.timeScale = paused ? 0f : 1f;
+
+        if (paused)
+            UnlockCursorForMenu();
+        else
+            LockCursorForGameplay();
+    }
+
+    void UnlockCursorForMenu()
+    {
+        if (thirdPersonCamera != null)
+        {
+            thirdPersonCamera.SetCursorLocked(false);
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+    }
+
+    void LockCursorForGameplay()
+    {
+        if (thirdPersonCamera == null)
+            thirdPersonCamera = FindObjectOfType<ThirdPersonCam>();
+
+        if (thirdPersonCamera != null)
+        {
+            thirdPersonCamera.SetCursorLocked(true);
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
     }
 }
