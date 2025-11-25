@@ -44,13 +44,15 @@ public class GameEndLadder : MonoBehaviour
     {
         if (LevelState.CurrentLevel < LevelState.TotalLevels)
         {
+            LevelState.LastCompletedLevel = LevelState.CurrentLevel;
+
             LevelState.CurrentLevel++;
-            SceneManager.LoadScene("LevelGeneration", LoadSceneMode.Single);
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            SceneManager.LoadScene("InterLevelScene", LoadSceneMode.Single);
         }
         else
         {
+            LevelState.LastCompletedLevel = LevelState.CurrentLevel;
+
             SceneManager.LoadScene("WinScene", LoadSceneMode.Single);
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
