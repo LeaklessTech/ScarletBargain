@@ -44,8 +44,8 @@ public class ThirdPersonCam : MonoBehaviour
         Vector3 e = transform.eulerAngles;
         yaw = e.y;
         pitch = e.x;
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void LateUpdate()
@@ -88,6 +88,12 @@ public class ThirdPersonCam : MonoBehaviour
         Vector3 lookTarget = targetPos;
         Quaternion desiredRot = Quaternion.LookRotation(lookTarget - transform.position, Vector3.up);
         transform.rotation = Quaternion.Slerp(transform.rotation, desiredRot, 1f - Mathf.Exp(-20f * Time.deltaTime));
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
     }
 
     void OnDrawGizmosSelected()
