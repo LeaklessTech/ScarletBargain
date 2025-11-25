@@ -41,14 +41,14 @@ public class EnergyBall : MonoBehaviour
 
     private void ExplodeBall(GameObject gameObject)
     {
-        var audio = Instantiate(AudioSource, this.transform.position, Quaternion.identity);
+        var audio = Instantiate(AudioSource, this.transform);
         audio.Play();
 
         this.GetComponent<Rigidbody>().isKinematic = true;
         this.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
         this.GetComponentInChildren<MeshRenderer>().enabled = false;
         isDestroyed = true;
-        var ex = Instantiate(Explosion, this.transform.position, Quaternion.identity);
+        var ex = Instantiate(Explosion, this.transform);
         ex.Play();
     }
 

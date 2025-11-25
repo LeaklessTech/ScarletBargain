@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using UnityEngine.AI;
+using FillefranzTools;
 
 public class CharacterDeath : MonoBehaviour
 {
@@ -11,6 +12,10 @@ public class CharacterDeath : MonoBehaviour
     private AdvancedPlayerController apc;
 
     public int DisableRagdollTime = 15;
+    private bool deathAudioPlayed = false;
+
+    public AudioSource AudioSource;
+    public AudioClip[] AudioClipList;
 
     void Start()
     {
@@ -33,8 +38,14 @@ public class CharacterDeath : MonoBehaviour
     }
     private IEnumerator DeathSequence(int id)
     {
-        if (this.gameObject.tag == "Prisoner" && id == this.gameObject.GetInstanceID())
+        if (this.gameObject.tag == "Prisoner" && id == this.gameObject.GetInstanceID() && !this.gameObject.GetComponent<PrisonerAI>().isDead && this.gameObject.GetComponent<PrisonerAI>().isRescued)
         {
+            if(!deathAudioPlayed)
+            {
+                var audio = Instantiate(AudioSource, this.gameObject.transform);
+                audio.PlayOneShot(AudioClipList.Random());
+                deathAudioPlayed = true;
+            }
             if (this.gameObject.GetComponent<PrisonerAI>().isRescued)
             {
                 SetRagdoll(true);
@@ -45,8 +56,16 @@ public class CharacterDeath : MonoBehaviour
             }
         }
 
-        if (this.gameObject.tag == "Player" && id == this.gameObject.GetInstanceID())
+        if (this.gameObject.tag == "Player" && id == this.gameObject.GetInstanceID() && !this.gameObject.GetComponent<AdvancedPlayerController>().IsDead)
         {
+            this.gameObject.GetComponent<AdvancedPlayerController>().IsDead = true;
+            
+            if(!deathAudioPlayed)
+            {
+                var audio = Instantiate(AudioSource, this.gameObject.transform);
+                audio.PlayOneShot(AudioClipList.Random());
+                deathAudioPlayed = true;
+            }
             apc.SetActive(false);
             SetRagdoll(true);
             yield return new WaitForSeconds(2f);

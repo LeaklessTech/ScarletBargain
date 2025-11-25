@@ -44,7 +44,7 @@ public class BotScanner : MonoBehaviour
 
     public void DestroySelf(Component sender, object data)
     {
-        var audio = Instantiate(AudioSource, droneTransform.position, Quaternion.identity);
+        var audio = Instantiate(AudioSource, this.gameObject.transform);
         audio.Play();
 
         this.GetComponent<NavMeshAgent>().isStopped = true;
@@ -53,7 +53,7 @@ public class BotScanner : MonoBehaviour
         this.GetComponentsInChildren<AudioSource>()[0].enabled = false;
         this.GetComponentInChildren<Light>().enabled = false;
         isDestroyed = true;
-        var ex = Instantiate(Explosion, droneTransform.position, Quaternion.identity);
+        var ex = Instantiate(Explosion, droneTransform);
         ex.Play();
     }
 }

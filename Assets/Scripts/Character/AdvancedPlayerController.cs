@@ -47,6 +47,7 @@ public class AdvancedPlayerController : MonoBehaviour
     private float hInput;
     private float vInput;
 
+    public bool IsDead = false;
     private bool wantJump;
     private bool isCrouching;
     private bool isRunning;
