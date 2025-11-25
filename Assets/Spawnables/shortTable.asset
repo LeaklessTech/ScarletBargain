@@ -20,4 +20,5 @@ MonoBehaviour:
   UseRendererBounds: 1
   ManualHalfExtents: {x: 0.4, y: 0.6, z: 0.4}
   BoundsPadding: 0.02
-  AtMostOnePerRoom: 1
+  AtMostOnePerRoom: 0
+  MustSpawnInEveryRoom: 1

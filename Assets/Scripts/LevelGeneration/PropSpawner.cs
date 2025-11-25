@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class PropSpawner : MonoBehaviour
@@ -16,61 +16,89 @@ public class PropSpawner : MonoBehaviour
 
     Transform level;
     readonly List<Transform> floors = new();
+    readonly Dictionary<Transform, List<Transform>> roomToFloors = new(); // Room → List of its floors
 
     public void SpawnNow()
     {
-        Transform propsRoot;
+        if (levelRoot != null) level = levelRoot;
+        else level = GameObject.Find("Level")?.transform;
 
-        if (levelRoot != null)
+        if (level == null)
         {
-            level = levelRoot;
-        }
-        else
-        {
-            level = GameObject.Find("Level").transform;
+            Debug.LogError("PropSpawner: Could not find Level root!");
+            return;
         }
 
         floors.Clear();
+        roomToFloors.Clear();
+
         for (int i = 0; i < level.childCount; i++)
         {
             var child = level.GetChild(i);
             if (child.name.StartsWith(roomNamePrefix))
             {
-                CollectFloors(child, floors);
+                var roomFloors = new List<Transform>();
+                CollectFloors(child, roomFloors);
+                if (roomFloors.Count > 0)
+                {
+                    roomToFloors[child] = roomFloors;
+                    floors.AddRange(roomFloors);
+                }
             }
         }
 
-        Transform found = level.Find("Props");
-        if (found != null)
+        if (floors.Count == 0)
         {
-            propsRoot = found;
+            Debug.LogWarning("PropSpawner: No floors found to spawn props on.");
+            return;
         }
-        else
-        {
-            GameObject newProps = new GameObject("Props");
-            propsRoot = newProps.transform;
-        }
-        
-        if (propsRoot.parent == null)
-        {
-            propsRoot.SetParent(level, false);   
-        } 
 
-        for (int i = 0; i < targetCount; i++)
+        Transform propsRoot = level.Find("Props");
+        if (propsRoot == null)
+        {
+            propsRoot = new GameObject("Props").transform;
+            propsRoot.SetParent(level, false);
+        }
+
+        int spawnedCount = 0;
+
+        var mustSpawnProps = props.FindAll(p => p.MustSpawnInEveryRoom && p.Prefab != null);
+
+        foreach (var roomPair in roomToFloors)
+        {
+            Transform roomRoot = roomPair.Key;
+            var roomFloors = roomPair.Value;
+
+            foreach (var mustProp in mustSpawnProps)
+            {
+                var floor = roomFloors[Random.Range(0, roomFloors.Count)];
+                var pos = JitterOnFloor(floor, mustProp.YOffset, mustProp.JitterXZ);
+                var yaw = mustProp.SnapRotation90 ? 90f * Random.Range(0, 4) : Random.Range(0f, 360f);
+                var rot = Quaternion.Euler(0f, yaw, 0f);
+
+                Instantiate(mustProp.Prefab, pos, rot, roomRoot).name = mustProp.Prefab.name;
+                spawnedCount++;
+            }
+        }
+
+        int remaining = targetCount - spawnedCount;
+        for (int i = 0; i < remaining; i++)
         {
             var p = PickWeighted(props);
             if (p == null || p.Prefab == null) continue;
 
             var floor = floors[Random.Range(0, floors.Count)];
-            var pos   = JitterOnFloor(floor, p.YOffset, p.JitterXZ);
-            var yaw   = p.SnapRotation90 ? 90f * Random.Range(0, 4) : Random.Range(0f, 360f);
-            var rot   = Quaternion.Euler(0f, yaw, 0f);
-            var room  = FindRoomRoot(floor) ?? propsRoot;
+            var pos = JitterOnFloor(floor, p.YOffset, p.JitterXZ);
+            var yaw = p.SnapRotation90 ? 90f * Random.Range(0, 4) : Random.Range(0f, 360f);
+            var rot = Quaternion.Euler(0f, yaw, 0f);
+            var room = FindRoomRoot(floor) ?? propsRoot;
 
             Instantiate(p.Prefab, pos, rot, room).name = p.Prefab.name;
+            spawnedCount++;
         }
-    }
 
+        Debug.Log($"PropSpawner: Spawned {spawnedCount} props ({mustSpawnProps.Count} types guaranteed per room)");
+    }
 
     void CollectFloors(Transform root, List<Transform> into)
     {
@@ -80,30 +108,20 @@ public class PropSpawner : MonoBehaviour
         while (open.Count > 0)
         {
             Transform current = open.Pop();
-
             if (current.name == floorChildName)
-            {
                 into.Add(current);
-            }
 
-            // push all children
             for (int i = 0; i < current.childCount; i++)
-            {
-                Transform child = current.GetChild(i);
-                open.Push(child);
-            }
+                open.Push(current.GetChild(i));
         }
     }
-
 
     Transform FindRoomRoot(Transform t)
     {
         while (t != null && t != level)
         {
             if (t.name.StartsWith(roomNamePrefix))
-            {
                 return t;
-            }
             t = t.parent;
         }
         return null;
@@ -113,48 +131,32 @@ public class PropSpawner : MonoBehaviour
     {
         var pos = floor.position + Vector3.up * yOffset;
 
-        var right = floor.right;
-        right.y = 0f;
-        right.Normalize();
+        var right = Vector3.ProjectOnPlane(floor.right, Vector3.up).normalized;
+        var fwd = Vector3.ProjectOnPlane(floor.forward, Vector3.up).normalized;
 
-        var fwd = floor.forward;
-        fwd.y = 0f;
-        fwd.Normalize();
+        pos += right * Random.Range(-jitter.x, jitter.x);
+        pos += fwd * Random.Range(-jitter.y, jitter.y);
 
-        pos += right * Random.Range(-jitter.x, jitter.x) + fwd * Random.Range(-jitter.y, jitter.y);
-        
         return pos;
     }
 
     SpawnableProp PickWeighted(IList<SpawnableProp> list)
     {
         float total = 0f;
+        foreach (var p in list)
+            total += Mathf.Max(0f, p.Weight);
 
-        for (int i = 0; i < list.Count; i++)
+        if (total <= 0f) return null;
+
+        float r = Random.Range(0f, total);
+        float acc = 0f;
+
+        foreach (var p in list)
         {
-            SpawnableProp currentProp = list[i];
-            float weight = currentProp.Weight;
-            float clampedWeight = Mathf.Max(0f, weight);
-
-            total += clampedWeight;
-        }
-        
-        if (total <= 0f)
-        {
-            return null;
-        }
-        float r = Random.Range(0f, total), acc = 0f;
-        
-        foreach (SpawnableProp p in list)
-        {
-            float clampedWeight = Mathf.Max(0f, p.Weight);
-
-            acc += clampedWeight;
-
+            float w = Mathf.Max(0f, p.Weight);
+            acc += w;
             if (r <= acc)
-            {
                 return p;
-            }
         }
         return list[list.Count - 1];
     }

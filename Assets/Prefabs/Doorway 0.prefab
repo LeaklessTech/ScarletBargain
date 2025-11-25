@@ -338,7 +338,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 3
+  m_Radius: 5
   m_Center: {x: 0.6237357, y: 1.5, z: 0}
 --- !u!1 &4114630713427958087
 GameObject:
@@ -565,7 +565,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6d31516504728864a9551c3de7d28d1d, type: 2}
+  - {fileID: 2100000, guid: 7412908143b9e0e44b9962fe54eea196, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -721,7 +721,7 @@ MeshCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 5
   m_Convex: 1
   m_CookingOptions: 30

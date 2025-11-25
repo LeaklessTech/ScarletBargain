@@ -70,7 +70,7 @@ public class AdvancedPlayerController : MonoBehaviour
     public float minRunStamina = 2f;
     public Slider staminaSlider;
 
-    public float jumpStaminaCost = 2f;
+    public float jumpStaminaCost = 1f;
     public float minJumpStamina = 2f;
 
     // tracks current stamina value
@@ -169,8 +169,11 @@ public class AdvancedPlayerController : MonoBehaviour
             TryPlayJumpAnimation();
         }
 
-        // kills any tilt creep
-        rb.angularVelocity = Vector3.zero;
+        if (!isHiding && isActive)
+        {
+            // kills any tilt creep
+            rb.angularVelocity = Vector3.zero;
+        }
 
         // update the stamina UI slider if assigned
         if (staminaSlider != null)

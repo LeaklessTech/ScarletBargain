@@ -13,13 +13,13 @@ public class GameQuitter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyUp(KeyCode.X))
-            QuitGame();
+
         
     }
 
     public void QuitGame()
     {
+        //https://docs.unity3d.com/6000.2/Documentation/Manual/platform-dependent-compilation.html
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else

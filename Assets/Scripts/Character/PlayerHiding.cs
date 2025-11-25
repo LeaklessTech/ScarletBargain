@@ -148,12 +148,9 @@ public class PlayerHiding : MonoBehaviour
 
         if (animator != null)
         {
-            animator.speed = -1f;
-        }
-
-        if (animator != null)
-        {
             animator.SetBool("IsCrawling", true);
+            animator.Play("Crawling", 0, 1.0f);
+            animator.speed = -1f;
         }
 
         // HIDE_DEBUG: Log exit start
@@ -163,13 +160,12 @@ public class PlayerHiding : MonoBehaviour
     private void CompleteExitHideSpot()
     {
         isExitingHide = false;
-
         playerController.ExitHideSpot();
 
         if (animator != null)
         {
-            animator.SetBool("IsCrawling", false);
             animator.speed = 1f;
+            animator.SetBool("IsCrawling", false);
         }
 
         currentHidingSpot?.ExitHideSpot(this);

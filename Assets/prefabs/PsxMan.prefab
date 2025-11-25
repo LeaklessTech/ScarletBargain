@@ -980,7 +980,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.171, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.25, y: 1.25, z: 1.25}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 9040052868341513410}
@@ -1060,9 +1060,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.35
-  m_Height: 1.9895772
+  m_Height: 1.4329329
   m_Direction: 1
-  m_Center: {x: 0, y: 0.9052114, z: 0}
+  m_Center: {x: 0, y: 0.6268892, z: 0}
 --- !u!114 &2774928599939051158
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1097,7 +1097,7 @@ MonoBehaviour:
   staminaRegenRate: 1
   minRunStamina: 2
   staminaSlider: {fileID: 0}
-  jumpStaminaCost: 2
+  jumpStaminaCost: 0
   minJumpStamina: 2
 --- !u!114 &-3008325046020758645
 MonoBehaviour:
