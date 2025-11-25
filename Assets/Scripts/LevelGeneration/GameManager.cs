@@ -86,6 +86,9 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         int previousSaved = Mathf.RoundToInt(prisonerCount.Variable.Variable);
 
         if (LevelState.CurrentLevel == 1 || previousSaved <= 0)

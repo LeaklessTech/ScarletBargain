@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class DoorTriggerController : MonoBehaviour
@@ -24,7 +25,7 @@ public class DoorTriggerController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") || other.CompareTag("Monster"))
+        if (CheckValidTag(other.tag))
         {
             agentsInRange++;
 
@@ -36,11 +37,18 @@ public class DoorTriggerController : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player") || other.CompareTag("Monster"))
+        if (CheckValidTag(other.tag))
         {
             agentsInRange = Mathf.Max(0, agentsInRange - 1);
 
             Debug.Log($"{other.name} exited. Agents in range: {agentsInRange}");
         }
+    }
+
+    private bool CheckValidTag(string tag)
+    {
+        HashSet<string> validTags = new() { "Player", "Monster", "Prisoner" };
+
+        return validTags.Contains(tag);
     }
 }

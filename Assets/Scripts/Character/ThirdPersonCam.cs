@@ -44,8 +44,8 @@ public class ThirdPersonCam : MonoBehaviour
         Vector3 e = transform.eulerAngles;
         yaw = e.y;
         pitch = e.x;
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        //Cursor.lockState = CursorLockMode.None;
+        //Cursor.visible = true;
     }
 
     void LateUpdate()

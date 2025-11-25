@@ -46,10 +46,14 @@ public class GameEndLadder : MonoBehaviour
         {
             LevelState.CurrentLevel++;
             SceneManager.LoadScene("LevelGeneration", LoadSceneMode.Single);
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
         else
         {
             SceneManager.LoadScene("WinScene", LoadSceneMode.Single);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
     }
 
