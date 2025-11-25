@@ -12,6 +12,8 @@ public class PrisonerAI : MonoBehaviour
     // flag indicating whether the prisoner has been rescued
     public bool isRescued { get; private set; }
 
+    public bool isDead = false;
+
     private float maxHistorySeconds = 20f; // max trail time history
     private float lookbackSeconds = 0.6f; // how far behind in seconds to follow leader
     private float sampleInterval = 0.05f; // how often leader pos is sampled
@@ -43,7 +45,7 @@ public class PrisonerAI : MonoBehaviour
 
     void Update()
     {
-        if (!isRescued || leader == null) return;
+        if (!isRescued || leader == null || isDead) return;
 
         float now = Time.time;
 

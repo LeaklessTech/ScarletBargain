@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.AI;
 using Utils;
@@ -6,6 +7,12 @@ public class BotScanner : MonoBehaviour
 {
     private NavMeshAgent agent;
 
+    public ParticleSystem Explosion;
+    public AudioSource AudioSource;
+
+    public Transform droneTransform;
+
+    private bool isDestroyed = false;
 
     public float Lifespan = 30;
 
@@ -23,14 +30,30 @@ public class BotScanner : MonoBehaviour
             Lifespan -= Time.deltaTime;
         }
 
-        if (NavMeshUtilities.IsAtTargetLocation(agent) || Lifespan <= 0)
+        if ((NavMeshUtilities.IsAtTargetLocation(agent) || Lifespan <= 0) && !isDestroyed)
         {
             DestroySelf(null, null);
         }
+
+        if(isDestroyed && !Explosion.isPlaying)
+        {
+            Destroy(gameObject);
+        }
+        
     }
 
     public void DestroySelf(Component sender, object data)
     {
-        Destroy(gameObject);        
+        var audio = Instantiate(AudioSource, droneTransform.position, Quaternion.identity);
+        audio.Play();
+
+        this.GetComponent<NavMeshAgent>().isStopped = true;
+        this.GetComponent<NavMeshAgent>().velocity = Vector3.zero;
+        this.GetComponentInChildren<MeshRenderer>().enabled = false;
+        this.GetComponentsInChildren<AudioSource>()[0].enabled = false;
+        this.GetComponentInChildren<Light>().enabled = false;
+        isDestroyed = true;
+        var ex = Instantiate(Explosion, droneTransform.position, Quaternion.identity);
+        ex.Play();
     }
 }

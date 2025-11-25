@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using TMPro;
 
@@ -24,6 +24,22 @@ public class PlayerHiding : MonoBehaviour
     private bool isExitingHide = false; // flag for exit crawl phase
     private Vector3 exitTargetPosition; // target for exit lerp (starts as entryPosition)
 
+
+    [Header("Animation")]
+    [Tooltip("Name of the Animator state that plays the crawl animation.")]
+    [SerializeField] private string crawlStateName = "Crawl";
+
+    [Tooltip("Animator float parameter that drives the crawl state's speed multiplier.\n" +
+             "The crawl state in the Animator should have its Speed parameter bound " +
+             "to this parameter so that a value of 1 plays it forward and -1 plays it backwards.")]
+    [SerializeField] private string crawlSpeedParameter = "CrawlSpeed";
+
+    [Tooltip("If true the script will drive the crawl state's speed using the " +
+             "specified crawlSpeedParameter rather than setting Animator.speed directly.")]
+    [SerializeField] private bool useStateSpeedParameter = true;
+
+    private float originalCrawlSpeed = 1f;
+
     public bool IsHidden => playerController?.IsHiding() ?? false;
 
     private void Awake()
@@ -38,7 +54,28 @@ public class PlayerHiding : MonoBehaviour
         animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
         if (animator == null)
         {
-            Debug.LogWarning("PlayerHiding: No Animator found�hiding animations will be skipped.");
+            Debug.LogWarning("PlayerHiding: No Animator found - hiding animations will be skipped.");
+        }
+        else
+        {
+            if (useStateSpeedParameter)
+            {
+                bool paramFound = false;
+                foreach (var param in animator.parameters)
+                {
+                    if (param.name == crawlSpeedParameter && param.type == AnimatorControllerParameterType.Float)
+                    {
+                        paramFound = true;
+                        break;
+                    }
+                }
+                if (!paramFound)
+                {
+                    Debug.LogWarning($"PlayerHiding: Animator does not contain a float parameter named '{crawlSpeedParameter}'. " +
+                                     "Assign a float parameter to the crawl state’s Speed multiplier to enable reversal. Falling back to using Animator.speed instead.");
+                    useStateSpeedParameter = false;
+                }
+            }
         }
     }
 
@@ -129,8 +166,20 @@ public class PlayerHiding : MonoBehaviour
 
         if (animator != null)
         {
+            if (!string.IsNullOrEmpty(crawlStateName))
+            {
+                animator.Play(crawlStateName, 0, 0f);
+            }
             animator.SetBool("IsCrawling", true);
-            animator.speed = 1f;
+            if (useStateSpeedParameter)
+            {
+                originalCrawlSpeed = animator.GetFloat(crawlSpeedParameter);
+                animator.SetFloat(crawlSpeedParameter, 1f);
+            }
+            else
+            {
+                animator.speed = 1f;
+            }
         }
 
         UpdatePrompt(exitText, true);
@@ -148,24 +197,53 @@ public class PlayerHiding : MonoBehaviour
 
         if (animator != null)
         {
+            if (!string.IsNullOrEmpty(crawlStateName))
+            {
+                animator.Play(crawlStateName, 0, 1f);
+            }
             animator.SetBool("IsCrawling", true);
-            animator.Play("Crawling", 0, 1.0f);
-            animator.speed = -1f;
+            if (useStateSpeedParameter)
+            {
+                
+                if (originalCrawlSpeed == 0f)
+                {
+                    originalCrawlSpeed = animator.GetFloat(crawlSpeedParameter);
+                }
+                animator.SetFloat(crawlSpeedParameter, -Mathf.Abs(originalCrawlSpeed));
+            }
+            else
+            {
+                animator.speed = -Mathf.Abs(animator.speed);
+            }
         }
 
         // HIDE_DEBUG: Log exit start
-        Debug.Log($"[HIDE_DEBUG] Exit crawl started! Lerping back to {entryPosition} (distance from hide: {Vector3.Distance(transform.position, entryPosition):F2}). Anim speed: {animator?.speed}");
+        float distance = Vector3.Distance(transform.position, entryPosition);
+        float currentSpeed = 0f;
+        if (animator != null)
+        {
+            currentSpeed = useStateSpeedParameter ? animator.GetFloat(crawlSpeedParameter) : animator.speed;
+        }
+        Debug.Log($"[HIDE_DEBUG] Exit crawl started! Lerping back to {entryPosition} (distance from hide: {distance:F2}). Anim speed: {currentSpeed}");
     }
 
     private void CompleteExitHideSpot()
     {
         isExitingHide = false;
+
         playerController.ExitHideSpot();
 
         if (animator != null)
         {
-            animator.speed = 1f;
             animator.SetBool("IsCrawling", false);
+            if (useStateSpeedParameter)
+            {
+                animator.SetFloat(crawlSpeedParameter, Mathf.Abs(originalCrawlSpeed));
+            }
+            else
+            {
+                animator.speed = Mathf.Abs(animator.speed);
+            }
         }
 
         currentHidingSpot?.ExitHideSpot(this);
