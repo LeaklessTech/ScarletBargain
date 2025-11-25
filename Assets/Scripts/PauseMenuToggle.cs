@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(CanvasGroup))]
@@ -7,6 +8,7 @@ public class PauseMenuToggle : MonoBehaviour
     [SerializeField] ThirdPersonCam thirdPersonCamera;
 
     bool isPaused;
+    Coroutine cursorLockRoutine;
 
     void Awake()
     {
@@ -47,37 +49,60 @@ public class PauseMenuToggle : MonoBehaviour
         Time.timeScale = paused ? 0f : 1f;
 
         if (paused)
+        {
             UnlockCursorForMenu();
+        }
         else
+        {
             LockCursorForGameplay();
+        }
     }
 
     void UnlockCursorForMenu()
     {
-        if (thirdPersonCamera != null)
-        {
-            thirdPersonCamera.SetCursorLocked(false);
-        }
-        else
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
+        StopEnsureCursorLock();
+        ApplyCursorLock(false);
     }
 
     void LockCursorForGameplay()
+    {
+        ApplyCursorLock(true);
+        EnsureCursorLockNextFrame();
+    }
+
+    void ApplyCursorLock(bool locked)
     {
         if (thirdPersonCamera == null)
             thirdPersonCamera = FindObjectOfType<ThirdPersonCam>();
 
         if (thirdPersonCamera != null)
-        {
-            thirdPersonCamera.SetCursorLocked(true);
-        }
+            thirdPersonCamera.SetCursorLocked(locked);
         else
         {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !locked;
         }
+    }
+
+    void EnsureCursorLockNextFrame()
+    {
+        StopEnsureCursorLock();
+        cursorLockRoutine = StartCoroutine(ReapplyCursorLock());
+    }
+
+    void StopEnsureCursorLock()
+    {
+        if (cursorLockRoutine != null)
+        {
+            StopCoroutine(cursorLockRoutine);
+            cursorLockRoutine = null;
+        }
+    }
+
+    IEnumerator ReapplyCursorLock()
+    {
+        yield return null;
+        ApplyCursorLock(true);
+        cursorLockRoutine = null;
     }
 }
