@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 549186236987171521}
   - component: {fileID: 5577214220615857716}
   - component: {fileID: 4016980099151590210}
-  m_Layer: 0
+  m_Layer: 16
   m_Name: EnergyBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -50,6 +50,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   huntedPlayerId: 0
   onCharacterKilled: {fileID: 11400000, guid: af0ece34110b4d47197815df5aec01bc, type: 2}
+  Lifespan: 3
 --- !u!23 &8148949304155988514
 MeshRenderer:
   m_ObjectHideFlags: 0

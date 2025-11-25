@@ -27,11 +27,9 @@ public class EnergyBall : MonoBehaviour
     {
         if(collision.transform.tag == "Player" || collision.transform.tag == "Prisoner")
         {
-            onCharacterKilled.TriggerEvent(this, huntedPlayerId);
+            onCharacterKilled.TriggerEvent(this, collision.gameObject.GetInstanceID());
             ExplodeBall(this.gameObject);    
         }
-
-        
     }
 
 

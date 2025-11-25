@@ -304,7 +304,7 @@ SphereCollider:
     m_Bits: 64
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 1215
+    m_Bits: 246975
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
@@ -335,7 +335,6 @@ GameObject:
   - component: {fileID: 7842370378274609479}
   - component: {fileID: 6474184239626954455}
   - component: {fileID: 8254926184307673026}
-  - component: {fileID: 3032554398008856312}
   m_Layer: 0
   m_Name: TouchingCollider
   m_TagString: Untagged
@@ -371,7 +370,7 @@ SphereCollider:
     m_Bits: 64
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 1215
+    m_Bits: 246975
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
@@ -392,34 +391,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   onCharaceterKilled: {fileID: 11400000, guid: af0ece34110b4d47197815df5aec01bc, type: 2}
---- !u!114 &3032554398008856312
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4389510325921265780}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4a2b5f9b9ef8f93f85b37262104a5f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameEvent: {fileID: 11400000, guid: 3dbc49f3afbc74f0fa1333088a0ef6bc, type: 2}
-  onEventTriggered:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8254926184307673026}
-        m_TargetAssemblyTypeName: TouchingCollision, Assembly-CSharp
-        m_MethodName: TriggerHunt
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1 &5527467106798387121
 GameObject:
   m_ObjectHideFlags: 0
@@ -715,6 +686,10 @@ PrefabInstance:
       value: Monster
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 3594bcf4f928e7a419f756d17574bce8, type: 3}
+      propertyPath: m_Layer
+      value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3594bcf4f928e7a419f756d17574bce8, type: 3}
       propertyPath: m_TagString
       value: Monster
       objectReference: {fileID: 0}
@@ -882,6 +857,7 @@ MonoBehaviour:
   SearchForPlayer: 1
   Delay: 0.2
   onPlayerFound: {fileID: 11400000, guid: 3dbc49f3afbc74f0fa1333088a0ef6bc, type: 2}
+  onPlayerLost: {fileID: 11400000, guid: e370ae20c8fe7792c8ca398340a84aa1, type: 2}
 --- !u!114 &8795879704838526092
 MonoBehaviour:
   m_ObjectHideFlags: 0
