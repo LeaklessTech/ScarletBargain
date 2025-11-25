@@ -80,7 +80,36 @@ public class PrisonerAI : MonoBehaviour
 
     void Update()
     {
-        if (!isRescued || leader == null || isDead) return;
+        if (isDead)
+            return;
+
+        if (!isRescued || leader == null)
+        {
+            if (animator)
+            {
+                Vector3 vel = agent.velocity;
+                float horizontalSpeed = new Vector3(vel.x, 0f, vel.z).magnitude;
+                animator.SetFloat("Speed", horizontalSpeed, 0.1f, Time.deltaTime);
+            }
+
+            // if the agent is currently en route to a destination and still far from it, don't interrupt
+            if (agent.remainingDistance > 2f && agent.destination != null)
+                return;
+
+            if (wanderCooldown > 0.1f)
+            {
+                wanderCooldown -= Time.deltaTime;
+                return;
+            }
+
+            // If a monster is nearby, attempt to flee away from it instead of normal wandering.
+            if (TryFleeFromNearestMonster())
+                return;
+
+            RandomWander();
+
+            return;
+        }
 
         float now = Time.time;
 
