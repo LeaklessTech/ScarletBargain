@@ -54,6 +54,8 @@ public class GameEndLadder : MonoBehaviour
             LevelState.LastCompletedLevel = LevelState.CurrentLevel;
 
             SceneManager.LoadScene("WinScene", LoadSceneMode.Single);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
     }
 
