@@ -8,6 +8,9 @@ public class BotScanner : MonoBehaviour
     private NavMeshAgent agent;
 
     public ParticleSystem Explosion;
+    public AudioSource AudioSource;
+
+    public Transform droneTransform;
 
     private bool isDestroyed = false;
 
@@ -41,11 +44,16 @@ public class BotScanner : MonoBehaviour
 
     public void DestroySelf(Component sender, object data)
     {
-        Explosion.Play();
+        var audio = Instantiate(AudioSource, droneTransform.position, Quaternion.identity);
+        audio.Play();
+
+        this.GetComponent<NavMeshAgent>().isStopped = true;
+        this.GetComponent<NavMeshAgent>().velocity = Vector3.zero;
         this.GetComponentInChildren<MeshRenderer>().enabled = false;
         this.GetComponentsInChildren<AudioSource>()[0].enabled = false;
-        this.GetComponentsInChildren<AudioSource>()[1].Play();
         this.GetComponentInChildren<Light>().enabled = false;
         isDestroyed = true;
+        var ex = Instantiate(Explosion, droneTransform.position, Quaternion.identity);
+        ex.Play();
     }
 }

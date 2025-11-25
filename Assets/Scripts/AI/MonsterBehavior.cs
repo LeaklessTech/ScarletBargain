@@ -228,10 +228,11 @@ public class MonsterBehavior : MonoBehaviour
 
             foreach (var target in targetList)
             {
+                Debug.LogWarning("Spawning BOT set for: " + target.Position);
                 GameObject instance = Instantiate(BotPrefab.gameObject, this.transform.position, Quaternion.identity) as GameObject;
                 instance.GetComponent<NavMeshAgent>().SetDestination(target.Position);
             }
-
+            targetList.Clear();
         }
 
         // if all bots finished or player found
