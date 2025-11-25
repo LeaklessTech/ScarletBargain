@@ -41,6 +41,7 @@ public class MonsterBehavior : MonoBehaviour
 
     public int ScanRadius = 0;
     [SerializeField] public GameObject BotPrefab;
+    [SerializeField] public GameObject EnergyBallPrefab;
 
     public AudioSource footstepSource;
 
@@ -48,6 +49,16 @@ public class MonsterBehavior : MonoBehaviour
     private float currStep;
 
     public AudioClip footstepClip;
+
+    private GameObject playerObj;
+
+    private float energyBallDelay = 0f;
+    public float energyBallDelayMax = 10f;
+
+    private float resetSpeed;
+
+    private bool characterDied = false;
+
 
 
     void Start()
@@ -58,6 +69,10 @@ public class MonsterBehavior : MonoBehaviour
         agent = this.GetComponent<NavMeshAgent>();
         animator = this.GetComponent<Animator>();
         anim = this.GetComponent<Animator>();
+        
+        agent.speed = 6f;
+
+        resetSpeed = 2f;
 
         // AI Behavior Setup
         Tree = new BehaviorTree("Base Tree", Policies.RunForever);
@@ -94,10 +109,18 @@ public class MonsterBehavior : MonoBehaviour
         Tree.AddChild(patrolSequence);
 
         Tree.PrintTree();
+
+        playerObj = GameObject.FindWithTag("Player");
     }
 
     void Update()
     {
+
+        if (energyBallDelay > 0)
+        {
+            energyBallDelay -= Time.deltaTime;
+        }
+
         if (animator)
         {
             Vector3 vel = agent.velocity;
@@ -130,6 +153,18 @@ public class MonsterBehavior : MonoBehaviour
 
 
         TreeStatus = Tree.Process();
+
+        // Reset speed after a small delay (monster can get stuck at zero speed if the attack animation does not finish)
+        if(resetSpeed > 0 && agent.speed == 0)
+        {
+            resetSpeed -= Time.deltaTime;
+        }
+
+        if(resetSpeed <= 0)
+        {
+            agent.speed = 6f;
+            resetSpeed = 2f;
+        }
     }
 
     #region Behaviors
@@ -225,14 +260,6 @@ public class MonsterBehavior : MonoBehaviour
             return Node.Status.FAILURE;
         }
 
-        // Get player reference
-        GameObject playerObj = GameObject.FindWithTag("Player");
-        if (playerObj == null)
-        {
-            Debug.LogWarning("[MONSTER_DEBUG] HuntCharacter: No player found—skipping chase.");
-            return Node.Status.FAILURE;
-        }
-
         var playerHiding = playerObj.GetComponent<PlayerHiding>();
         if (playerHiding != null && playerHiding.IsHidden)
         {
@@ -250,15 +277,20 @@ public class MonsterBehavior : MonoBehaviour
             agent.SetDestination(characterPosition);
         }
 
-        if (Vector3.Distance(this.transform.position, characterPosition) < 2 && fov.CanSeePlayer)
+        if (Vector3.Distance(this.transform.position, characterPosition) < 8 && fov.CanSeePlayer && energyBallDelay <= 0)
         {
-            Debug.Log("Consumed character in hunt stage");
-            onCharacterKilled.TriggerEvent(this, huntedPlayerId);
-            onPlayMonsterAudio.TriggerEvent(this, Resources.Load<AudioClip>("Audio/monster-victory"));
+            anim.Play("Attack");
+            energyBallDelay = energyBallDelayMax;
+        }
+
+        if(characterDied)
+        {
             state = ActionState.IDLE;
             IsCharacterFound = false;
+            characterDied = false;
             return Node.Status.SUCCESS;
         }
+
         if (NavMeshUtilities.IsAtTargetLocation(agent))
         {
             state = ActionState.IDLE;
@@ -319,6 +351,32 @@ public class MonsterBehavior : MonoBehaviour
     }
     #endregion
 
+    #region Animation Events
+
+    public void Fire()
+    {
+        var directionToTarget = new Vector3(characterPosition.x - this.transform.position.x, .75f, characterPosition.z - this.transform.position.z);
+        directionToTarget.Normalize();
+
+        GameObject instance = Instantiate(EnergyBallPrefab.gameObject, this.transform.position + new Vector3(0, 1f, 0.5f), Quaternion.identity);
+        EnergyBall l = instance.GetComponent<EnergyBall>();
+        l.huntedPlayerId = huntedPlayerId;
+        instance.GetComponent<Rigidbody>().AddForce(directionToTarget * 750);
+        onPlayMonsterAudio.TriggerEvent(this, Resources.Load<AudioClip>("Audio/monster-victory"));
+    }
+
+    public void BeginAttack()
+    {
+        agent.speed = 0;
+    }
+
+    public void EndAttack()
+    {
+        agent.speed = 6f;
+    }
+
+    #endregion
+
 
     #region Actions
     // Node.Status GoToLocation(Vector3 destination)
@@ -364,6 +422,11 @@ public class MonsterBehavior : MonoBehaviour
             huntedPlayerId = ((CharacterPosition)data).objectId;
             IsCharacterFound = true;
         }
+    }
+
+    public void CharacterDied(Component sender, object data)
+    {
+        characterDied = true;
     }
 
     public Waypoint GetWaypoint(Waypoint prevWaypoint)
