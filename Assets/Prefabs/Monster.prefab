@@ -790,7 +790,7 @@ MonoBehaviour:
   waypointList:
     UseConstant: 0
     Variable: {fileID: 11400000, guid: 5372321db87b80d8483796503a9060c0, type: 2}
-  ScanRadius: 75
+  ScanRadius: 40
   BotPrefab: {fileID: 8329922771217900141, guid: d5ff52d87f07274b2af571a50b239ab6, type: 3}
   EnergyBallPrefab: {fileID: 7194774010845182516, guid: f60696f2ffbe062b1ba26211a84586cb, type: 3}
   footstepSource: {fileID: 895412446499135549}
@@ -857,7 +857,6 @@ MonoBehaviour:
   SearchForPlayer: 1
   Delay: 0.2
   onPlayerFound: {fileID: 11400000, guid: 3dbc49f3afbc74f0fa1333088a0ef6bc, type: 2}
-  onPlayerLost: {fileID: 11400000, guid: e370ae20c8fe7792c8ca398340a84aa1, type: 2}
 --- !u!114 &8795879704838526092
 MonoBehaviour:
   m_ObjectHideFlags: 0
