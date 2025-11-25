@@ -1097,7 +1097,7 @@ MonoBehaviour:
   staminaRegenRate: 1
   minRunStamina: 2
   staminaSlider: {fileID: 0}
-  jumpStaminaCost: 2
+  jumpStaminaCost: 0
   minJumpStamina: 2
 --- !u!114 &-3008325046020758645
 MonoBehaviour:
