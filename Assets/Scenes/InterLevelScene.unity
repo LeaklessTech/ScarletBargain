@@ -8362,7 +8362,6 @@ GameObject:
   - component: {fileID: 1674620883175656738}
   - component: {fileID: 3330533166888129455}
   - component: {fileID: 7028833426120319259}
-  - component: {fileID: 4086480399410014848}
   m_Layer: 5
   m_Name: PauseCanvas
   m_TagString: Untagged
@@ -8520,20 +8519,6 @@ Transform:
   - {fileID: 8009786971915606859}
   m_Father: {fileID: 9087432883237054892}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4086480399410014848
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3457492239135530537}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c03103d743e874c3b9dcd9dc28747200, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  canvasGroup: {fileID: 7028833426120319259}
-  thirdPersonCamera: {fileID: 0}
 --- !u!4 &4118092943244779186
 Transform:
   m_ObjectHideFlags: 0
